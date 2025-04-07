@@ -3,7 +3,7 @@ package com.example.nomsy.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.nomsy.data.Food
+import com.example.nomsy.models.Food
 import com.example.nomsy.models.IFoodRepository
 
 class FoodViewModel(private val foodRepository: IFoodRepository) : ViewModel() {
@@ -19,7 +19,7 @@ class FoodViewModel(private val foodRepository: IFoodRepository) : ViewModel() {
     fun loadFoods(userId: String) {
         _foods.value = Result.loading()
         foodRepository.getFoods(userId).observeForever {
-            _foods.value = it
+//            _foods.value = it
         }
     }
 }

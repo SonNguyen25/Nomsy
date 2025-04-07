@@ -3,8 +3,8 @@ package com.example.nomsy.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.nomsy.data.Food
-import com.example.nomsy.data.Recipe
+import com.example.nomsy.models.Food
+import com.example.nomsy.models.Recipe
 import com.example.nomsy.models.IFoodRepository
 import com.example.nomsy.models.IRecipeRepository
 

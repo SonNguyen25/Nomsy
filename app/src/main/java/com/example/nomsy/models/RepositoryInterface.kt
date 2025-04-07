@@ -1,8 +1,5 @@
 package com.example.nomsy.models
 import androidx.lifecycle.LiveData
-import com.example.nomsy.data.Food
-import com.example.nomsy.data.Recipe
-import com.example.nomsy.data.User
 
 interface IUserRepository {
     fun login(username: String, password: String): LiveData<Result<User>>

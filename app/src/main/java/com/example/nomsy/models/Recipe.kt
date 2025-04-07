@@ -1,4 +1,4 @@
-package com.example.nomsy.data
+package com.example.nomsy.models
 
 data class Recipe(
     val id: String,
