@@ -1,8 +1,13 @@
 package com.example.nomsy.models
 
 data class Recipe(
-    val id: String,
-    val name: String,
-    val ingredients: List<String>,
-    val instructions: String
+    val idMeal: String,
+    val strMeal: String,
+    val strInstructions: String,
+    val strMealThumb: String,
+    val strYoutube: String?,
+    val strCategory: String?,
+    val strArea: String?,
+    val strTags: String?,
+    val ingredients: List<String> = listOf()
 )
