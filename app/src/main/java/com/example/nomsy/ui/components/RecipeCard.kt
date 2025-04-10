@@ -1,3 +1,4 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -9,37 +10,53 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.example.nomsy.models.Recipe
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.nomsy.models.Recipe
 import com.example.nomsy.ui.theme.NomsySubtitle
 import com.example.nomsy.ui.theme.NomsyTexts
 import com.example.nomsy.ui.theme.NomsyTitle
-import androidx.compose.ui.tooling.preview.Preview
-
-val placeholderRecipe = Recipe(
-    strMeal = "Loading...",
-    strCategory = "Unknown",
-    strArea = "Unknown",
-    strTags = "None",
-    strMealThumb = "",
-    idMeal = "",
-    strInstructions = "",
-    strYoutube = "",
-    ingredients = emptyList()
-)
+import com.example.nomsy.ui.theme.NomsyBackground
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun recipesCard(recipe: Recipe) {
+fun recipeImage(imageUrl: String, description: String?) {
+    val isInPreview = LocalInspectionMode.current
 
+    if (isInPreview) {
+        // Use gray placeholder in preview
+        Box(
+            modifier = Modifier
+                .size(70.dp)
+                .clip(RoundedCornerShape(50.dp))
+                .background(NomsyBackground)
+        )
+    } else {
+        // Use Glide at runtime
+        GlideImage(
+            model = imageUrl,
+            contentDescription = description,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(70.dp)
+                .clip(RoundedCornerShape(50.dp))
+        )
+    }
+}
+
+@Composable
+fun recipesCard(recipe: Recipe) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(20.dp),
-        elevation = 6.dp
+        elevation = 6.dp,
+        backgroundColor = Color(0xFFE3F2FD)
     ) {
         Row(
             modifier = Modifier
@@ -47,42 +64,31 @@ fun recipesCard(recipe: Recipe) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Meal Image
-            GlideImage(
-                model = recipe.strMealThumb,
-                contentDescription = recipe.strMeal,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(70.dp)
-                    .clip(RoundedCornerShape(50.dp))
-            )
+            // Image
+            recipeImage(recipe.strMealThumb, recipe.strMeal)
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // General Information
+            // Text Info
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                // Title
                 Text(
                     text = recipe.strMeal,
                     style = MaterialTheme.typography.h6,
                     fontWeight = FontWeight.Bold,
                     color = NomsyTitle
                 )
-                // Category
                 Text(
                     text = recipe.strCategory ?: "",
                     style = MaterialTheme.typography.body1,
                     color = NomsySubtitle
                 )
-                // Area
                 Text(
                     text = recipe.strArea ?: "",
                     style = MaterialTheme.typography.body2,
                     color = NomsyTexts
                 )
-                // Tags
                 Text(
                     text = recipe.strTags ?: "",
                     style = MaterialTheme.typography.body2,
