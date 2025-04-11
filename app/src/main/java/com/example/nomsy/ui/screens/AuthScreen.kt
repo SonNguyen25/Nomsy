@@ -849,6 +849,39 @@ fun OnboardingNutritionScreen(navController: NavController, authViewModel: AuthV
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Carbs Row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(0.8f)
+            ) {
+                Text(
+                    text = "Carbs:",
+                    color = NomsyColors.Texts,
+                    fontSize = 16.sp,
+                    modifier = Modifier.width(100.dp)
+                )
+
+                OutlinedTextField(
+                    value = carbs,
+                    onValueChange = { input ->
+                        if (input.all { it.isDigit() }) {
+                            carbs = input
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = NomsyColors.Texts,
+                        cursorColor = NomsyColors.Texts,
+                        focusedBorderColor = NomsyColors.Title,
+                        unfocusedBorderColor = NomsyColors.Subtitle,
+                        backgroundColor = NomsyColors.PictureBackground
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Fat Row
             Row(
                 verticalAlignment = Alignment.CenterVertically,

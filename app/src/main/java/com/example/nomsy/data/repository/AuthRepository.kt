@@ -16,7 +16,7 @@ class AuthRepository(
     private val userDatabase: UserDatabase
 ) : IUserRepository {
 
-    override suspend fun login(username: String, password: String): LiveData<Result<User>> =
+    override fun login(username: String, password: String): LiveData<Result<User>> =
         liveData(Dispatchers.IO) {
             emit(Result.Loading)
             try {
@@ -38,7 +38,7 @@ class AuthRepository(
             }
         }
 
-    override suspend fun register(user: User): LiveData<Result<User>> =
+    override fun register(user: User): LiveData<Result<User>> =
         liveData(Dispatchers.IO) {
             emit(Result.Loading)
             try {
@@ -71,7 +71,7 @@ class AuthRepository(
             }
         }
 
-    override suspend fun getProfile(userId: String): LiveData<Result<User>> =
+    override fun getProfile(userId: String): LiveData<Result<User>> =
         liveData(Dispatchers.IO) {
             emit(Result.Loading)
             try {

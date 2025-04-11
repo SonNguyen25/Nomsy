@@ -3,6 +3,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.models.User
@@ -15,9 +16,40 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val userDatabase = UserDatabase.getDatabase(application)
     private val repository: IUserRepository = AuthRepository(userDatabase = userDatabase)
 
-    var loginResult: LiveData<Result<User>>? = null
-    var registerResult: LiveData<Result<User>>? = null
-    var profileResult: LiveData<Result<User>>? = null
+    // --- Login ---
+    private val _loginResult = MutableLiveData<Result<User>>()
+    val loginResult: LiveData<Result<User>> = _loginResult
+
+    fun login(username: String, password: String) {
+        // Kick off the LiveData from the repo and mirror its emissions
+        repository.login(username, password)
+            .observeForever { result ->
+                _loginResult.postValue(result)
+            }
+    }
+
+    // --- Register ---
+    private val _registerResult = MutableLiveData<Result<User>>()
+    val registerResult: LiveData<Result<User>> = _registerResult
+
+    fun register(user: User) {
+        user.fitness_goal.lowercase()
+        repository.register(user)
+            .observeForever { result ->
+                _registerResult.postValue(result)
+            }
+    }
+
+    // --- Profile fetch ---
+    private val _profileResult = MutableLiveData<Result<User>>()
+    val profileResult: LiveData<Result<User>> = _profileResult
+
+    fun fetchProfile(userId: String) {
+        repository.getProfile(userId)
+            .observeForever { result ->
+                _profileResult.postValue(result)
+            }
+    }
 
     private var tempUsername: String? = null
     private var tempPassword: String? = null
@@ -29,29 +61,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private var tempFitnessGoal: String? = null
     private var tempNutritionGoals: Map<String, Int>? = null
 
-    fun login(username: String, password: String) {
-        viewModelScope.launch {
-            loginResult = repository.login(username, password)
-            loginResult!!.observeForever { result ->
-                Log.d("AuthViewModel", "Login result: $result")
-            }
-        }
-    }
 
-    fun register(user: User) {
-        viewModelScope.launch {
-            registerResult = repository.register(user)
-            loginResult!!.observeForever { result ->
-                Log.d("AuthViewModel", "Login result: $result")
-            }
-        }
-    }
 
-    fun getProfile(userId: String) {
-        viewModelScope.launch {
-            profileResult = repository.getProfile(userId)
-        }
-    }
 
     fun setCredentials(username: String, password: String, email: String) {
         this.tempUsername = username
