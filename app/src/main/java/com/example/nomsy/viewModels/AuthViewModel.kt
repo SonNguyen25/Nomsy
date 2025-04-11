@@ -1,5 +1,6 @@
 package com.example.nomsy.viewModels
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
@@ -21,6 +22,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun login(username: String, password: String) {
         viewModelScope.launch {
             loginResult = repository.login(username, password)
+            loginResult!!.observeForever { result ->
+                Log.d("AuthViewModel", "Login result: $result")
+            }
         }
     }
 
