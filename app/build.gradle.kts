@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("androidx.navigation.safeargs.kotlin")
     id("kotlin-kapt")
+    id("com.google.devtools.ksp")
 }
 kotlin {
     jvmToolchain {
@@ -74,7 +75,7 @@ dependencies {
     val room_version = "2.6.1"
 
         implementation("androidx.room:room-runtime:$room_version")
-        kapt("androidx.room:room-compiler:$room_version")
+        ksp("androidx.room:room-compiler:$room_version")
     // optional - Kotlin Extensions and Coroutines support for Room
         implementation("androidx.room:room-ktx:$room_version")
 
