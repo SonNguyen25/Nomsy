@@ -8,6 +8,7 @@ import androidx.room.TypeConverters
 import com.example.nomsy.data.local.dao.UserDao
 import com.example.nomsy.data.local.models.User
 
+
 @Database(entities = [User::class], version = 1)
 @TypeConverters(Converters::class)
 abstract class UserDatabase : RoomDatabase() {
