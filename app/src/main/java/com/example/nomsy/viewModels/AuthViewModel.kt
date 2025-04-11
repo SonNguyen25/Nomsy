@@ -41,6 +41,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun register(user: User) {
         viewModelScope.launch {
             registerResult = repository.register(user)
+            loginResult!!.observeForever { result ->
+                Log.d("AuthViewModel", "Login result: $result")
+            }
         }
     }
 
