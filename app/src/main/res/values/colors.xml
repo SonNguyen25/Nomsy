@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Custom Nomsy Colors -->
+    <color name="nomsy_background">#FF000000</color>
+    <color name="nomsy_title">#FF1DCD9F</color>
+    <color name="nomsy_subtitle">#FF169976</color>
+    <color name="nomsy_highlight">#FF000000</color>
+    <color name="nomsy_texts">#FF1DCD9F</color>
+    <color name="nomsy_water">#FF123458</color>
+    <color name="nomsy_picture_background">#FF222222</color>
+    <!-- Existing colors -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +16,5 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
 </resources>
