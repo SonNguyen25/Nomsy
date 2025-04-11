@@ -3,10 +3,10 @@ package com.example.nomsy.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.nomsy.models.Food
-import com.example.nomsy.models.Recipe
-import com.example.nomsy.models.IFoodRepository
-import com.example.nomsy.models.IRecipeRepository
+import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.models.Recipe
+import com.example.nomsy.data.repository.IFoodRepository
+import com.example.nomsy.data.repository.IRecipeRepository
 
 class LandingViewModel(
     private val foodRepository: IFoodRepository,

@@ -3,8 +3,8 @@ package com.example.nomsy.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.nomsy.models.Recipe
-import com.example.nomsy.models.IRecipeRepository
+import com.example.nomsy.data.local.models.Recipe
+import com.example.nomsy.data.repository.IRecipeRepository
 
 class RecipeViewModel(private val recipeRepository: IRecipeRepository) : ViewModel() {
 

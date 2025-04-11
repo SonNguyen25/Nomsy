@@ -1,4 +1,4 @@
-package com.example.nomsy.models
+package com.example.nomsy.data.local.models
 
 data class Food(
     val id: String,

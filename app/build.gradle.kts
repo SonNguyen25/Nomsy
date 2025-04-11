@@ -35,17 +35,21 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "1.8" }
+    kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true }
     composeOptions { kotlinCompilerExtensionVersion = "1.5.2" }
     packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
     buildToolsVersion = "34.0.0"
     buildFeatures { viewBinding = true }
 }
-
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
+    }
+}
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -57,6 +61,9 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.room.runtime.android)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -72,6 +79,15 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     //Glide Image
     implementation(libs.compose)
+    implementation("androidx.compose.ui:ui:<compose_version>")
+    implementation("androidx.compose.material:material:<compose_version>")
+    implementation("androidx.compose.ui:ui-tooling-preview:<compose_version>")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:<version>")
+    implementation("androidx.activity:activity-compose:<version>")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.paging:paging-runtime:3.1.0")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 
 
 

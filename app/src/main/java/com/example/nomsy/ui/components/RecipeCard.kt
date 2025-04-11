@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.nomsy.models.Recipe
+import com.example.nomsy.data.local.models.Recipe
 import com.example.nomsy.ui.theme.NomsySubtitle
 import com.example.nomsy.ui.theme.NomsyTexts
 import com.example.nomsy.ui.theme.NomsyTitle

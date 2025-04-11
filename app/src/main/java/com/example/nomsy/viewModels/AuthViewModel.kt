@@ -1,33 +1,38 @@
 package com.example.nomsy.viewModels
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.example.nomsy.models.User
-import com.example.nomsy.models.IUserRepository
+import androidx.lifecycle.viewModelScope
+import com.example.nomsy.data.local.UserDatabase
+import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.repository.AuthRepository
+import com.example.nomsy.data.repository.IUserRepository
+import com.example.nomsy.utils.Result
+import kotlinx.coroutines.launch
 
-class AuthViewModel(private val userRepository: IUserRepository) : ViewModel() {
+class AuthViewModel(application: Application) : AndroidViewModel(application) {
+    private val userDatabase = UserDatabase.getDatabase(application)
+    private val repository: IUserRepository = AuthRepository(userDatabase = userDatabase)
 
-    private val _user = MutableLiveData<Result<User>>()
-    val user: LiveData<Result<User>> = _user
+    var loginResult: LiveData<Result<User>>? = null
+    var registerResult: LiveData<Result<User>>? = null
+    var profileResult: LiveData<Result<User>>? = null
 
     fun login(username: String, password: String) {
-        _user.value = Result.loading()
-        userRepository.login(username, password).observeForever {
-//            _user.value = it
+        viewModelScope.launch {
+            loginResult = repository.login(username, password)
         }
     }
 
     fun register(user: User) {
-        _user.value = Result.loading()
-        userRepository.register(user).observeForever {
-//            _user.value = it
+        viewModelScope.launch {
+            registerResult = repository.register(user)
         }
     }
 
-    fun loadProfile(userId: String) {
-        _user.value = Result.loading()
-        userRepository.getProfile(userId).observeForever {
-//            _user.value = it
+    fun getProfile(userId: String) {
+        viewModelScope.launch {
+            profileResult = repository.getProfile(userId)
         }
     }
 }
