@@ -2,7 +2,7 @@
 accompanistGlide = "0.32.0"
 agp = "8.1.4"
 compose = "1.0.0-beta01"
-kotlin = "1.9.24"
+kotlin = "1.9.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
