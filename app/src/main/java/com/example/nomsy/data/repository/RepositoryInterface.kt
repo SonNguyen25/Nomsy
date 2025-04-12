@@ -9,6 +9,7 @@ interface IUserRepository {
      fun login(username: String, password: String): LiveData<Result<User>>
      fun register(user: User): LiveData<Result<User>>
      fun getProfile(userId: String): LiveData<Result<User>>
+     fun getProfileByUsername(username: String): LiveData<Result<User>>
 }
 
 interface IFoodRepository {

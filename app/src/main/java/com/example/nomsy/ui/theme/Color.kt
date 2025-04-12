@@ -2,10 +2,12 @@ package com.example.nomsy.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val NomsyBackground = Color(0x000000)
-val NomsyTitle = Color(0x1DCD9F)
-val NomsySubtitle = Color(0x169976)
-val NomsyHighlight = Color(0x000000)
-val NomsyTexts = Color(0x1DCD9F)
-val NomsyWater = Color(0x123458)
-val NomsyPictureBackground = Color(0x222222)
+object NomsyColors {
+    val Background = Color(0xFF000000)
+    val Title = Color(0xFF1DCD9F)
+    val Subtitle = Color(0xFF169976)
+    val Highlight = Color(0xFF000000)
+    val Texts = Color(0xFF1DCD9F)
+    val Water = Color(0xFF123458)
+    val PictureBackground = Color(0xFF222222)
+}

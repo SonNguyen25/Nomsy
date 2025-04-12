@@ -13,8 +13,8 @@ data class User(
     val password: String,
     val name: String,
     val age: Int,
-    val height: Double,
-    val weight: Double,
+    val height: Int,
+    val weight: Int,
     val fitness_goal: String,
     val nutrition_goals: Map<String, Int>
 )

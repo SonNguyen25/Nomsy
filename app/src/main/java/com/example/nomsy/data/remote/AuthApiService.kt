@@ -6,6 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 data class LoginRequest(val username: String, val password: String)
 data class LoginResponse(val message: String, val user: User)
@@ -15,8 +16,8 @@ data class RegisterRequest(
     val password: String,
     val name: String,
     val age: Int,
-    val height: Double,
-    val weight: Double,
+    val height: Int,
+    val weight: Int,
     val fitness_goal: String,
     val nutrition_goals: Map<String, Int>
 )
@@ -34,4 +35,7 @@ interface AuthApiService {
 
     @GET("profile/{user_id}")
     suspend fun getProfile(@Path("user_id") userId: String): Response<GetProfileResponse>
+
+    @GET("profile")
+    suspend fun getUserByUsername(@Query("username") username: String): Response<GetProfileResponse>
 }

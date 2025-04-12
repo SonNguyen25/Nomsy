@@ -17,10 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.nomsy.data.local.models.Recipe
-import com.example.nomsy.ui.theme.NomsySubtitle
-import com.example.nomsy.ui.theme.NomsyTexts
-import com.example.nomsy.ui.theme.NomsyTitle
-import com.example.nomsy.ui.theme.NomsyBackground
+import com.example.nomsy.ui.theme.NomsyColors
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -33,7 +30,7 @@ fun recipeImage(imageUrl: String, description: String?) {
             modifier = Modifier
                 .size(70.dp)
                 .clip(RoundedCornerShape(50.dp))
-                .background(NomsyBackground)
+                .background(NomsyColors.Background)
         )
     } else {
         // Use Glide at runtime
@@ -77,23 +74,23 @@ fun recipesCard(recipe: Recipe) {
                     text = recipe.strMeal,
                     style = MaterialTheme.typography.h6,
                     fontWeight = FontWeight.Bold,
-                    color = NomsyTitle
+                    color = NomsyColors.Title
                 )
                 Text(
                     text = recipe.strCategory ?: "",
                     style = MaterialTheme.typography.body1,
-                    color = NomsySubtitle
+                    color = NomsyColors.Subtitle
                 )
                 Text(
                     text = recipe.strArea ?: "",
                     style = MaterialTheme.typography.body2,
-                    color = NomsyTexts
+                    color = NomsyColors.Texts
                 )
                 Text(
                     text = recipe.strTags ?: "",
                     style = MaterialTheme.typography.body2,
                     fontWeight = FontWeight.Bold,
-                    color = NomsyTexts
+                    color = NomsyColors.Texts
                 )
             }
         }

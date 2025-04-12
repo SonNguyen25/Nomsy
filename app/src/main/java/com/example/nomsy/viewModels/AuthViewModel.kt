@@ -20,8 +20,20 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _loginResult = MutableLiveData<Result<User>>()
     val loginResult: LiveData<Result<User>> = _loginResult
 
+    // Store the current username
+    private var currentUsername: String = ""
+
+    // Methods to get/set current username
+    fun setCurrentUsername(username: String) {
+        currentUsername = username
+    }
+
+    fun getCurrentUsername(): String {
+        return currentUsername
+    }
+
     fun login(username: String, password: String) {
-        // Kick off the LiveData from the repo and mirror its emissions
+        setCurrentUsername(username) // Save username on login attempt
         repository.login(username, password)
             .observeForever { result ->
                 _loginResult.postValue(result)
@@ -33,7 +45,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     val registerResult: LiveData<Result<User>> = _registerResult
 
     fun register(user: User) {
-        user.fitness_goal.lowercase()
+        tempUsername?.let { setCurrentUsername(it) }
         repository.register(user)
             .observeForever { result ->
                 _registerResult.postValue(result)
@@ -51,13 +63,20 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
+    fun fetchProfileByUsername(username: String = currentUsername) {
+        repository.getProfileByUsername(username)
+            .observeForever { result ->
+                _profileResult.postValue(result)
+            }
+    }
+
     private var tempUsername: String? = null
     private var tempPassword: String? = null
     private var tempEmail: String? = null
     private var tempName: String? = null
     private var tempAge: Int? = null
-    private var tempHeight: Double? = null
-    private var tempWeight: Double? = null
+    private var tempHeight: Int? = null
+    private var tempWeight: Int? = null
     private var tempFitnessGoal: String? = null
     private var tempNutritionGoals: Map<String, Int>? = null
 
@@ -78,11 +97,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         this.tempAge = age
     }
 
-    fun setUserHeight(height: Double) {
+    fun setUserHeight(height: Int) {
         this.tempHeight = height
     }
 
-    fun setUserWeight(weight: Double) {
+    fun setUserWeight(weight: Int) {
         this.tempWeight = weight
     }
 
@@ -98,8 +117,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun getPassword(): String = this.tempPassword ?: ""
     fun getUserName(): String = this.tempName ?: ""
     fun getUserAge(): Int = this.tempAge ?: 0
-    fun getUserHeight(): Double = this.tempHeight ?: 0.0
-    fun getUserWeight(): Double = this.tempWeight ?: 0.0
+    fun getUserHeight(): Int = this.tempHeight ?: 0
+    fun getUserWeight(): Int = this.tempWeight ?: 0
     fun getUserFitnessGoal(): String = this.tempFitnessGoal ?: ""
 
 

@@ -92,4 +92,28 @@ class AuthRepository(
                 emit(Result.Error(e))
             }
         }
+
+    override fun getProfileByUsername(username: String): LiveData<Result<User>> =
+        liveData(Dispatchers.IO) {
+            emit(Result.Loading)
+            try {
+                // Query Firestore for users with matching username
+                val user = authApi.getUserByUsername(username) // You'll need to add this API method
+
+                if (user.isSuccessful) {
+                    val profileResponse = user.body()
+                    if (profileResponse != null) {
+                        // Optionally, update local DB with latest profile data
+                        userDatabase.userDao().insertUser(profileResponse.user)
+                        emit(Result.Success(profileResponse.user))
+                    } else {
+                        emit(Result.Error(Exception("Profile not found.")))
+                    }
+                } else {
+                    emit(Result.Error(Exception("Profile fetch failed: ${user.code()}")))
+                }
+            } catch (e: Exception) {
+                emit(Result.Error(e))
+            }
+        }
 }
