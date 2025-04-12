@@ -1,4 +1,4 @@
-package com.example.nomsy.ui.screens
+package com.example.nomsy.ui.screens.profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -12,7 +12,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -21,19 +20,23 @@ import com.example.nomsy.ui.components.ProfileContent
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
+    profileViewModel: ProfileViewModel = viewModel()
 ) {
     val username = authViewModel.getCurrentUsername()
-    val profileResult by authViewModel.profileResult.observeAsState()
+    val profileResult by profileViewModel.profile.observeAsState()
 
     // Only fetch once when screen first composes (avoids infinite recomposition)
     LaunchedEffect(username) {
-        authViewModel.fetchProfileByUsername(username)
+        if (username.isNotEmpty()) {
+            profileViewModel.fetchByUsername(username)
+        }
     }
 
     Scaffold(
@@ -53,12 +56,14 @@ fun ProfileScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO: navigate to edit screen */ },
-                backgroundColor = NomsyColors.Title,
-                contentColor = NomsyColors.Background
-            ) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit Profile")
+            if (profileResult is Result.Success) {
+                FloatingActionButton(
+                    onClick = { navController.navigate("edit_profile") },
+                    backgroundColor = NomsyColors.Title,
+                    contentColor = NomsyColors.Background
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit Profile")
+                }
             }
         },
         backgroundColor = NomsyColors.Background,
