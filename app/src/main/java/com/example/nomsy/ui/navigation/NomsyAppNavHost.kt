@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.nomsy.ui.screens.HomeScreen
 import com.example.nomsy.ui.screens.StatisticsScreen
 import com.example.nomsy.ui.screens.profile.ProfileScreen
 import com.example.nomsy.ui.screens.auth.LoginScreen
@@ -24,6 +25,7 @@ import com.example.nomsy.ui.screens.auth.RegisterScreen
 import com.example.nomsy.ui.screens.auth.RegistrationCompleteScreen
 import com.example.nomsy.ui.screens.profile.EditProfileScreen
 import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.HomeViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 
 @Composable
@@ -31,6 +33,7 @@ fun NomsyAppNavHost() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val profileViewModel: ProfileViewModel = viewModel()
+    val homeViewModel: HomeViewModel = viewModel()
 
     // Observe the current route
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -70,7 +73,13 @@ fun NomsyAppNavHost() {
 
             // Main app screens with bottom bar
             composable(BottomNavItem.Statistics.route) { StatisticsScreen() }
-//            composable(BottomNavItem.Home.route)       { HomeScreen(navController) }
+            composable(BottomNavItem.Home.route) {
+                HomeScreen(
+                    navController = navController,
+                    viewModel = homeViewModel,
+                    onAddFoodClick = { navController.navigate("add_food") },
+                )
+            }
 //            composable(BottomNavItem.Recipes.route)    { RecipesScreen(navController) }
             composable(BottomNavItem.Profile.route) {
                 ProfileScreen(
@@ -79,6 +88,7 @@ fun NomsyAppNavHost() {
                     profileViewModel    = profileViewModel
                 )
             }
+
 
 
 

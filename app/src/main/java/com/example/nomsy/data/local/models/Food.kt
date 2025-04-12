@@ -4,6 +4,9 @@ data class Food(
     val id: String,
     val name: String,
     val calories: Double,
+    val protein: Double,
+    val fats: Double,
+    val carbs: Double,
     val userId: String
 )
 
