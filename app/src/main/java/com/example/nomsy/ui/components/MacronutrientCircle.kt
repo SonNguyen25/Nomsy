@@ -86,6 +86,13 @@ fun MacronutrientCircle(
             )
 
             Text(
+                text = "${goal - current}g left",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Thin,
+                color = NomsyColors.Texts
+            )
+
+            Text(
                 text = name,
                 fontSize = 12.sp,
                 color = NomsyColors.Subtitle,
