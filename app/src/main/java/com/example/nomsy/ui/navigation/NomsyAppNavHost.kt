@@ -29,17 +29,14 @@ import com.example.nomsy.ui.screens.auth.RegisterScreen
 import com.example.nomsy.ui.screens.auth.RegistrationCompleteScreen
 import com.example.nomsy.ui.screens.profile.EditProfileScreen
 import com.example.nomsy.ui.screens.recipes.recipesScreen
-import com.example.nomsy.viewModels.AuthViewModel
-import com.example.nomsy.viewModels.ProfileViewModel
-import com.example.nomsy.viewModels.RecipeViewModel
-import com.example.nomsy.viewModels.RecipeViewModelFactory
-import com.example.nomsy.ui.home.HomeFragment
+import com.example.nomsy.viewModels.*
 
 @Composable
 fun NomsyAppNavHost() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val profileViewModel: ProfileViewModel = viewModel()
+    val homeViewModel: HomeViewModel = viewModel()
 
     // Observe the current route
     val backStackEntry by navController.currentBackStackEntryAsState()

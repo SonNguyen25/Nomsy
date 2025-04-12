@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class FoodLog(
     @PrimaryKey val id: String,
     val username: String,
-    val foodId: String,  // Reference to the Food id
+    val foodId: Long,  // Reference to the Food id
     val name: String,    // Denormalized for convenience
     val calories: Int,
     val protein: Float,
@@ -41,11 +41,11 @@ data class FoodLog(
                 id = id,
                 username = username,
                 foodId = food.id,
-                name = food.name,
+                name = food.food_name,
                 calories = (food.calories * servingMultiplier).toInt(),
                 protein = (food.protein * servingMultiplier).toFloat(),
                 carbs = (food.carbs * servingMultiplier).toFloat(),
-                fat = (food.fats * servingMultiplier).toFloat(),
+                fat = (food.fat * servingMultiplier).toFloat(),
                 servingSize = servingSize,
                 servingUnit = servingUnit,
                 servings = servings,

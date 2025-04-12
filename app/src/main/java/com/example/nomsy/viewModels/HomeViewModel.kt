@@ -12,7 +12,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class
+HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val userDatabase = UserDatabase.getDatabase(application)
 //    private val repository = FoodRepository(userDatabase)
     private val authViewModel = AuthViewModel(application)
