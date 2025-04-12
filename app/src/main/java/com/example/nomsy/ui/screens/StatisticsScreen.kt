@@ -32,7 +32,7 @@ fun StatisticsScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "STATISTICS",
+            text = "Statistics",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = NomsyColors.Title
