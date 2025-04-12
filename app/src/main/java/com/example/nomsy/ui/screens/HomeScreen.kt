@@ -16,15 +16,17 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.nomsy.ui.components.*
 import com.example.nomsy.ui.theme.NomsyColors
+import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.HomeViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavController,
+    authViewModel: AuthViewModel,
     viewModel: HomeViewModel,
     onAddFoodClick: () -> Unit = { navController.navigate("add_food") }
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+//    val uiState by viewModel.uiState.collectAsState()
 //    val selectedDate by viewModel.selectedDate.collectAsState()
     val scrollState = rememberScrollState()
 
