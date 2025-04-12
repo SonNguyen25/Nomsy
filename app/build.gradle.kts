@@ -114,7 +114,7 @@ dependencies {
 
     // If this project only uses Java source, use the Java annotationProcessor
     // No additional plugins are necessary
-    annotationProcessor("androidx.room:room-compiler:$room_version")
+//    annotationProcessor("androidx.room:room-compiler:$room_version")
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:$room_version")
@@ -157,4 +157,9 @@ dependencies {
     // paging
     implementation("androidx.paging:paging-runtime-ktx:3.3.5")
     implementation("androidx.paging:paging-compose:3.3.5")
+
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+    // graphs
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

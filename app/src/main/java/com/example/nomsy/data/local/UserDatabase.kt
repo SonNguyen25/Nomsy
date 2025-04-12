@@ -9,7 +9,7 @@ import com.example.nomsy.data.local.dao.UserDao
 import com.example.nomsy.data.local.models.User
 
 
-@Database(entities = [User::class], version = 1)
+@Database(entities = [User::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class UserDatabase : RoomDatabase() {
 
@@ -24,7 +24,9 @@ abstract class UserDatabase : RoomDatabase() {
                     context.applicationContext,
                     UserDatabase::class.java,
                     "nomsy_database"
-                ).build().also { instance = it }
+                ).fallbackToDestructiveMigration()
+                    .build().also { instance = it }
+
             }
     }
 }
