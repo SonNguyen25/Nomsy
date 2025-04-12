@@ -77,7 +77,13 @@ fun MacronutrientCircle(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Show actual amount and name
+            Text(
+                text = name,
+                fontSize = 12.sp,
+                color = NomsyColors.Subtitle,
+                textAlign = TextAlign.Center
+            )
+
             Text(
                 text = "${current.toInt()}g",
                 fontSize = 14.sp,
@@ -86,18 +92,13 @@ fun MacronutrientCircle(
             )
 
             Text(
-                text = "${goal - current}g left",
-                fontSize = 14.sp,
+                text = "${(goal - current).toInt()}g left",
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Thin,
                 color = NomsyColors.Texts
             )
 
-            Text(
-                text = name,
-                fontSize = 12.sp,
-                color = NomsyColors.Subtitle,
-                textAlign = TextAlign.Center
-            )
+
         }
     }
 }

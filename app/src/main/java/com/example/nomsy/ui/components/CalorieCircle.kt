@@ -25,6 +25,7 @@ fun CalorieCircle(
 ) {
     var animationPlayed by remember { mutableStateOf(false) }
     val curPercentage = if (goalCalories > 0) (currentCalories.toFloat() / goalCalories.toFloat()).coerceIn(0f, 1f) else 0f
+    val caloriesLeft = goalCalories - currentCalories
     val animatedPercentage = animateFloatAsState(
         targetValue = if (animationPlayed) curPercentage else 0f,
         animationSpec = tween(
@@ -74,19 +75,19 @@ fun CalorieCircle(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // how many calories
+            // calories left
             Text(
-                text = "$currentCalories",
+                text = "$caloriesLeft",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = NomsyColors.Texts
             )
-
             Text(
-                text = "of $goalCalories kcal",
+                text = "kcal left",
                 fontSize = 16.sp,
                 color = NomsyColors.Subtitle
             )
+
         }
     }
 }
