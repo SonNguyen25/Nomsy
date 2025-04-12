@@ -159,4 +159,7 @@ dependencies {
     implementation("androidx.paging:paging-compose:3.3.5")
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+
+    // graphs
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

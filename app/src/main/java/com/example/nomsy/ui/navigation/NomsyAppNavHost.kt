@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.nomsy.ui.screens.StatisticsScreen
 import com.example.nomsy.ui.screens.profile.ProfileScreen
 import com.example.nomsy.ui.screens.auth.LoginScreen
 import com.example.nomsy.ui.screens.auth.OnboardingAgeScreen
@@ -68,7 +69,7 @@ fun NomsyAppNavHost() {
             composable("registration_complete") { RegistrationCompleteScreen(navController, authViewModel) }
 
             // Main app screens with bottom bar
-//            composable(BottomNavItem.Statistics.route) { StatisticsScreen() }
+            composable(BottomNavItem.Statistics.route) { StatisticsScreen() }
 //            composable(BottomNavItem.Home.route)       { HomeScreen(navController) }
 //            composable(BottomNavItem.Recipes.route)    { RecipesScreen(navController) }
             composable(BottomNavItem.Profile.route) {
