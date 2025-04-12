@@ -1,7 +1,11 @@
 package com.example.nomsy.data.local.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "recipe")
 data class Recipe(
-    val idMeal: String,
+    @PrimaryKey val idMeal: String,
     val strMeal: String,
     val strInstructions: String,
     val strMealThumb: String,

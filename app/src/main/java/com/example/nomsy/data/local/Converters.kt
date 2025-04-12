@@ -15,4 +15,10 @@ class Converters {
         val mapType = object : TypeToken<Map<String, Int>>() {}.type
         return Gson().fromJson(value, mapType)
     }
+
+    @TypeConverter
+    fun fromString(value: String): List<String> = value.split(",")
+
+    @TypeConverter
+    fun listToString(value: List<String>): String = value.joinToString(",")
 }

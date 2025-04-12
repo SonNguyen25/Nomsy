@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nomsy.ui.components.BarChartView
@@ -14,6 +15,7 @@ import com.example.nomsy.ui.components.LineChartView
 import com.example.nomsy.ui.components.MultiLineChartView
 import com.example.nomsy.ui.theme.NomsyColors
 
+@Preview(showBackground = true)
 @Composable
 fun StatisticsScreen() {
     // Fake data for 7 days

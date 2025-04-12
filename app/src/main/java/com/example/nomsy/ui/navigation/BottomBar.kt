@@ -25,7 +25,7 @@ fun BottomBar(navController: NavController) {
                 onClick = {
                     if (!selected) {
                         navController.navigate(item.route) {
-                            // popUpTo the start so you don't build a huge backstack
+                            // popUpTo the start so it doesn't cause a huge backstack
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
                             }

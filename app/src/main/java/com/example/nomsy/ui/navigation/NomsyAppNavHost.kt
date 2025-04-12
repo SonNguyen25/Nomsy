@@ -23,14 +23,17 @@ import com.example.nomsy.ui.screens.auth.OnboardingWelcomeScreen
 import com.example.nomsy.ui.screens.auth.RegisterScreen
 import com.example.nomsy.ui.screens.auth.RegistrationCompleteScreen
 import com.example.nomsy.ui.screens.profile.EditProfileScreen
+import com.example.nomsy.ui.screens.recipes.recipesScreen
 import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
+import com.example.nomsy.viewmodel.recipeViewModel
 
 @Composable
 fun NomsyAppNavHost() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val profileViewModel: ProfileViewModel = viewModel()
+    val productViewModel: recipeViewModel = viewModel()
 
     // Observe the current route
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -71,7 +74,10 @@ fun NomsyAppNavHost() {
             // Main app screens with bottom bar
             composable(BottomNavItem.Statistics.route) { StatisticsScreen() }
 //            composable(BottomNavItem.Home.route)       { HomeScreen(navController) }
-//            composable(BottomNavItem.Recipes.route)    { RecipesScreen(navController) }
+            composable(BottomNavItem.Recipes.route) {
+                recipesScreen(navController, productViewModel)
+            }
+
             composable(BottomNavItem.Profile.route) {
                 ProfileScreen(
                     navController       = navController,
@@ -79,9 +85,6 @@ fun NomsyAppNavHost() {
                     profileViewModel    = profileViewModel
                 )
             }
-
-
-
             // Edit profile screen – no bottom bar
             composable("edit_profile") {
                 EditProfileScreen(

@@ -1,0 +1,10 @@
+package com.example.nomsy.network
+
+import com.example.nomsy.responses.MealResponse
+import retrofit2.http.GET
+import retrofit2.http.Query
+
+interface RecipeAPIService {
+    @GET("search.php")
+    suspend fun searchMeals(@Query("s") query: String): MealResponse
+}

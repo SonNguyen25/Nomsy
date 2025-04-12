@@ -1,20 +1,21 @@
-package com.example.nomsy.viewModels
+// ViewModel/ProductViewModel.kt
+package com.example.nomsy.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.nomsy.data.repository.RecipeRepository
 import com.example.nomsy.data.local.models.Recipe
-import com.example.nomsy.data.repository.IRecipeRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
-class RecipeViewModel(private val recipeRepository: IRecipeRepository) : ViewModel() {
+class recipeViewModel(private val repository: RecipeRepository) : ViewModel() {
+    private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
+    val recipes: StateFlow<List<Recipe>> = _recipes
 
-    private val _recipes = MutableLiveData<Result<List<Recipe>>>()
-    val recipes: LiveData<Result<List<Recipe>>> = _recipes
-
-    fun fetchRecipes() {
-        _recipes.value = Result.loading()
-        recipeRepository.fetchRecipes().observeForever {
-//            _recipes.value = it
+    fun search(query: String) {
+        viewModelScope.launch {
+            _recipes.value = repository.searchRecipes(query)
         }
     }
 }
