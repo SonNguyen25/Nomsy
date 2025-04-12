@@ -1,9 +1,18 @@
 package com.example.nomsy.data.local.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "foods")
 data class Food(
-    val id: String,
-    val name: String,
-    val calories: Double,
-    val userId: String
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L,
+    val date: String,
+    val meal_type: String,
+    val food_name: String,
+    val calories: Int,
+    val carbs: Int,
+    val protein: Int,
+    val fat: Int
 )
 

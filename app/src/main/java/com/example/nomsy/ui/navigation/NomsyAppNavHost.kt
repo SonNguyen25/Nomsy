@@ -5,11 +5,16 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.nomsy.data.local.RecipeDatabase
+import com.example.nomsy.data.remote.network.RecipeRetrofitInstance
+import com.example.nomsy.data.repository.RecipeRepository
+import com.example.nomsy.ui.screens.HomeScreen
 import com.example.nomsy.ui.screens.StatisticsScreen
 import com.example.nomsy.ui.screens.profile.ProfileScreen
 import com.example.nomsy.ui.screens.auth.LoginScreen
@@ -27,13 +32,8 @@ import com.example.nomsy.ui.screens.recipes.recipesScreen
 import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 import com.example.nomsy.viewModels.RecipeViewModel
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.nomsy.data.local.RecipeDatabase
-import com.example.nomsy.data.repository.RecipeRepository
-import com.example.nomsy.data.remote.network.RecipeRetrofitInstance
 import com.example.nomsy.viewModels.RecipeViewModelFactory
-
+import com.example.nomsy.ui.home.HomeFragment
 
 @Composable
 fun NomsyAppNavHost() {
@@ -79,7 +79,14 @@ fun NomsyAppNavHost() {
 
             // Main app screens with bottom bar
             composable(BottomNavItem.Statistics.route) { StatisticsScreen() }
-//            composable(BottomNavItem.Home.route)       { HomeScreen(navController) }
+            composable(BottomNavItem.Home.route) {
+                HomeScreen(
+                    navController = navController,
+                    viewModel = homeViewModel,
+                    onAddFoodClick = { navController.navigate("add_food") },
+                    authViewModel = authViewModel,
+                )
+            }
 
             composable(BottomNavItem.Recipes.route) {
                 val context = LocalContext.current
@@ -98,6 +105,9 @@ fun NomsyAppNavHost() {
                     profileViewModel    = profileViewModel
                 )
             }
+
+
+
             // Edit profile screen – no bottom bar
             composable("edit_profile") {
                 EditProfileScreen(
