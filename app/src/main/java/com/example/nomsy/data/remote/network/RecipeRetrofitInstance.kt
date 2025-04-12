@@ -1,9 +1,10 @@
-package com.example.nomsy.network
+package com.example.nomsy.data.remote.network
 
+import com.example.nomsy.data.remote.RecipeAPIService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object RetrofitInstance {
+object RecipeRetrofitInstance {
     private const val BASE_URL = "https://www.themealdb.com/api/json/v1/1/"
 
     val api: RecipeAPIService by lazy {

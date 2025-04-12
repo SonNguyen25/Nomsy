@@ -1,4 +1,4 @@
-package com.example.nomsy.network
+package com.example.nomsy.data.remote
 
 import com.example.nomsy.responses.MealResponse
 import retrofit2.http.GET

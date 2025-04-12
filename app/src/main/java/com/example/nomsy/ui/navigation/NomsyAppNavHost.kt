@@ -26,14 +26,20 @@ import com.example.nomsy.ui.screens.profile.EditProfileScreen
 import com.example.nomsy.ui.screens.recipes.recipesScreen
 import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
-import com.example.nomsy.viewmodel.recipeViewModel
+import com.example.nomsy.viewModels.RecipeViewModel
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nomsy.data.local.RecipeDatabase
+import com.example.nomsy.data.repository.RecipeRepository
+import com.example.nomsy.data.remote.network.RecipeRetrofitInstance
+import com.example.nomsy.viewModels.RecipeViewModelFactory
+
 
 @Composable
 fun NomsyAppNavHost() {
     val navController = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
     val profileViewModel: ProfileViewModel = viewModel()
-    val productViewModel: recipeViewModel = viewModel()
 
     // Observe the current route
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -74,8 +80,15 @@ fun NomsyAppNavHost() {
             // Main app screens with bottom bar
             composable(BottomNavItem.Statistics.route) { StatisticsScreen() }
 //            composable(BottomNavItem.Home.route)       { HomeScreen(navController) }
+
             composable(BottomNavItem.Recipes.route) {
-                recipesScreen(navController, productViewModel)
+                val context = LocalContext.current
+                val db = RecipeDatabase.getInstance(context)
+                val repository = RecipeRepository(RecipeRetrofitInstance.api, db.recipeDAO())
+                val factory = RecipeViewModelFactory(repository)
+                val recipeViewModel: RecipeViewModel = viewModel(factory = factory)
+
+                recipesScreen(navController = navController, viewModel = recipeViewModel)
             }
 
             composable(BottomNavItem.Profile.route) {

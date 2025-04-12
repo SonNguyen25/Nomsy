@@ -1,4 +1,5 @@
-import androidx.compose.foundation.background
+package com.example.nomsy.ui.components
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -11,7 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -20,31 +20,6 @@ import com.example.nomsy.data.local.models.Recipe
 import com.example.nomsy.ui.theme.NomsyColors
 
 @OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun recipeImage(imageUrl: String, description: String?) {
-    val isInPreview = LocalInspectionMode.current
-
-    if (isInPreview) {
-        // Use gray placeholder in preview
-        Box(
-            modifier = Modifier
-                .size(70.dp)
-                .clip(RoundedCornerShape(50.dp))
-                .background(NomsyColors.Background)
-        )
-    } else {
-        // Use Glide at runtime
-        GlideImage(
-            model = imageUrl,
-            contentDescription = description,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(70.dp)
-                .clip(RoundedCornerShape(50.dp))
-        )
-    }
-}
-
 @Composable
 fun recipesCard(recipe: Recipe) {
     Card(
@@ -62,7 +37,13 @@ fun recipesCard(recipe: Recipe) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Image
-            recipeImage(recipe.strMealThumb, recipe.strMeal)
+            GlideImage(
+                model = recipe.strMealThumb,
+                contentDescription = recipe.strMeal,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(70.dp)
+                    .clip(RoundedCornerShape(50.dp)))
 
             Spacer(modifier = Modifier.width(16.dp))
 

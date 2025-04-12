@@ -17,14 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.models.Recipe
 import com.example.nomsy.ui.theme.NomsyColors
-import recipesCard
-import com.example.nomsy.viewmodel.recipeViewModel
+import com.example.nomsy.ui.components.recipesCard
+import com.example.nomsy.viewModels.RecipeViewModel
 
 @Composable
 
 fun recipesScreen(
     navController: NavController,
-    viewModel: recipeViewModel
+    viewModel: RecipeViewModel
 ) {
     val recipes by viewModel.recipes.collectAsState()
     var searchQuery by remember { mutableStateOf("") }

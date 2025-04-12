@@ -2,7 +2,7 @@ package com.example.nomsy.data.repository
 
 import com.example.nomsy.data.local.dao.RecipeDAO
 import com.example.nomsy.data.local.models.Recipe
-import com.example.nomsy.network.RecipeAPIService
+import com.example.nomsy.data.remote.RecipeAPIService
 
 
 class RecipeRepository(
@@ -14,6 +14,4 @@ class RecipeRepository(
         dao.insertRecipes(result)
         return result
     }
-
-    suspend fun getAllLocalRecipes(): List<Recipe> = dao.getAllRecipes()
 }
