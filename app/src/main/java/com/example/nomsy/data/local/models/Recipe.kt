@@ -15,3 +15,5 @@ data class Recipe(
     val strTags: String?,
     val ingredients: List<String> = listOf()
 )
+
+

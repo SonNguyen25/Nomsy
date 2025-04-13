@@ -46,7 +46,7 @@ fun ProfileScreen(
                     Text(
                         text = "My Profile",
                         color = NomsyColors.Title,
-                        fontSize = 24.sp,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Bold
                     )
                 },

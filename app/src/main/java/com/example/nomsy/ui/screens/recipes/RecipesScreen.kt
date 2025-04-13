@@ -1,14 +1,15 @@
 package com.example.nomsy.ui.screens.recipes
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -19,66 +20,165 @@ import com.example.nomsy.data.local.models.Recipe
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.ui.components.recipesCard
 import com.example.nomsy.viewModels.RecipeViewModel
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
+import com.example.nomsy.ui.components.recipePopUp
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+
 
 fun recipesScreen(
     navController: NavController,
     viewModel: RecipeViewModel
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.loadAllRecipes()
+
+    }
+
     val recipes by viewModel.recipes.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    var selectedRecipe by remember { mutableStateOf<Recipe?>(null) }
+    val listState = rememberLazyListState()
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+
+    Column(modifier = Modifier.fillMaxSize().background(NomsyColors.Background)) {
         // Top bar
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(NomsyColors.Background)
-                .padding(top = 100.dp, bottom = 16.dp, start = 20.dp, end = 20.dp)
+                .padding(top = 100.dp, bottom = 16.dp, start = 10.dp, end = 20.dp)
         ) {
             Text(
-                "Cook Book",
-                style = MaterialTheme.typography.h6,
+                text = "Cook Book",
+                fontSize = 28.sp,
                 color = NomsyColors.Title,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             // Search bar
-            TextField(
+            OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search Food") },
+                placeholder = {
+                    Text(
+                        text = "Search Food",
+                        color = NomsyColors.Texts.copy(alpha = 0.6f)
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                shape = RoundedCornerShape(15.dp),
+                textStyle = TextStyle(color = NomsyColors.Texts),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = NomsyColors.Texts,
+                    unfocusedBorderColor = NomsyColors.Texts,
+                    textColor = NomsyColors.Texts,
+                    cursorColor = NomsyColors.Texts,
+                    placeholderColor = NomsyColors.Texts.copy(alpha = 0.6f)
                 ),
-                shape = RoundedCornerShape(50.dp),
-                textStyle = TextStyle(color = Color.Black),
+                trailingIcon = {
+                    Row {
+                        if (searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { searchQuery = "" }) {
+                                androidx.compose.material3.Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Clear",
+                                    tint = NomsyColors.Subtitle
+                                )
+                            }
+                        }
+                        IconButton(onClick = {
+                            focusManager.clearFocus()
+                            if (searchQuery.isBlank()) {
+                                viewModel.loadAllRecipes()
+                            } else {
+                                viewModel.search(searchQuery)
+                            }
+                        }) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = NomsyColors.Subtitle
+                            )
+                        }
+                    }
+                },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
                     onSearch = {
                         focusManager.clearFocus()
-                        viewModel.search(searchQuery)
+                        if (searchQuery.isBlank()) {
+                            viewModel.loadAllRecipes()
+                        } else {
+                            viewModel.search(searchQuery)
+                        }
                     }
                 )
             )
 
+
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Recipes list
-        Column(modifier = Modifier.fillMaxSize()) {
-            recipes.forEach {
-                recipesCard(recipe = it)
+        val recipeMap by viewModel.recipesByCategory.collectAsState()
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 16.dp)
+        ) {
+            recipeMap.forEach { (category, recipesInCategory) ->
+                item {
+                    Text(
+                        text = category,
+                        fontSize = 25.sp,
+                        color = NomsyColors.Title,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+
+                item {
+                    val listState = rememberLazyListState()
+                    LazyRow(
+                        state = listState,
+                        flingBehavior = rememberSnapFlingBehavior(listState),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(recipesInCategory) { recipe ->
+                            recipesCard(recipe = recipe, onClick = {
+                                selectedRecipe = recipe
+                            })
+                        }
+                    }
+                }
             }
         }
+
+    }
+
+    selectedRecipe?.let { recipe ->
+        recipePopUp(recipe = recipe, onDismiss = { selectedRecipe = null })
     }
 }
 

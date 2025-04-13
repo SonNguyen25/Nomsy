@@ -10,4 +10,5 @@ object NomsyColors {
     val Texts = Color(0xFF1DCD9F)
     val Water = Color(0xFF123458)
     val PictureBackground = Color(0xFF222222)
+
 }

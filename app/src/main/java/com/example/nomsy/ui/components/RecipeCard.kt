@@ -1,5 +1,7 @@
 package com.example.nomsy.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -12,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -21,77 +24,74 @@ import com.example.nomsy.ui.theme.NomsyColors
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun recipesCard(recipe: Recipe) {
+fun recipeImage(imageUrl: String?, content: String?, modifier: Modifier = Modifier) {
+    val isInPreview = LocalInspectionMode.current
+
+    if (isInPreview) {
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.White)
+        )
+    } else {
+        GlideImage(
+            model = imageUrl,
+            contentDescription = content,
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+                .clip(RoundedCornerShape(20.dp))
+        )
+    }
+}
+
+@Composable
+fun recipesCard(recipe: Recipe, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
-        elevation = 6.dp,
-        backgroundColor = Color(0xFFE3F2FD)
+        elevation = 6.dp
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+                .height(300.dp)
+                .fillMaxWidth()
         ) {
-            // Image
-            GlideImage(
-                model = recipe.strMealThumb,
-                contentDescription = recipe.strMeal,
-                contentScale = ContentScale.Crop,
+            recipeImage(
+                imageUrl = recipe.strMealThumb,
+                content = recipe.strMeal,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            Box(
                 modifier = Modifier
-                    .size(70.dp)
-                    .clip(RoundedCornerShape(50.dp)))
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f))
+            )
 
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Text Info
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+                    .fillMaxWidth()
             ) {
                 Text(
-                    text = recipe.strMeal,
-                    style = MaterialTheme.typography.h6,
-                    fontWeight = FontWeight.Bold,
-                    color = NomsyColors.Title
+                    text = recipe.strMeal ?: "",
+                    style = MaterialTheme.typography.h4,
+                    color = NomsyColors.Title,
+                    maxLines = 2
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = recipe.strCategory ?: "",
-                    style = MaterialTheme.typography.body1,
-                    color = NomsyColors.Subtitle
-                )
-                Text(
-                    text = recipe.strArea ?: "",
-                    style = MaterialTheme.typography.body2,
-                    color = NomsyColors.Texts
-                )
-                Text(
-                    text = recipe.strTags ?: "",
+                    text = recipe.strTags?.replace(",", " • ") ?: "",
                     style = MaterialTheme.typography.body2,
                     fontWeight = FontWeight.Bold,
-                    color = NomsyColors.Texts
+                    color = NomsyColors.Subtitle,
+                    maxLines = 2
                 )
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun recipeCardPreview() {
-    val sampleRecipe = Recipe(
-        idMeal = "12345",
-        strMeal = "Chicken Burger",
-        strInstructions = "Just cook it well.",
-        strMealThumb = "https://www.themealdb.com/images/media/meals/qptpvt1487339892.jpg",
-        strYoutube = null,
-        strCategory = "Fast Food",
-        strArea = "American",
-        strTags = "Burger,Grill",
-        ingredients = listOf("Chicken", "Bun", "Lettuce", "Tomato", "Cheese")
-    )
-
-    recipesCard(recipe = sampleRecipe)
 }

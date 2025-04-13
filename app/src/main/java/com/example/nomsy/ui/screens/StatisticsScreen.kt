@@ -30,7 +30,7 @@ fun StatisticsScreen() {
         modifier = Modifier
             .fillMaxSize()
             .background(NomsyColors.Background)
-            .padding(16.dp),
+            .padding(25.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
