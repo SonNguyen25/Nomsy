@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -45,11 +46,13 @@ fun recipeImage(imageUrl: String?, content: String?, modifier: Modifier = Modifi
 }
 
 @Composable
-fun recipesCard(recipe: Recipe, onClick: () -> Unit) {
+fun recipesCard(
+    recipe: Recipe,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+        modifier = modifier
             .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
         elevation = 6.dp
@@ -79,9 +82,11 @@ fun recipesCard(recipe: Recipe, onClick: () -> Unit) {
             ) {
                 Text(
                     text = recipe.strMeal ?: "",
-                    style = MaterialTheme.typography.h4,
+                    style = MaterialTheme.typography.h6,
+                    fontWeight = FontWeight.Bold,
                     color = NomsyColors.Title,
-                    maxLines = 2
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
@@ -89,7 +94,8 @@ fun recipesCard(recipe: Recipe, onClick: () -> Unit) {
                     style = MaterialTheme.typography.body2,
                     fontWeight = FontWeight.Bold,
                     color = NomsyColors.Subtitle,
-                    maxLines = 2
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
