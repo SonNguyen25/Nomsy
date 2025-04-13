@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.models.User
 import com.example.nomsy.data.remote.MealItem
@@ -26,21 +27,60 @@ import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.HomeViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavController,
+<<<<<<< Updated upstream
     viewModel: HomeViewModel,
     profileViewModel: ProfileViewModel,
+=======
+    viewModel: HomeViewModel = viewModel(),
+    profileViewModel: ProfileViewModel = viewModel(),
+    onAddFoodClick: () -> Unit = { navController.navigate("add_food") }
+>>>>>>> Stashed changes
 ) {
-//    val uiState by viewModel.uiState.collectAsState()
-//    val selectedDate by viewModel.selectedDate.collectAsState()
+
     val scrollState = rememberScrollState()
     val date = viewModel.selectedDate.collectAsState().value
     val profileResult by profileViewModel.profile.observeAsState()
+    val nutritionResult by viewModel.nutritionTotals.observeAsState(initial = Result.Loading)
+    val mealsResult by viewModel.mealsByType.observeAsState(initial = Result.Loading)
+
+    val waterIntake by viewModel.waterIntake.collectAsState()
     var (waterGoal, calorieGoal, proteinGoal, carbsGoal, fatGoal) = List(5) { 0 }
     var showAddFoodDialog by remember { mutableStateOf(false) }
+
+
+
+    // nutrition goals early
+    when (profileResult) {
+        is Result.Success -> {
+            val user = (profileResult as Result.Success<User>).data
+            waterGoal = user.nutrition_goals["water"] ?: 2
+            calorieGoal = user.nutrition_goals["calories"] ?: 2000
+            proteinGoal = user.nutrition_goals["protein"] ?: 50
+            carbsGoal = user.nutrition_goals["carbs"] ?: 250
+            fatGoal = user.nutrition_goals["fat"] ?: 70
+        }
+
+        is Result.Error -> {
+            androidx.compose.material.Text(
+                text = "Error loading profile",
+                color = MaterialTheme.colors.error,
+            )
+        }
+
+        Result.Loading -> {
+            androidx.compose.material.CircularProgressIndicator(
+                color = NomsyColors.Title
+            )
+        }
+
+        null -> {}
+    }
 
 
     Box(
@@ -68,8 +108,8 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
 
-            //loading profile material
-            when (profileResult) {
+            //loading current nutrition totals material
+            when (nutritionResult) {
                 is Result.Loading -> {
                     androidx.compose.material.CircularProgressIndicator(
                         color = NomsyColors.Title
@@ -85,12 +125,6 @@ fun HomeScreen(
                 }
 
                 is Result.Success -> {
-                    val user = (profileResult as Result.Success<User>).data
-                    waterGoal = user.nutrition_goals["water"] ?: 2
-                    calorieGoal = user.nutrition_goals["calories"] ?: 2000
-                    proteinGoal = user.nutrition_goals["protein"] ?: 50
-                    carbsGoal = user.nutrition_goals["carbs"] ?: 250
-                    fatGoal = user.nutrition_goals["fat"] ?: 70
                     // load nutrition progress circles and water intake guages
                     // Large calorie circle
                     CalorieCircle(
@@ -136,18 +170,19 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Water intake with interactive capability
+
                     WaterIntakeBar(
                         currentIntake = 1f,
                         goal = waterGoal.toFloat(),
-                        onWaterIntakeChange = { viewModel.updateWaterIntake(it) }
+                        onWaterIntakeChange = {
+                            viewModel.updateWaterIntake(
+                                "2025-04-$date",
+                                newWaterIntake = it.toDouble()
+                            )
+                        }
                     )
 
 
-                }
-
-                null -> {
-                    // initial state before load
                 }
             }
 
@@ -188,10 +223,63 @@ fun HomeScreen(
                 title = "Dinner",
                 meals = dinnerMeals
             )
+            Spacer(modifier = Modifier.height(50.dp))
 
+            // Display meals by meal type
+            when (mealsResult) {
+                is Result.Loading -> {
+                    androidx.compose.material.CircularProgressIndicator(
+                        color = NomsyColors.Title
+                    )
+                }
+
+                is Result.Error -> {
+                    Text(
+                        text = "error has occured",
+                        color = NomsyColors.Subtitle
+                    )
+                }
+
+                is Result.Success -> {
+                    val mealsByType = (mealsResult as Result.Success).data
+                    Text(
+                        text = "meal section!!!!!!!!!!!!!!!!!",
+                        color = NomsyColors.Title
+                    )
+                    if (mealsByType.isEmpty()) {
+                        Text(
+                            text = "No meals logged for this date",
+                            color = NomsyColors.Subtitle
+                        )
+                    } else {
+                        // Display each meal type section
+                        mealsByType.forEach { (mealType, meals) ->
+                            // Capitalize first letter for display
+                            val displayMealType = mealType.replaceFirstChar {
+                                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                            }
+
+                            MealListSection(
+                                title = displayMealType,
+                                meals = meals
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+                }
+
+                else -> {
+                    // Fallback case
+                    Text(
+                        text = "Loading meal data...",
+                        color = NomsyColors.Subtitle
+                    )
+                }
+            }
         }
         Spacer(Modifier.height(32.dp))
         Spacer(Modifier.height(32.dp))
+
 
         // Add food floating action button
         FloatingActionButton(

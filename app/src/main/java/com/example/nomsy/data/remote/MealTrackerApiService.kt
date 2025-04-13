@@ -15,8 +15,8 @@ interface MealTrackerApiService {
 // Request model for adding a meal
 data class AddMealRequest(
     val date: String,          // "YYYY-MM-DD"
-    val meal_type: String,     // "breakfast", "lunch", "dinner", "snack"
-    val food_name: String,
+    val mealType: String,     // "breakfast", "lunch", "dinner"
+    val foodName: String,
     val calories: Int,
     val carbs: Int,
     val protein: Int,
@@ -26,7 +26,7 @@ data class AddMealRequest(
 // Response model for adding a meal
 data class AddMealResponse(
     val message: String,
-    val meal_id: String
+    val mealId: String
 )
 
 // Response models for daily summary
@@ -45,7 +45,7 @@ data class NutritionTotals(
 )
 
 data class MealItem(
-    val food_name: String,
+    val foodName: String,
     val calories: Int,
     val carbs: Int,
     val protein: Int,

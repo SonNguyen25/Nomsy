@@ -2,17 +2,24 @@ package com.example.nomsy.viewModels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.example.nomsy.data.local.MealTrackerDatabase
 import com.example.nomsy.data.local.UserDatabase
+import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.models.FoodLog
 import com.example.nomsy.data.remote.DailySummaryResponse
 import com.example.nomsy.data.remote.MealItem
+import com.example.nomsy.data.remote.MealTrackerApiService
+import com.example.nomsy.data.remote.MealTrackerRetrofitClient
 import com.example.nomsy.data.repository.MealTrackerRepository
-
+import com.example.nomsy.utils.Result
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
+<<<<<<< Updated upstream
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     sealed class HomeState {
         object Loading : HomeState()
@@ -38,20 +45,26 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val fatPercent: Float get() = (fat.toFloat() / fatGoal).coerceIn(0f, 1f)
             val waterPercent: Float get() = (water / waterGoal).coerceIn(0.0, 1.0).toFloat()
         }
+=======
+class
+HomeViewModel(application: Application) :
+    AndroidViewModel(application) {
+    private val database = MealTrackerDatabase.getInstance(application)
+    private val mealDao = database.mealDao()
+    private val apiService = MealTrackerRetrofitClient.mealTrackerApi
+    private val mealRepository = MealTrackerRepository(apiService, mealDao)
+>>>>>>> Stashed changes
 
-        data class Error(val message: String) : HomeState()
-    }
+    // Nutrition totals
+    private val _nutritionTotals = MutableLiveData<Result<DailySummaryEntity?>>()
+    val nutritionTotals: LiveData<Result<DailySummaryEntity?>> = _nutritionTotals
 
-    private val _state = MutableStateFlow<HomeState>(HomeState.Loading)
-    val state: StateFlow<HomeState> = _state
-    private val userDatabase = UserDatabase.getDatabase(application)
-    private val authViewModel = AuthViewModel(application)
-//    private val repository = MealTrackerRepository(
-//        apiService = TODO(),
-//        context = TODO()
-//    )
+    // Water intake dont think we need this since its in nutrition totals
+    private val _waterIntake = MutableStateFlow(0.0)
+    val waterIntake: StateFlow<Double> = _waterIntake
 
-    private val _foodLogs = MutableStateFlow<List<FoodLog>>(emptyList())
+    // Meals by type
+    private val _mealsByType = MutableLiveData<Result<Map<String, List<MealItem>>>>()
 
     /**
      * Using an integer to keep track of date. This is simplified because
@@ -60,96 +73,84 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     // simplify the date to always start at 12
     val selectedDate = MutableStateFlow(12)
 
-
     init {
-        loadHomeScreenData()
+        loadData()
     }
 
-    private fun loadHomeScreenData() {
+    // Set date and load data for that date
+    // simplify this to be 2025-04-[date]
+    fun setDate(date: Int) {
+        selectedDate.value = date
+        loadData()
+    }
+
+    private fun loadData() {
         //our api takes YYYY-MM-DD format
         loadDataForDate("2025-04-$selectedDate")
     }
 
-    private fun loadDataForDate(dateString: String) {
+    // Load all data for the current date
+    private fun loadDataForDate(date: String) {
+        loadNutritionTotals(date)
+        loadMealsByType(date)
+    }
+
+    private fun loadMealsByType(date: String) {
         viewModelScope.launch {
-            _state.value = HomeState.Loading
+            _mealsByType.value = Result.Loading
+            // Fetch meals by type
+            when (val result = mealRepository.getMealsByDate(date)) {
+                is Result.Success -> _mealsByType.value = Result.Success(result.data)
+                is Result.Error -> _mealsByType.value = Result.Error(result.exception)
+                else -> _mealsByType.value = Result.Loading
+            }
+        }
 
+    }
 
-//            repository.getDailySummary(dateString).collect { result ->
-////                when (result) {
-////                    is Result.Loading -> {
-////                        // Already set loading above
-////                    }
-////                    is Result.Success -> {
-////                        processDailySummary(result.data)
-////                    }
-////                    is Result.Error -> {
-////                        _state.value = HomeState.Error(result.exception.message ?: "Unknown error")
-////                    }
-////
-////                    is com.example.nomsy.utils.Result.Error -> TODO()
-////                    com.example.nomsy.utils.Result.Loading -> TODO()
-////                    is com.example.nomsy.utils.Result.Success -> TODO()
-////                }
-//            }
+    // Load nutrition totals
+    private fun loadNutritionTotals(date: String) {
+        viewModelScope.launch {
+            _nutritionTotals.value = Result.Loading
+            // fetch
+            when (val result = mealRepository.getDailyNutritionTotals(date)) {
+                is Result.Success -> {
+                    result.data.collect { summaryEntity ->
+                        _nutritionTotals.value = Result.Success(summaryEntity)
+                        if (summaryEntity != null) {
+                            _waterIntake.value = summaryEntity.waterLiters
+                        }
+                    }
+                }
+
+                is Result.Error -> _nutritionTotals.value = Result.Error(result.exception)
+                else -> _nutritionTotals.value = Result.Loading
+            }
         }
     }
-
-    private fun processDailySummary(data: DailySummaryResponse) {
-        // Process meals by type
-        val breakfastMeals = data.meals["breakfast"] ?: emptyList()
-        val lunchMeals = data.meals["lunch"] ?: emptyList()
-        val dinnerMeals = data.meals["dinner"] ?: emptyList()
-
-        _state.value = HomeState.Success(
-            calories = data.totals.calories,
-            protein = data.totals.protein,
-            carbs = data.totals.carbs,
-            fat = data.totals.fat,
-            water = data.totals.water,
-            // Use default goals (these could come from user preferences in a real app)
-            breakfastMeals = breakfastMeals,
-            lunchMeals = lunchMeals,
-            dinnerMeals = dinnerMeals
-        )
-    }
-
 
     // only allow 4/11, 4/12, 4/13 because that is our dummy data.
     fun incrementDate() {
         if (selectedDate.value <= 12) {
             selectedDate.value += 1
         }
-        loadHomeScreenData()
+        loadData()
     }
 
     fun decrementDate() {
         if (selectedDate.value >= 12) {
             selectedDate.value -= 1
         }
-        loadHomeScreenData()
+        loadData()
     }
 
-    fun updateWaterIntake(amount: Float) {
+    fun updateWaterIntake(date: String, newWaterIntake: Double) {
         viewModelScope.launch {
-            try {
-
-                // Data will refresh through flows
-            } catch (e: Exception) {
-
-            }
+            _waterIntake.value = newWaterIntake
+            mealRepository.updateWaterIntake(date, newWaterIntake)
+            loadNutritionTotals(date)
         }
     }
 
-    fun deleteFoodLog(id: String) {
-        viewModelScope.launch {
-            try {
-
-                // Data will refresh through flows
-            } catch (e: Exception) {
-
-            }
-        }
-    }
 
 }

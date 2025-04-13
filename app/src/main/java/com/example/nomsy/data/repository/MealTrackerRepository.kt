@@ -1,50 +1,141 @@
 package com.example.nomsy.data.repository
 
 import android.content.Context
+import com.example.nomsy.data.local.dao.MealTrackerDao
+import com.example.nomsy.data.local.entities.DailySummaryEntity
+import com.example.nomsy.data.local.entities.MealEntity
+import com.example.nomsy.data.local.entities.toMealItem
 import com.example.nomsy.data.remote.*
 import com.example.nomsy.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MealTrackerRepository(
-    private val apiService: MealTrackerApiService,
-    private val context: Context
+    private val mealApiService: MealTrackerApiService = MealTrackerRetrofitClient.mealTrackerApi,
+    private val mealDao: MealTrackerDao,
 ) {
-    // by lazy lets us create only when needed to save resources
-//    private val database: MealTrackerDatabase by lazy {
-//        MealTrackerDatabase.getDatabase(context)
-//    }
-//    private val mealTrackerDao: MealTrackerDao by lazy {
-//        database.mealTrackerDao()
-//    }
-
-
-    fun getDailySummary(date: String): Flow<Result<DailySummaryResponse>> = flow {
-        emit(Result.Loading)
-        try {
-            // Convert date to YYYY-MM-DD
-
-            val response = apiService.getDailySummary(date)
+    // Get nutrition totals for a specific date
+    suspend fun getDailyNutritionTotals(date: String): Result<Flow<DailySummaryEntity?>> {
+        return try {
+            val response = mealApiService.getDailySummary(date)
             if (response.isSuccessful) {
-                val data = response.body()
-                if (data != null) {
-                    emit(Result.Success(data))
+                val summaryResponse = response.body()
+                summaryResponse?.let {
+                    //  save to database
+                    val dailySummaryEntity = DailySummaryEntity(
+                        date = it.date,
+                        totalCalories = it.totals.calories,
+                        totalCarbs = it.totals.carbs,
+                        totalProtein = it.totals.protein,
+                        totalFat = it.totals.fat,
+                        waterLiters = it.totals.water
+                    )
+                    mealDao.insertDailySummary(dailySummaryEntity)
+                }
+
+                // Return data from local database as Flow
+                Result.Success(mealDao.getDailySummaryByDate(date))
+            } else {
+                // If API call fails, try to fetch from local database
+                Result.Success(mealDao.getDailySummaryByDate(date))
+            }
+        } catch (e: IOException) {
+            // Network error - return local data if available
+            Result.Success(mealDao.getDailySummaryByDate(date))
+        } catch (e: Exception) {
+            Result.Error(Exception(e.message))
+        }
+    }
+
+    // Get meals for a specific date
+    suspend fun getMealsByDate(date: String): Result<Map<String, List<MealItem>>> {
+        return try {
+            // Fetch from remote API
+            val response = mealApiService.getDailySummary(date)
+
+            if (response.isSuccessful) {
+                val summaryResponse = response.body()
+                if (summaryResponse != null) {
+                    // Extract meals from response
+                    val mealsMap = summaryResponse.meals.mapValues { (_, meals) ->
+                        meals.map { meal ->
+                            MealItem(
+                                foodName = meal.foodName,
+                                calories = meal.calories,
+                                carbs = meal.carbs,
+                                protein = meal.protein,
+                                fat = meal.fat
+                            )
+                        }
+                    }
+
+                    // Also update DB for offline access
+                    val mealEntities = mutableListOf<MealEntity>()
+                    mealsMap.forEach { (mealType, meals) ->
+                        meals.forEach { meal ->
+                            mealEntities.add(
+                                MealEntity(
+                                    mealId = "",
+                                    date = date,
+                                    mealType = mealType,
+                                    foodName = meal.foodName,
+                                    calories = meal.calories,
+                                    carbs = meal.carbs,
+                                    protein = meal.protein,
+                                    fat = meal.fat
+                                )
+                            )
+                        }
+                    }
+
+                    // Save to database
+                    mealDao.deleteMealsByDate(date)
+                    mealDao.insertMeals(mealEntities)
+
+                    Result.Success(mealsMap)
                 } else {
-                    emit(Result.Error(Exception("Empty response body")))
+                    Result.Error(Exception("No meal data available for date"))
                 }
             } else {
-                emit(Result.Error(Exception("Error ${response.code()}: ${response.message()}")))
+                // API call failed, fetch from local database
+                val localMeals = mealDao.getMealsByDate(date)
+                    .flowOn(Dispatchers.IO)
+                    .map { meals ->
+                        // group meals here - make map by mealType
+                        meals.groupBy { it.mealType }
+                            .mapValues { (_, mealList) ->
+                                mealList.map { it.toMealItem() }
+                            }
+                    }.first()
+                Result.Success(localMeals)
+            }
+        } catch (e: IOException) {
+            // Network error
+            try {
+                val localMeals = mealDao.getMealsByDate(date).map { meals ->
+                    meals.groupBy { it.mealType }
+                        .mapValues { (_, mealList) ->
+                            mealList.map { it.toMealItem() }
+                        }
+                }.first()
+                Result.Success(localMeals)
+            } catch (e: Exception) {
+                Result.Error(Exception("No meal data available for date"))
             }
         } catch (e: Exception) {
-            emit(Result.Error(e))
+            Result.Error(Exception("an unknown error has occurred"))
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
+    // i dunno if ur using this
     suspend fun addMeal(
         date: String,
         mealType: String,
@@ -56,21 +147,24 @@ class MealTrackerRepository(
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
 
-
             val request = AddMealRequest(
                 date = date,
-                meal_type = mealType,
-                food_name = foodName,
+                mealType = mealType,
+                foodName = foodName,
                 calories = calories,
                 carbs = carbs,
                 protein = protein,
                 fat = fat
             )
-            val response = apiService.addMeal(request)
+
+
+            val response = mealApiService.addMeal(request)
             if (response.isSuccessful) {
                 val data = response.body()
                 if (data != null) {
-                    Result.Success(data.meal_id)
+
+                    Result.Success(data.mealId)
+
                 } else {
                     Result.Error(Exception("Empty response body"))
                 }
@@ -82,10 +176,13 @@ class MealTrackerRepository(
         }
     }
 
-
-    // converts YYYY-MM-DD string format into Long from API
-    private fun parseApiDate(dateString: String): Long {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        return dateFormat.parse(dateString)?.time ?: System.currentTimeMillis()
+    suspend fun updateWaterIntake(date: String, waterLiters: Double): Result<Unit> {
+        return try {
+            mealDao.updateWaterIntake(date, waterLiters)
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
     }
+
 }
