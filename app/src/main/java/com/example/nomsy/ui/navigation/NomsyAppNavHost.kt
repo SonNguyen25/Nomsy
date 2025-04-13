@@ -52,18 +52,18 @@ fun NomsyAppNavHost() {
         BottomNavItem.Profile.route
     )
     val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
-    val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
 
-    // Only navigate when not already on login screen and user is logged out
-    LaunchedEffect(isLoggedIn, currentDestination) {
-        if (!isLoggedIn && currentDestination != "login" &&
-            currentDestination != "register" &&
-            !currentDestination.isNullOrEmpty()) {
+
+    // Only navigate to "login" when we just logged out and we're not already there
+    LaunchedEffect(isLoggedIn) {
+        if (!isLoggedIn && navController.currentBackStackEntry?.destination?.route != "login") {
             navController.navigate("login") {
-                popUpTo(0) { inclusive = true }
+                // Pop everything up to (and including) "login" so we don't stack multiple logins
+                popUpTo("login") { inclusive = true }
             }
         }
     }
+
 
 
     Scaffold(

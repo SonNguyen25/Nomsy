@@ -1,10 +1,9 @@
 package com.example.nomsy.viewModels
+
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.models.User
 import com.example.nomsy.data.repository.AuthRepository
@@ -13,15 +12,14 @@ import com.example.nomsy.utils.Result
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val userDatabase = UserDatabase.getDatabase(application)
     private val repository: IUserRepository = AuthRepository(userDatabase = userDatabase)
 
     // --- Login ---
-    private val _loginResult = MutableLiveData<Result<User>>()
-    val loginResult: LiveData<Result<User>> = _loginResult
+    private val _loginResult = MutableLiveData<Result<User>?>()
+    val loginResult: LiveData<Result<User>?> = _loginResult
 
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
@@ -50,9 +48,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
-        fun logout() {
+    fun logout() {
         setCurrentUsername("")
         _isLoggedIn.value = false
+        _loginResult.value = null
+
+
     }
 
     // --- Register ---
@@ -94,8 +95,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private var tempWeight: Int? = null
     private var tempFitnessGoal: String? = null
     private var tempNutritionGoals: Map<String, Int>? = null
-
-
 
 
     fun setCredentials(username: String, password: String, email: String) {
