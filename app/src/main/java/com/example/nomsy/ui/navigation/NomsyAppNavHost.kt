@@ -1,5 +1,7 @@
 package com.example.nomsy.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
@@ -16,7 +18,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.nomsy.data.local.RecipeDatabase
 import com.example.nomsy.data.remote.network.RecipeRetrofitInstance
 import com.example.nomsy.data.repository.RecipeRepository
-import com.example.nomsy.ui.screens.AddFoodScreen
 import com.example.nomsy.ui.screens.HomeScreen
 import com.example.nomsy.ui.screens.StatisticsScreen
 import com.example.nomsy.ui.screens.profile.ProfileScreen
@@ -34,6 +35,7 @@ import com.example.nomsy.ui.screens.profile.EditProfileScreen
 import com.example.nomsy.ui.screens.recipes.recipesScreen
 import com.example.nomsy.viewModels.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NomsyAppNavHost() {
     val navController = rememberNavController()
@@ -98,8 +100,6 @@ fun NomsyAppNavHost() {
                 HomeScreen(
                     navController = navController,
                     viewModel = homeViewModel,
-                    onAddFoodClick = { navController.navigate("add_food") },
-
                     profileViewModel = profileViewModel,
                 )
             }
@@ -111,7 +111,9 @@ fun NomsyAppNavHost() {
                 val factory = RecipeViewModelFactory(repository)
                 val recipeViewModel: RecipeViewModel = viewModel(factory = factory)
 
-                recipesScreen(navController = navController, viewModel = recipeViewModel)
+                recipesScreen(
+                    navController = navController,
+                    viewModel = recipeViewModel)
             }
 
             composable(BottomNavItem.Profile.route) {
@@ -121,11 +123,6 @@ fun NomsyAppNavHost() {
                     profileViewModel    = profileViewModel
                 )
             }
-
-            composable("add_food") {
-                AddFoodScreen(navController, foodViewModel)
-            }
-
 
             // Edit profile screen – no bottom bar
             composable("edit_profile") {

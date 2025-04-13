@@ -1,5 +1,7 @@
 package com.example.nomsy.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -25,12 +27,12 @@ import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.HomeViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel,
     profileViewModel: ProfileViewModel,
-    onAddFoodClick: () -> Unit = { navController.navigate("add_food") }
 ) {
 //    val uiState by viewModel.uiState.collectAsState()
 //    val selectedDate by viewModel.selectedDate.collectAsState()
@@ -38,6 +40,8 @@ fun HomeScreen(
     val date = viewModel.selectedDate.collectAsState().value
     val profileResult by profileViewModel.profile.observeAsState()
     var (waterGoal, calorieGoal, proteinGoal, carbsGoal, fatGoal) = List(5) { 0 }
+    var showAddFoodDialog by remember { mutableStateOf(false) }
+
 
     Box(
         modifier = Modifier
@@ -191,7 +195,7 @@ fun HomeScreen(
 
         // Add food floating action button
         FloatingActionButton(
-            onClick = onAddFoodClick,
+            onClick = { showAddFoodDialog = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
@@ -203,6 +207,12 @@ fun HomeScreen(
                 contentDescription = "Add Food"
             )
         }
+    }
+
+    if (showAddFoodDialog) {
+        addFoodCard(
+            onDismiss = { showAddFoodDialog = false }
+        )
     }
 }
 
