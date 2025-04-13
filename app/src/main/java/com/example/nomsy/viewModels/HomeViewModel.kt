@@ -47,10 +47,10 @@ HomeViewModel(application: Application) : AndroidViewModel(application) {
     val state: StateFlow<HomeState> = _state
     private val userDatabase = UserDatabase.getDatabase(application)
     private val authViewModel = AuthViewModel(application)
-    private val repository = MealTrackerRepository(
-        apiService = TODO(),
-        context = TODO()
-    )
+//    private val repository = MealTrackerRepository(
+//        apiService = TODO(),
+//        context = TODO()
+//    )
 
     private val _foodLogs = MutableStateFlow<List<FoodLog>>(emptyList())
 
@@ -76,23 +76,23 @@ HomeViewModel(application: Application) : AndroidViewModel(application) {
             _state.value = HomeState.Loading
 
 
-            repository.getDailySummary(dateString).collect { result ->
-//                when (result) {
-//                    is Result.Loading -> {
-//                        // Already set loading above
-//                    }
-//                    is Result.Success -> {
-//                        processDailySummary(result.data)
-//                    }
-//                    is Result.Error -> {
-//                        _state.value = HomeState.Error(result.exception.message ?: "Unknown error")
-//                    }
-//
-//                    is com.example.nomsy.utils.Result.Error -> TODO()
-//                    com.example.nomsy.utils.Result.Loading -> TODO()
-//                    is com.example.nomsy.utils.Result.Success -> TODO()
-//                }
-            }
+//            repository.getDailySummary(dateString).collect { result ->
+////                when (result) {
+////                    is Result.Loading -> {
+////                        // Already set loading above
+////                    }
+////                    is Result.Success -> {
+////                        processDailySummary(result.data)
+////                    }
+////                    is Result.Error -> {
+////                        _state.value = HomeState.Error(result.exception.message ?: "Unknown error")
+////                    }
+////
+////                    is com.example.nomsy.utils.Result.Error -> TODO()
+////                    com.example.nomsy.utils.Result.Loading -> TODO()
+////                    is com.example.nomsy.utils.Result.Success -> TODO()
+////                }
+//            }
         }
     }
 
