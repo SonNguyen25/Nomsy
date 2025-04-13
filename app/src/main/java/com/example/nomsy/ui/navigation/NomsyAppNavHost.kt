@@ -40,6 +40,7 @@ fun NomsyAppNavHost() {
     val authViewModel: AuthViewModel = viewModel()
     val profileViewModel: ProfileViewModel = viewModel()
     val homeViewModel: HomeViewModel = viewModel()
+    val foodViewModel: FoodViewModel = viewModel()
 
     // Observe the current route
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -122,7 +123,7 @@ fun NomsyAppNavHost() {
             }
 
             composable("add_food") {
-                AddFoodScreen()
+                AddFoodScreen(navController, foodViewModel)
             }
 
 

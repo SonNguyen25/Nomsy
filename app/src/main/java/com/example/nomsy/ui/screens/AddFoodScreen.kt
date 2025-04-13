@@ -1,5 +1,10 @@
 package com.example.nomsy.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Canvas
@@ -14,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,10 +30,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.nomsy.ui.theme.NomsyColors
+import com.example.nomsy.viewModels.FoodViewModel
 
 @Composable
-fun AddFoodScreen() {
+fun AddFoodScreen(navController: NavController,
+                  foodViewModel: FoodViewModel = viewModel()
+) {
+
+    val context = LocalContext.current
     var query by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var calories by remember { mutableStateOf("") }
@@ -37,6 +51,51 @@ fun AddFoodScreen() {
 
     var selectedMeal by remember { mutableStateOf("Breakfast") }
     val meals = listOf("Breakfast", "Lunch", "Dinner")
+
+    // ML‑Kit recognized name
+    val recognizedFood by foodViewModel.recognizedFood.observeAsState("")
+
+    // API‑looked up Food detail
+    val foodDetail by foodViewModel.foodDetail.observeAsState()
+
+    // Launcher to take a picture
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.let {
+            foodViewModel.processFoodImage(context, it)
+        }
+    }
+
+    // Launcher to request CAMERA permission
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            takePictureLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Camera permission is required to scan food", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // When ML Kit gives us a name, auto‑fill the search query & fire the API search
+    LaunchedEffect(recognizedFood) {
+        if (recognizedFood.isNotBlank()) {
+            query = recognizedFood
+            foodViewModel.searchFood(recognizedFood)
+        }
+    }
+
+    // When the API returns nutrition info, fill the form
+    LaunchedEffect(foodDetail) {
+        foodDetail?.let { f ->
+            name = f.food_name
+            calories = f.calories.toString()
+            protein = f.protein.toString()
+            carbs = f.carbs.toString()
+            fats = f.fat.toString()
+        }
+    }
 
     // dummy percentages for daily goals
     val percentCalories = 0.13f
@@ -58,7 +117,15 @@ fun AddFoodScreen() {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Scan with a photo:", color = NomsyColors.Texts)
             Spacer(Modifier.width(8.dp))
-            IconButton(onClick = { /* TODO: launch camera */ }) {
+            IconButton(onClick = {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
+                    takePictureLauncher.launch(null)
+                } else {
+                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            }) {
                 Icon(Icons.Default.CameraAlt, contentDescription = "Scan", tint = NomsyColors.Title)
             }
         }
@@ -67,7 +134,11 @@ fun AddFoodScreen() {
         // Search bar
         OutlinedTextField(
             value = query,
-            onValueChange = { query = it },
+            onValueChange = {
+                query = it
+                // allow manual searches too
+                foodViewModel.searchFood(it)
+            },
             placeholder = { Text("Search…", color = NomsyColors.Subtitle) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = NomsyColors.Title) },
             modifier = Modifier
