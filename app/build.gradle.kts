@@ -78,6 +78,8 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.10.0")
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
     implementation("androidx.compose.material3:material3-android:1.2.1")
+    implementation(libs.vision.common)
+    implementation(libs.image.labeling.default.common)
     debugImplementation("androidx.fragment:fragment-testing:1.8.5")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     androidTestImplementation("androidx.navigation:navigation-testing:2.8.5")
@@ -162,4 +164,7 @@ dependencies {
 
     // graphs
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    // object recognition
+    implementation("com.google.mlkit:image-labeling:17.0.9")
 }

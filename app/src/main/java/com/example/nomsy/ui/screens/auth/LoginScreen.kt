@@ -182,7 +182,7 @@ fun LoginScreen(
                         // Navigate to home screen after successful login
                         LaunchedEffect(key1 = true) {
 //                            navController.navigate("home") {
-                            navController.navigate("profile") {
+                            navController.navigate("add_food") {
                                 popUpTo("login") { inclusive = true }
                             }
                         }

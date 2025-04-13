@@ -6,8 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object AuthRetrofitClient {
-    // Use your Flask API base URL (e.g., your PythonAnywhere domain)
-    private const val AUTH_URL = "https://sonnguyen25.pythonanywhere.com/"
+    private const val API_URL = "https://sonnguyen25.pythonanywhere.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -18,7 +17,7 @@ object AuthRetrofitClient {
         .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(AUTH_URL)
+        .baseUrl(API_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -30,8 +29,7 @@ object AuthRetrofitClient {
 }
 
 object MealTrackerRetrofitClient {
-    // Use your Flask API base URL (e.g., your PythonAnywhere domain)
-    private const val AUTH_URL = "https://sonnguyen25.pythonanywhere.com/"
+    private const val API_URL = "https://sonnguyen25.pythonanywhere.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -42,7 +40,7 @@ object MealTrackerRetrofitClient {
         .build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(AUTH_URL)
+        .baseUrl(API_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
