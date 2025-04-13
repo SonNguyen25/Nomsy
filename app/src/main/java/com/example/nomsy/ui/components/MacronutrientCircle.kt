@@ -85,14 +85,14 @@ fun MacronutrientCircle(
             )
 
             Text(
-                text = "${current.toInt()}g",
+                text = "${(goal - current).toInt()}g",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = NomsyColors.Texts
             )
 
             Text(
-                text = "${(goal - current).toInt()}g left",
+                text = "left",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Thin,
                 color = NomsyColors.Texts

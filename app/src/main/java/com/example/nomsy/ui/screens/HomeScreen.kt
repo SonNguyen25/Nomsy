@@ -56,7 +56,7 @@ fun HomeScreen(
             // Main content - using dummy data instead of state
             // Large calorie circle
             CalorieCircle(
-                currentCalories = 20,
+                currentCalories = 1567,
                 goalCalories =  2000,
                 modifier = Modifier
                     .fillMaxWidth()

@@ -74,16 +74,21 @@ fun CalorieCircle(
             verticalArrangement = Arrangement.Center
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-
-            // calories left
             Text(
-                text = "$caloriesLeft",
+                text = "Calories",
+                fontSize = 16.sp,
+                color = NomsyColors.Subtitle
+            )
+            // calories
+            Text(
+                text = "$currentCalories kcal",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = NomsyColors.Texts
             )
+
             Text(
-                text = "kcal left",
+                text = "out of $goalCalories",
                 fontSize = 16.sp,
                 color = NomsyColors.Subtitle
             )
