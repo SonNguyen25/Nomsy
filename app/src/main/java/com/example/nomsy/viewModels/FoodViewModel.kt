@@ -55,7 +55,6 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
-
     fun addFood(food: Food) {
         // This can be expanded to update the UI based on addFood result if needed.
         foodRepository.addFood(food)

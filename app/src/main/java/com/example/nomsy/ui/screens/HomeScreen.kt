@@ -1,7 +1,6 @@
 package com.example.nomsy.ui.screens
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,18 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.models.User
-import com.example.nomsy.data.remote.MealItem
 import com.example.nomsy.ui.components.*
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.HomeViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 import java.util.Locale
@@ -37,7 +32,6 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = viewModel(),
     profileViewModel: ProfileViewModel = viewModel(),
-    onAddFoodClick: () -> Unit = { navController.navigate("add_food") }
 ) {
 
     val scrollState = rememberScrollState()
