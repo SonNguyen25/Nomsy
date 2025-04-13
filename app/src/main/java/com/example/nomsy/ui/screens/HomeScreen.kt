@@ -33,14 +33,9 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     navController: NavController,
-<<<<<<< Updated upstream
-    viewModel: HomeViewModel,
-    profileViewModel: ProfileViewModel,
-=======
     viewModel: HomeViewModel = viewModel(),
     profileViewModel: ProfileViewModel = viewModel(),
     onAddFoodClick: () -> Unit = { navController.navigate("add_food") }
->>>>>>> Stashed changes
 ) {
 
     val scrollState = rememberScrollState()
@@ -52,7 +47,6 @@ fun HomeScreen(
     val waterIntake by viewModel.waterIntake.collectAsState()
     var (waterGoal, calorieGoal, proteinGoal, carbsGoal, fatGoal) = List(5) { 0 }
     var showAddFoodDialog by remember { mutableStateOf(false) }
-
 
 
     // nutrition goals early

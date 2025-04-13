@@ -19,41 +19,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 
-<<<<<<< Updated upstream
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
-    sealed class HomeState {
-        object Loading : HomeState()
-        data class Success(
-            val calories: Int,
-            val protein: Int,
-            val carbs: Int,
-            val fat: Int,
-            val water: Double,
-            val calorieGoal: Int = 2000, // Default goals
-            val proteinGoal: Int = 150,
-            val carbsGoal: Int = 250,
-            val fatGoal: Int = 70,
-            val waterGoal: Double = 2.5,
-            val breakfastMeals: List<MealItem> = emptyList(),
-            val lunchMeals: List<MealItem> = emptyList(),
-            val dinnerMeals: List<MealItem> = emptyList()
-        ) : HomeState() {
-            // Helper properties for UI
-            val caloriePercent: Float get() = (calories.toFloat() / calorieGoal).coerceIn(0f, 1f)
-            val proteinPercent: Float get() = (protein.toFloat() / proteinGoal).coerceIn(0f, 1f)
-            val carbsPercent: Float get() = (carbs.toFloat() / carbsGoal).coerceIn(0f, 1f)
-            val fatPercent: Float get() = (fat.toFloat() / fatGoal).coerceIn(0f, 1f)
-            val waterPercent: Float get() = (water / waterGoal).coerceIn(0.0, 1.0).toFloat()
-        }
-=======
 class
 HomeViewModel(application: Application) :
     AndroidViewModel(application) {
+
     private val database = MealTrackerDatabase.getInstance(application)
     private val mealDao = database.mealDao()
     private val apiService = MealTrackerRetrofitClient.mealTrackerApi
     private val mealRepository = MealTrackerRepository(apiService, mealDao)
->>>>>>> Stashed changes
 
     // Nutrition totals
     private val _nutritionTotals = MutableLiveData<Result<DailySummaryEntity?>>()
@@ -64,7 +37,7 @@ HomeViewModel(application: Application) :
     val waterIntake: StateFlow<Double> = _waterIntake
 
     // Meals by type
-    private val _mealsByType = MutableLiveData<Result<Map<String, List<MealItem>>>>()
+    val mealsByType = MutableLiveData<Result<Map<String, List<MealItem>>>>()
 
     /**
      * Using an integer to keep track of date. This is simplified because
@@ -97,12 +70,12 @@ HomeViewModel(application: Application) :
 
     private fun loadMealsByType(date: String) {
         viewModelScope.launch {
-            _mealsByType.value = Result.Loading
+            mealsByType.value = Result.Loading
             // Fetch meals by type
             when (val result = mealRepository.getMealsByDate(date)) {
-                is Result.Success -> _mealsByType.value = Result.Success(result.data)
-                is Result.Error -> _mealsByType.value = Result.Error(result.exception)
-                else -> _mealsByType.value = Result.Loading
+                is Result.Success -> mealsByType.value = Result.Success(result.data)
+                is Result.Error -> mealsByType.value = Result.Error(result.exception)
+                else -> mealsByType.value = Result.Loading
             }
         }
 
