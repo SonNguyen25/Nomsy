@@ -97,7 +97,8 @@ fun NomsyAppNavHost() {
                     navController = navController,
                     viewModel = homeViewModel,
                     onAddFoodClick = { navController.navigate("add_food") },
-                    authViewModel = authViewModel,
+
+                    profileViewModel = profileViewModel,
                 )
             }
 

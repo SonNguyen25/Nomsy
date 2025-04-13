@@ -24,7 +24,11 @@ fun CalorieCircle(
     modifier: Modifier = Modifier
 ) {
     var animationPlayed by remember { mutableStateOf(false) }
-    val curPercentage = if (goalCalories > 0) (currentCalories.toFloat() / goalCalories.toFloat()).coerceIn(0f, 1f) else 0f
+    val curPercentage =
+        if (goalCalories > 0) (currentCalories.toFloat() / goalCalories.toFloat()).coerceIn(
+            0f,
+            1f
+        ) else 0f
     val caloriesLeft = goalCalories - currentCalories
     val animatedPercentage = animateFloatAsState(
         targetValue = if (animationPlayed) curPercentage else 0f,
@@ -74,6 +78,7 @@ fun CalorieCircle(
             verticalArrangement = Arrangement.Center
         ) {
             Spacer(modifier = Modifier.height(8.dp))
+            // label
             Text(
                 text = "Calories",
                 fontSize = 16.sp,
@@ -86,7 +91,7 @@ fun CalorieCircle(
                 fontWeight = FontWeight.Bold,
                 color = NomsyColors.Texts
             )
-
+            // subtitle / goal calories
             Text(
                 text = "out of $goalCalories",
                 fontSize = 16.sp,
