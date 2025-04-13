@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.nomsy.data.local.RecipeDatabase
 import com.example.nomsy.data.remote.network.RecipeRetrofitInstance
 import com.example.nomsy.data.repository.RecipeRepository
+import com.example.nomsy.ui.screens.AddFoodScreen
 import com.example.nomsy.ui.screens.HomeScreen
 import com.example.nomsy.ui.screens.StatisticsScreen
 import com.example.nomsy.ui.screens.profile.ProfileScreen
@@ -120,6 +121,9 @@ fun NomsyAppNavHost() {
                 )
             }
 
+            composable("add_food") {
+                AddFoodScreen()
+            }
 
 
             // Edit profile screen – no bottom bar
