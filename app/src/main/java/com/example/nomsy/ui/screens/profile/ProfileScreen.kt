@@ -12,6 +12,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -88,7 +89,31 @@ fun ProfileScreen(
                         )
                     }
                     is Result.Success -> {
-                        ProfileContent((profileResult as Result.Success<User>).data)
+                        Column(
+                            modifier = Modifier.fillMaxWidth()
+                                .fillMaxHeight(0.9f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            ProfileContent((profileResult as Result.Success<User>).data)
+
+                            Spacer(Modifier.height(32.dp))
+
+                            Button(
+                                onClick = {
+                                    // clear username and navigate back to login
+                                    authViewModel.logout()
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    backgroundColor = NomsyColors.Title,
+                                    contentColor = NomsyColors.Background
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth(0.6f)
+                                    .height(48.dp)
+                            ) {
+                                Text("Logout")
+                            }
+                        }
                     }
                     null -> {
                         // initial state before load
@@ -98,7 +123,5 @@ fun ProfileScreen(
         }
     )
 }
-
-
 
 

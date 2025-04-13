@@ -3,6 +3,7 @@ package com.example.nomsy.ui.screens.auth
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -45,29 +47,37 @@ fun OnboardingFitnessGoalScreen(navController: NavController, authViewModel: Aut
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth(0.8f)
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth(0.9f)
+
             ) {
                 FitnessGoalButton(
                     text = "Cut",
                     isSelected = selectedGoal == "cut",
                     onClick = { selectedGoal = "cut" },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
                 )
 
                 FitnessGoalButton(
                     text = "Maintain",
                     isSelected = selectedGoal == "maintain",
                     onClick = { selectedGoal = "maintain" },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
                 )
 
                 FitnessGoalButton(
                     text = "Bulk",
                     isSelected = selectedGoal == "bulk",
                     onClick = { selectedGoal = "bulk" },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
                 )
             }
 

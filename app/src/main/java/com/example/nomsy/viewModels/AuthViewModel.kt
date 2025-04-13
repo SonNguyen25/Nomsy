@@ -10,6 +10,9 @@ import com.example.nomsy.data.local.models.User
 import com.example.nomsy.data.repository.AuthRepository
 import com.example.nomsy.data.repository.IUserRepository
 import com.example.nomsy.utils.Result
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
@@ -20,12 +23,16 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val _loginResult = MutableLiveData<Result<User>>()
     val loginResult: LiveData<Result<User>> = _loginResult
 
+    private val _isLoggedIn = MutableStateFlow(false)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
     // Store the current username
     private var currentUsername: String = ""
 
     // Methods to get/set current username
     fun setCurrentUsername(username: String) {
         currentUsername = username
+//        _isLoggedIn.value = username.isNotEmpty()
     }
 
     fun getCurrentUsername(): String {
@@ -33,11 +40,19 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun login(username: String, password: String) {
-        setCurrentUsername(username) // Save username on login attempt
         repository.login(username, password)
             .observeForever { result ->
                 _loginResult.postValue(result)
+                if (result is Result.Success) {
+                    setCurrentUsername(username)
+                    _isLoggedIn.value = true
+                }
             }
+    }
+
+        fun logout() {
+        setCurrentUsername("")
+        _isLoggedIn.value = false
     }
 
     // --- Register ---

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,7 +28,7 @@ import com.example.nomsy.ui.theme.NomsyColors
 fun ProfileContent(user: User) {
     LazyColumn(
         Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -80,7 +81,7 @@ fun ProfileContent(user: User) {
                 KeyValueRow("Carbs", "${user.nutrition_goals["carbs"]} g")
                 KeyValueRow("Fat", "${user.nutrition_goals["fat"]} g")
             }
-            Spacer(Modifier.height(32.dp))
+//            Spacer(Modifier.height(32.dp))
         }
     }
 }
