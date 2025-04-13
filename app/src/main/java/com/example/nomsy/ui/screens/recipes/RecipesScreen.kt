@@ -166,9 +166,11 @@ fun recipesScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(recipesInCategory) { recipe ->
-                            recipesCard(recipe = recipe, onClick = {
-                                selectedRecipe = recipe
-                            })
+                            recipesCard(
+                                recipe = recipe,
+                                onClick = { selectedRecipe = recipe },
+                                modifier = Modifier.width(240.dp)
+                                )
                         }
                     }
                 }

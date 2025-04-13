@@ -70,34 +70,38 @@ fun recipesCard(
 
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.6f))
-            )
-
-            Column(
-                modifier = Modifier
                     .align(Alignment.BottomStart)
-                    .padding(16.dp)
                     .fillMaxWidth()
+                    .height(80.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
+                    )
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                Text(
-                    text = recipe.strMeal ?: "",
-                    style = MaterialTheme.typography.h6,
-                    fontWeight = FontWeight.Bold,
-                    color = NomsyColors.Title,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = recipe.strTags?.replace(",", " • ") ?: "",
-                    style = MaterialTheme.typography.body2,
-                    fontWeight = FontWeight.Bold,
-                    color = NomsyColors.Subtitle,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = recipe.strMeal ?: "",
+                        style = MaterialTheme.typography.h6,
+                        fontWeight = FontWeight.Bold,
+                        color = NomsyColors.Title,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = recipe.strTags?.replace(",", " • ") ?: "",
+                        style = MaterialTheme.typography.body2,
+                        fontWeight = FontWeight.Bold,
+                        color = NomsyColors.Subtitle,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
+
         }
     }
 }
