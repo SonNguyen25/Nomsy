@@ -47,7 +47,10 @@ HomeViewModel(application: Application) : AndroidViewModel(application) {
     val state: StateFlow<HomeState> = _state
     private val userDatabase = UserDatabase.getDatabase(application)
     private val authViewModel = AuthViewModel(application)
-    private val repository = MealTrackerRepository()
+    private val repository = MealTrackerRepository(
+        apiService = TODO(),
+        context = TODO()
+    )
 
     private val _foodLogs = MutableStateFlow<List<FoodLog>>(emptyList())
 
