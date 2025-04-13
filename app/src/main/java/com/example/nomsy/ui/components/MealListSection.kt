@@ -48,7 +48,7 @@ fun MealListSection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = meal.foodName,
+                        text = meal.food_name,
                         color = NomsyColors.Texts,
                         modifier = Modifier.padding(start = 16.dp)
                     )

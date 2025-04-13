@@ -10,7 +10,7 @@ import com.example.nomsy.data.local.entities.MealEntity
 
 @Database(
     entities = [MealEntity::class, DailySummaryEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class MealTrackerDatabase : RoomDatabase() {

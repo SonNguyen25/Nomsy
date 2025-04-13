@@ -1,6 +1,7 @@
 package com.example.nomsy.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.nomsy.data.local.dao.MealTrackerDao
 import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.entities.MealEntity
@@ -62,13 +63,34 @@ class MealTrackerRepository(
             val response = mealApiService.getDailySummary(date)
 
             if (response.isSuccessful) {
+                Log.d("MealTrackerRepository", "Meals get by date loaded successfully: $response")
                 val summaryResponse = response.body()
+
+                //DEBUGGING
                 if (summaryResponse != null) {
+                    Log.d("MealTrackerRepository", "Response meals: ${summaryResponse.meals}")
+
+                    // Print a sample meal if available
+                    if (summaryResponse.meals.isNotEmpty()) {
+                        val firstMealType = summaryResponse.meals.keys.first()
+                        val firstMealList = summaryResponse.meals[firstMealType]
+                        if (!firstMealList.isNullOrEmpty()) {
+                            Log.d(
+                                "MealTrackerRepository",
+                                "Sample meal properties: ${firstMealList[0]}"
+                            )
+                        }
+                    }
+
+                    // Rest of your code...
+                }
+                if (summaryResponse != null) {
+
                     // Extract meals from response
                     val mealsMap = summaryResponse.meals.mapValues { (_, meals) ->
                         meals.map { meal ->
                             MealItem(
-                                foodName = meal.foodName,
+                                food_name = meal.food_name,
                                 calories = meal.calories,
                                 carbs = meal.carbs,
                                 protein = meal.protein,
@@ -77,7 +99,7 @@ class MealTrackerRepository(
                         }
                     }
 
-                    // Also update DB for offline access
+                    // update DB for offline access
                     val mealEntities = mutableListOf<MealEntity>()
                     mealsMap.forEach { (mealType, meals) ->
                         meals.forEach { meal ->
@@ -86,7 +108,7 @@ class MealTrackerRepository(
                                     mealId = "",
                                     date = date,
                                     mealType = mealType,
-                                    foodName = meal.foodName,
+                                    food_name = meal.food_name,
                                     calories = meal.calories,
                                     carbs = meal.carbs,
                                     protein = meal.protein,

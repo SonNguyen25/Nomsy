@@ -45,9 +45,11 @@ data class NutritionTotals(
 )
 
 data class MealItem(
-    val foodName: String,
+    val food_name: String,
     val calories: Int,
     val carbs: Int,
     val protein: Int,
     val fat: Int
-)
+) {
+
+}

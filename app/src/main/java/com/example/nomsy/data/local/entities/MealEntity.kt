@@ -10,7 +10,7 @@ data class MealEntity(
     val mealId: String,
     val date: String,
     val mealType: String,
-    val foodName: String,
+    val food_name: String,
     val calories: Int,
     val carbs: Int,
     val protein: Int,
@@ -21,7 +21,7 @@ data class MealEntity(
 // Convert MealEntity to MealItem
 fun MealEntity.toMealItem(): MealItem {
     return MealItem(
-        foodName = this.foodName,
+        food_name = this.food_name,
         calories = this.calories,
         carbs = this.carbs,
         protein = this.protein,

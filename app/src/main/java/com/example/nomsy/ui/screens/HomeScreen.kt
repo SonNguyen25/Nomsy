@@ -1,6 +1,7 @@
 package com.example.nomsy.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.models.User
 import com.example.nomsy.data.remote.MealItem
 import com.example.nomsy.ui.components.*
@@ -43,8 +45,8 @@ fun HomeScreen(
     val profileResult by profileViewModel.profile.observeAsState()
     val nutritionResult by viewModel.nutritionTotals.observeAsState(initial = Result.Loading)
     val mealsResult by viewModel.mealsByType.observeAsState(initial = Result.Loading)
-
     val waterIntake by viewModel.waterIntake.collectAsState()
+
     var (waterGoal, calorieGoal, proteinGoal, carbsGoal, fatGoal) = List(5) { 0 }
     var showAddFoodDialog by remember { mutableStateOf(false) }
 
@@ -89,40 +91,26 @@ fun HomeScreen(
                 .verticalScroll(scrollState)
         ) {
 
+
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Date selector
-            DateSelector(
-                date = date.toString(),
-                onPreviousDay = { viewModel.decrementDate() },
-                onNextDay = { viewModel.incrementDate() }
-            )
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            //loading current nutrition totals material
+            // loading current nutrition totals material
             when (nutritionResult) {
-                is Result.Loading -> {
-                    androidx.compose.material.CircularProgressIndicator(
-                        color = NomsyColors.Title
-                    )
-                }
-
-                is Result.Error -> {
-                    androidx.compose.material.Text(
-                        text = "Error loading profile",
-                        color = MaterialTheme.colors.error,
-
-                        )
-                }
-
                 is Result.Success -> {
+                    // Date selector
+                    DateSelector(
+                        date = date.toString(),
+                        onPreviousDay = { viewModel.decrementDate() },
+                        onNextDay = { viewModel.incrementDate() }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    val nutrition = (nutritionResult as Result.Success<DailySummaryEntity?>).data
                     // load nutrition progress circles and water intake guages
                     // Large calorie circle
                     CalorieCircle(
-                        currentCalories = 1567,
+                        currentCalories = (nutrition?.totalCalories ?: 69),
                         goalCalories = calorieGoal,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -138,16 +126,18 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         // Protein circle
+
                         MacronutrientCircle(
-                            current = 20f,
+                            current = (nutrition?.totalProtein?.toFloat() ?: 69f),
                             goal = proteinGoal.toFloat(),
                             name = "Protein",
                             modifier = Modifier.weight(1f)
                         )
 
+
                         // Carbs circle
                         MacronutrientCircle(
-                            current = 20f,
+                            current = (nutrition?.totalCarbs?.toFloat() ?: 69f),
                             goal = carbsGoal.toFloat(),
                             name = "Carbs",
                             modifier = Modifier.weight(1f)
@@ -155,7 +145,7 @@ fun HomeScreen(
 
                         // Fat circle
                         MacronutrientCircle(
-                            current = 20f,
+                            current = (nutrition?.totalFat?.toFloat() ?: 69f),
                             goal = fatGoal.toFloat(),
                             name = "Fat",
                             modifier = Modifier.weight(1f)
@@ -166,7 +156,7 @@ fun HomeScreen(
 
 
                     WaterIntakeBar(
-                        currentIntake = 1f,
+                        currentIntake = waterIntake.toFloat(),
                         goal = waterGoal.toFloat(),
                         onWaterIntakeChange = {
                             viewModel.updateWaterIntake(
@@ -175,49 +165,61 @@ fun HomeScreen(
                             )
                         }
                     )
+                }
 
+                is Result.Loading -> {
+                    androidx.compose.material.CircularProgressIndicator(
+                        color = NomsyColors.Title
+                    )
+                }
 
+                is Result.Error -> {
+                    androidx.compose.material.Text(
+                        text = "Error loading profile",
+                        color = MaterialTheme.colors.error,
+
+                        )
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
 
-            // Meal sections with fixed data for prototype
-            val breakfastMeals = remember {
-                listOf(
-                    MealItem("Scrambled Eggs", 220, 2, 14, 16),
-                    MealItem("Whole Wheat Toast", 90, 15, 3, 1)
-                )
-            }
-            val lunchMeals = remember {
-                listOf(
-                    MealItem("Grilled Chicken Salad", 350, 10, 32, 18)
-                )
-            }
-            val dinnerMeals = remember {
-                listOf(
-                    MealItem("Salmon Fillet", 280, 0, 22, 18),
-                    MealItem("Steamed Broccoli", 55, 10, 4, 0),
-                    MealItem("Brown Rice", 120, 25, 3, 1)
-                )
-            }
-
-            MealListSection(
-                title = "Breakfast",
-                meals = breakfastMeals
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            MealListSection(
-                title = "Lunch",
-                meals = lunchMeals
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            MealListSection(
-                title = "Dinner",
-                meals = dinnerMeals
-            )
-            Spacer(modifier = Modifier.height(50.dp))
+//            // Meal sections with fixed data for prototype
+//            val breakfastMeals = remember {
+//                listOf(
+//                    MealItem("Scrambled Eggs", 220, 2, 14, 16),
+//                    MealItem("Whole Wheat Toast", 90, 15, 3, 1)
+//                )
+//            }
+//            val lunchMeals = remember {
+//                listOf(
+//                    MealItem("Grilled Chicken Salad", 350, 10, 32, 18)
+//                )
+//            }
+//            val dinnerMeals = remember {
+//                listOf(
+//                    MealItem("Salmon Fillet", 280, 0, 22, 18),
+//                    MealItem("Steamed Broccoli", 55, 10, 4, 0),
+//                    MealItem("Brown Rice", 120, 25, 3, 1)
+//                )
+//            }
+//
+//            MealListSection(
+//                title = "Breakfast",
+//                meals = breakfastMeals
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            MealListSection(
+//                title = "Lunch",
+//                meals = lunchMeals
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            MealListSection(
+//                title = "Dinner",
+//                meals = dinnerMeals
+//            )
+//            Spacer(modifier = Modifier.height(50.dp))
 
             // Display meals by meal type
             when (mealsResult) {
@@ -236,10 +238,6 @@ fun HomeScreen(
 
                 is Result.Success -> {
                     val mealsByType = (mealsResult as Result.Success).data
-                    Text(
-                        text = "meal section!!!!!!!!!!!!!!!!!",
-                        color = NomsyColors.Title
-                    )
                     if (mealsByType.isEmpty()) {
                         Text(
                             text = "No meals logged for this date",
