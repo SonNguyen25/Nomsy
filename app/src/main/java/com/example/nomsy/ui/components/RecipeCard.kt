@@ -14,10 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.nomsy.data.local.models.Recipe
@@ -26,23 +24,13 @@ import com.example.nomsy.ui.theme.NomsyColors
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun recipeImage(imageUrl: String?, content: String?, modifier: Modifier = Modifier) {
-    val isInPreview = LocalInspectionMode.current
-
-    if (isInPreview) {
-        Box(
-            modifier = modifier
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color.White)
-        )
-    } else {
-        GlideImage(
-            model = imageUrl,
-            contentDescription = content,
-            contentScale = ContentScale.Crop,
-            modifier = modifier
-                .clip(RoundedCornerShape(20.dp))
-        )
-    }
+    GlideImage(
+        model = imageUrl,
+        contentDescription = content,
+        contentScale = ContentScale.Crop,
+        modifier = modifier
+            .clip(RoundedCornerShape(20.dp))
+    )
 }
 
 @Composable
