@@ -13,31 +13,31 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
+class AuthViewModel(application: Application) : AndroidViewModel(application), IAuthViewModel {
     private val userDatabase = UserDatabase.getDatabase(application)
     private val repository: IUserRepository = AuthRepository(userDatabase = userDatabase)
 
     // --- Login ---
     private val _loginResult = MutableLiveData<Result<User>?>()
-    val loginResult: LiveData<Result<User>?> = _loginResult
+    override val loginResult: LiveData<Result<User>?> = _loginResult
 
     private val _isLoggedIn = MutableStateFlow(false)
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+    override val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
     // Store the current username
     private var currentUsername: String = ""
 
     // Methods to get/set current username
-    fun setCurrentUsername(username: String) {
+    override fun setCurrentUsername(username: String) {
         currentUsername = username
 //        _isLoggedIn.value = username.isNotEmpty()
     }
 
-    fun getCurrentUsername(): String {
+    override fun getCurrentUsername(): String {
         return currentUsername
     }
 
-    fun login(username: String, password: String) {
+    override fun login(username: String, password: String) {
         repository.login(username, password)
             .observeForever { result ->
                 _loginResult.postValue(result)
@@ -48,7 +48,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
-    fun logout() {
+    override fun logout() {
         setCurrentUsername("")
         _isLoggedIn.value = false
         _loginResult.value = null
@@ -58,9 +58,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     // --- Register ---
     private val _registerResult = MutableLiveData<Result<User>>()
-    val registerResult: LiveData<Result<User>> = _registerResult
+    override val registerResult: LiveData<Result<User>> = _registerResult
 
-    fun register(user: User) {
+    override fun register(user: User) {
         tempUsername?.let { setCurrentUsername(it) }
         repository.register(user)
             .observeForever { result ->
@@ -70,16 +70,16 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     // --- Profile fetch ---
     private val _profileResult = MutableLiveData<Result<User>>()
-    val profileResult: LiveData<Result<User>> = _profileResult
+    override val profileResult: LiveData<Result<User>> = _profileResult
 
-    fun fetchProfile(userId: String) {
+    override fun fetchProfile(userId: String) {
         repository.getProfile(userId)
             .observeForever { result ->
                 _profileResult.postValue(result)
             }
     }
 
-    fun fetchProfileByUsername(username: String = currentUsername) {
+    override fun fetchProfileByUsername(username: String) {
         repository.getProfileByUsername(username)
             .observeForever { result ->
                 _profileResult.postValue(result)
@@ -97,43 +97,43 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private var tempNutritionGoals: Map<String, Int>? = null
 
 
-    fun setCredentials(username: String, password: String, email: String) {
+    override fun setCredentials(username: String, password: String, email: String) {
         this.tempUsername = username
         this.tempPassword = password
         this.tempEmail = email
     }
 
-    fun setUserName(name: String) {
+    override fun setUserName(name: String) {
         this.tempName = name
     }
 
-    fun setUserAge(age: Int) {
+    override fun setUserAge(age: Int) {
         this.tempAge = age
     }
 
-    fun setUserHeight(height: Int) {
+    override fun setUserHeight(height: Int) {
         this.tempHeight = height
     }
 
-    fun setUserWeight(weight: Int) {
+    override fun setUserWeight(weight: Int) {
         this.tempWeight = weight
     }
 
-    fun setUserFitnessGoal(goal: String) {
+    override fun setUserFitnessGoal(goal: String) {
         this.tempFitnessGoal = goal
     }
 
-    fun setUserNutritionGoals(goals: Map<String, Int>) {
+    override fun setUserNutritionGoals(goals: Map<String, Int>) {
         this.tempNutritionGoals = goals
     }
 
-    fun getUsername(): String = this.tempUsername ?: ""
-    fun getPassword(): String = this.tempPassword ?: ""
-    fun getUserName(): String = this.tempName ?: ""
-    fun getUserAge(): Int = this.tempAge ?: 0
-    fun getUserHeight(): Int = this.tempHeight ?: 0
-    fun getUserWeight(): Int = this.tempWeight ?: 0
-    fun getUserFitnessGoal(): String = this.tempFitnessGoal ?: ""
+    override fun getUsername(): String = this.tempUsername ?: ""
+    override fun getPassword(): String = this.tempPassword ?: ""
+    override fun getUserName(): String = this.tempName ?: ""
+    override fun getUserAge(): Int = this.tempAge ?: 0
+    override fun getUserHeight(): Int = this.tempHeight ?: 0
+    override fun getUserWeight(): Int = this.tempWeight ?: 0
+    override fun getUserFitnessGoal(): String = this.tempFitnessGoal ?: ""
 
 
 }

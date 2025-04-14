@@ -29,6 +29,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<!--        <instrumentation-->
+<!--            android:name="androidx.test.runner.AndroidJUnitRunner"-->
+<!--            android:targetPackage="com.example.nomsy">-->
+<!--            <meta-data-->
+<!--                android:name="android.junit.runner.AndroidJUnitRunnerWithJetpack"-->
+<!--                android:value="true" />-->
+<!--            <meta-data-->
+<!--                android:name="mockk-android-agent"-->
+<!--                android:value="true" />-->
+<!--        </instrumentation>-->
     </application>
 
 </manifest>

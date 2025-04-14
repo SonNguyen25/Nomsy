@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -32,12 +33,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: IAuthViewModel = viewModel()
 ) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -173,7 +174,7 @@ fun LoginScreen(
             loginResult?.value?.let { result ->
                 Spacer(modifier = Modifier.height(16.dp))
                 when (result) {
-                    is Result.Loading -> CircularProgressIndicator(color = NomsyColors.Title)
+                    is Result.Loading -> CircularProgressIndicator(modifier = Modifier.testTag("loading_indicator"), color = NomsyColors.Title)
                     is Result.Success -> {
                         Text(
                             "Welcome, ${result.data.name}!",

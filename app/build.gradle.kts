@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.nomsy"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -167,4 +167,12 @@ dependencies {
 
     // object recognition
     implementation("com.google.mlkit:image-labeling:17.0.9")
+
+    //test - mock class
+//    androidTestImplementation("io.mockk:mockk:1.12.0")
+    androidTestImplementation("io.mockk:mockk-android:1.12.0")
+    testImplementation("com.google.truth:truth:1.1.3")
+    androidTestImplementation("com.google.truth:truth:1.1.3")
+//    androidTestImplementation("io.mockk:mockk-android-agent:1.12.0")
+    testImplementation("io.mockk:mockk:1.12.0")
 }
