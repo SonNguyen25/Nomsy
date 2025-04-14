@@ -46,6 +46,7 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
     val date = viewModel.selectedDate.collectAsState().value
+    val formattedDate = remember(date) { "2025-04-$date" }
     val profileResult by profileViewModel.profile.observeAsState()
     val nutritionResult by viewModel.nutritionTotals.observeAsState(initial = Result.Loading)
     val mealsResult by viewModel.mealsByType.observeAsState(initial = Result.Loading)
@@ -53,7 +54,7 @@ fun HomeScreen(
 
     var (waterGoal, calorieGoal, proteinGoal, carbsGoal, fatGoal) = List(5) { 0 }
     var showAddFoodDialog by remember { mutableStateOf(false) }
-    
+
     // nutrition goals early
     when (profileResult) {
         is Result.Success -> {
@@ -110,7 +111,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     val nutrition = (nutritionResult as Result.Success<DailySummaryEntity?>).data
-                    // load nutrition progress circles and water intake guages
+                    // load nutrition progress circles and water intake gauges
                     // Large calorie circle
                     CalorieCircle(
                         currentCalories = (nutrition?.totalCalories ?: 69),
@@ -163,7 +164,7 @@ fun HomeScreen(
                         goal = waterGoal.toFloat(),
                         onWaterIntakeChange = {
                             viewModel.updateWaterIntake(
-                                "2025-04-$date",
+                                formattedDate,
                                 newWaterIntake = it.toDouble()
                             )
                         }
@@ -239,7 +240,7 @@ fun HomeScreen(
 
                 is Result.Error -> {
                     Text(
-                        text = "error has occured",
+                        text = "error has occurred",
                         color = NomsyColors.Subtitle
                     )
                 }
@@ -264,7 +265,7 @@ fun HomeScreen(
                                 meals = meals,
                                 onDelete = { meal ->
                                     Log.d("HomeScreen", "Delete requested for: ${meal.food_name}")
-                                    viewModel.deleteMeal("2025-04-$date", meal.food_name)
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
                                 }
                             )
                             Spacer(modifier = Modifier.height(16.dp))

@@ -1,12 +1,17 @@
 package com.example.nomsy.data.remote
 
 
+import androidx.room.PrimaryKey
+import com.example.nomsy.data.local.models.Food
 import retrofit2.Response
 import retrofit2.http.*
 
 interface MealTrackerApiService {
     @POST("meals")
     suspend fun addMeal(@Body mealRequest: AddMealRequest): Response<AddMealResponse>
+
+    @PATCH("water")
+    suspend fun adjustWater(@Body data: AdjustWaterRequest): WaterResponse
 
     @GET("daily-summary")
     suspend fun getDailySummary(@Query("date") date: String): Response<DailySummaryResponse>
@@ -16,7 +21,26 @@ interface MealTrackerApiService {
         @Query("date") date: String,
         @Query("food_name") foodName: String
     ): Response<DeleteMealResponse>
+
+    @GET("/foods")
+    suspend fun getAllFoods(): Response<FoodResponse>
+
 }
+
+data class AdjustWaterRequest(
+    val date: String,
+    val delta: Double
+)
+
+data class WaterResponse(
+    val date: String,
+    val water: Double
+)
+
+
+data class FoodResponse(
+    val foods: List<Food>
+)
 
 // model for delete meal response
 data class DeleteMealResponse(
@@ -26,9 +50,9 @@ data class DeleteMealResponse(
 
 // Request model for adding a meal
 data class AddMealRequest(
-    val date: String,          // "YYYY-MM-DD"
-    val mealType: String,     // "breakfast", "lunch", "dinner"
-    val foodName: String,
+    val date: String,
+    val meal_type: String,
+    val food_name: String,
     val calories: Int,
     val carbs: Int,
     val protein: Int,

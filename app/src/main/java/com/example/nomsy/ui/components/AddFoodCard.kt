@@ -3,6 +3,7 @@ package com.example.nomsy.ui.components
 import android.graphics.Bitmap
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -24,33 +25,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.nomsy.data.local.models.Food
 import com.example.nomsy.ui.theme.NomsyColors
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nomsy.data.remote.AddMealRequest
+import com.example.nomsy.data.remote.MealTrackerRetrofitClient
 import com.example.nomsy.viewModels.FoodViewModel
+import kotlinx.coroutines.*
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun addFoodCard(
     food: Food? = null,
@@ -58,13 +61,6 @@ fun addFoodCard(
 ) {
     var inputMethod by remember { mutableStateOf("Manual") }
     val context = LocalContext.current
-
-    val dailyGoals = mapOf(
-        "calories" to 2000f,
-        "protein" to 250f,
-        "carbs" to 250f,
-        "fat" to 70f
-    )
 
     var foodName by remember { mutableStateOf("") }
     var calories by remember { mutableStateOf("") }
@@ -75,14 +71,46 @@ fun addFoodCard(
     val mealType = mealTypeState.value
     val setMealType: (String) -> Unit = { mealTypeState.value = it }
 
+
     val foodViewModel: FoodViewModel = viewModel()
     val foodDetail by foodViewModel.foodDetail.observeAsState()
+    val date = LocalDate.now().toString().substring(0, 10)
+    LaunchedEffect(Unit) {
+        foodViewModel.fetchDailySummary(date)
+    }
+    val dailySummary by foodViewModel.dailySummary.observeAsState()
+
+    val dailyGoals = mapOf(
+        "calories" to (dailySummary?.calories?.toFloat() ?: 2000f),
+        "protein" to (dailySummary?.protein?.toFloat() ?: 250f),
+        "carbs" to (dailySummary?.carbs?.toFloat() ?: 250f),
+        "fat" to (dailySummary?.fat?.toFloat() ?: 70f)
+    )
+
 
     //Calculate the percentages
-    val calPercent = (calories.toFloatOrNull() ?: 0f) / dailyGoals["calories"]!! * 100
-    val proteinPercent = (protein.toFloatOrNull() ?: 0f) / dailyGoals["protein"]!! * 100
-    val carbsPercent = (carbs.toFloatOrNull() ?: 0f) / dailyGoals["carbs"]!! * 100
-    val fatPercent = (fat.toFloatOrNull() ?: 0f) / dailyGoals["fat"]!! * 100
+    val caloriesValue = calories.toFloatOrNull() ?: 0f
+    val proteinValue = protein.toFloatOrNull() ?: 0f
+    val carbsValue = carbs.toFloatOrNull() ?: 0f
+    val fatValue = fat.toFloatOrNull() ?: 0f
+
+    val calGoal = dailyGoals["calories"] ?: 0f
+    val proteinGoal = dailyGoals["protein"] ?: 0f
+    val carbsGoal = dailyGoals["carbs"] ?: 0f
+    val fatGoal = dailyGoals["fat"] ?: 0f
+
+    fun safePercentage(numerator: Float, denominator: Float): Float {
+        return if (denominator > 0f && !numerator.isNaN() && !denominator.isNaN()) {
+            (numerator / denominator) * 100
+        } else {
+            0f
+        }
+    }
+
+    val calPercent = safePercentage(caloriesValue, if (calGoal > 0f) calGoal else caloriesValue + calGoal)
+    val proteinPercent = safePercentage(proteinValue, if (proteinGoal > 0f) proteinGoal else proteinValue + proteinGoal)
+    val carbsPercent = safePercentage(carbsValue, if (carbsGoal > 0f) carbsGoal else carbsValue + carbsGoal)
+    val fatPercent = safePercentage(fatValue, if (fatGoal > 0f) fatGoal else fatValue + fatGoal)
 
     LaunchedEffect(foodDetail) {
         foodDetail?.let {
@@ -103,7 +131,6 @@ fun addFoodCard(
                 .background(NomsyColors.Background, shape = RoundedCornerShape(16.dp))
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-
                 // Static black toggle header
                 Box(
                     modifier = Modifier
@@ -161,11 +188,16 @@ fun addFoodCard(
                             carbs, { carbs = it },
                             fat, { fat = it },
                             mealType, setMealType,
-                            calPercent,
-                            proteinPercent,
-                            carbsPercent,
-                            fatPercent
+                            calPercent, proteinPercent, carbsPercent, fatPercent,
+                            onSelectFood = {
+                                foodName = it.food_name
+                                calories = it.calories.toString()
+                                protein = it.protein.toString()
+                                carbs = it.carbs.toString()
+                                fat = it.fat.toString()
+                            }
                         )
+
                     } else {
                         PictureCaptureSection()
                     }
@@ -189,34 +221,39 @@ fun addFoodCard(
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val foodData = if (inputMethod == "Picture") foodDetail else null
 
-                                    val json = JSONObject().apply {
-                                        put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-                                        put("meal_type", mealType.lowercase())
-                                        put("food_name", foodData?.food_name ?: foodName)
-                                        put("calories", foodData?.calories ?: calories.toIntOrNull() ?: 0)
-                                        put("carbs", foodData?.carbs ?: carbs.toIntOrNull() ?: 0)
-                                        put("protein", foodData?.protein ?: protein.toIntOrNull() ?: 0)
-                                        put("fat", foodData?.fat ?: fat.toIntOrNull() ?: 0)
-                                    }
+                                    val mealRequest = AddMealRequest(
+                                        date = LocalDate.now().toString().substring(0, 10),
+                                        meal_type = mealType.lowercase(),
+                                        food_name = foodName,
+                                        calories = foodData?.calories ?: calories.toIntOrNull() ?: 0,
+                                        carbs = foodData?.carbs ?: carbs.toIntOrNull() ?: 0,
+                                        protein = foodData?.protein ?: protein.toIntOrNull() ?: 0,
+                                        fat = foodData?.fat ?: fat.toIntOrNull() ?: 0
+                                    )
 
-                                    val client = OkHttpClient()
-                                    val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
-                                    val request = Request.Builder()
-                                        .url("https://sonnguyen25.pythonanywhere.com/meals")
-                                        .post(body)
-                                        .build()
+                                    Log.d("AddMealOutput", mealRequest.toString())
 
                                     try {
-                                        val response = client.newCall(request).execute()
+                                        val response = MealTrackerRetrofitClient.mealTrackerApi.addMeal(mealRequest)
                                         if (response.isSuccessful) {
                                             withContext(Dispatchers.Main) { onDismiss() }
-                                            Log.e("AddMeal", "Meal Added Successfully")
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(context, "Meal Successfully Added", Toast.LENGTH_SHORT).show()
+                                                onDismiss()
+                                            }
+                                            Log.d("AddMeal", "Meal added: ${response.body()?.message}")
                                         } else {
-                                            Log.e("AddMeal", "Error: ${response.body?.string()}")
+                                            val errorMessage = response.errorBody()?.string()
+                                            Log.e("AddMeal", "AddMeal error: $errorMessage")
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(context, "Failed to add meal: ${errorMessage ?: "Unknown error"}", Toast.LENGTH_SHORT).show()
+                                            }
+                                            Log.e("AddMeal", "AddMeal error: ${response.errorBody()?.string()}")
                                         }
                                     } catch (e: Exception) {
-                                        Log.e("AddMeal", "Exception: ${e.message}")
+                                        Log.e("AddMeal", "AddMeal exception: ${e.message}")
                                     }
+
                                 }
                             },
                             colors = ButtonDefaults.buttonColors(
@@ -252,17 +289,34 @@ fun ManualInputForm(
     calPercent: Float,
     proteinPercent: Float,
     carbsPercent: Float,
-    fatPercent: Float
+    fatPercent: Float,
+    onSelectFood: (Food) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
+        val foodViewModel: FoodViewModel = viewModel()
+
+        LaunchedEffect(Unit) {
+            if (foodViewModel.allFoods.isEmpty()) {
+                foodViewModel.fetchAllFoods()
+            }
+        }
+
+        SearchFoodDropdown(
+            viewModel = foodViewModel,
+            foodName = foodName,
+            onSelectFood = onSelectFood,
+            onQueryChange = onFoodNameChange
+        )
+
+
         LabeledInputRow("Name:", foodName, onFoodNameChange)
-        LabeledInputRow("Calories:", calories, onCaloriesChange, unit = "kcal")
-        LabeledInputRow("Protein:", protein, onProteinChange, unit = "g")
-        LabeledInputRow("Carbs:", carbs, onCarbsChange, unit = "g")
-        LabeledInputRow("Fats:", fat, onFatChange, unit = "g")
+        LabeledInputRow("Calories:", calories, onCaloriesChange, unit = "kcal", isNumeric = true)
+        LabeledInputRow("Protein:", protein, onProteinChange, unit = "g", isNumeric = true)
+        LabeledInputRow("Carbs:", carbs, onCarbsChange, unit = "g", isNumeric = true)
+        LabeledInputRow("Fats:", fat, onFatChange, unit = "g", isNumeric = true)
 
         MealTypeSelector(
             selectedMealType = mealType,
@@ -321,19 +375,28 @@ fun NutrientCircle(
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
+            val strokeWidth = 10f
+            val radius = size.minDimension / 2.2f
+
             drawCircle(
-                color = NomsyColors.Subtitle.copy(alpha = 0.2f),
-                style = Stroke(width = 10f)
+                color = NomsyColors.Subtitle.copy(alpha = 0.3f),
+                radius = radius,
+                center = center,
+                style = Stroke(width = strokeWidth)
             )
+
             val sweepAngle = 360f * animatedPercentage.value
             drawArc(
                 color = color,
                 startAngle = 270f,
                 sweepAngle = sweepAngle,
                 useCenter = false,
-                style = Stroke(width = 10f, cap = StrokeCap.Round),
-                size = Size(size.width, size.height),
-                topLeft = Offset.Zero
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+                size = Size(size.minDimension, size.minDimension),
+                topLeft = Offset(
+                    (size.width - size.minDimension) / 2f,
+                    (size.height - size.minDimension) / 2f
+                )
             )
         }
 
@@ -344,13 +407,112 @@ fun NutrientCircle(
     }
 }
 
+@Composable
+fun SearchFoodDropdown(
+    viewModel: FoodViewModel,
+    foodName: String,
+    onSelectFood: (Food) -> Unit,
+    onQueryChange: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
+    val searchResults = viewModel.searchResults
+    val focusManager = LocalFocusManager.current
+
+    var searchJob by remember { mutableStateOf<Job?>(null) }
+
+    val coroutineScope = rememberCoroutineScope()
+
+
+    Column {
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = {
+                searchQuery = it
+                onQueryChange(it)
+                expanded = true
+
+                searchJob?.cancel()
+                searchJob = coroutineScope.launch {
+                    delay(300)
+                    viewModel.searchFoodsFromApi(it)
+                }
+            },
+            placeholder = {
+                Text("Search Food", color = NomsyColors.Texts.copy(alpha = 0.6f))
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(15.dp)),
+            singleLine = true,
+            shape = RoundedCornerShape(15.dp),
+            textStyle = TextStyle(color = NomsyColors.Texts),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = NomsyColors.Texts,
+                unfocusedBorderColor = NomsyColors.Texts,
+                textColor = NomsyColors.Texts,
+                cursorColor = NomsyColors.Texts,
+                placeholderColor = NomsyColors.Texts.copy(alpha = 0.6f)
+            ),
+            trailingIcon = {
+                Row {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = {
+                            searchQuery = ""
+                            onQueryChange("")
+                            expanded = false
+                        }) {
+                            Icon(Icons.Default.Close, contentDescription = "Clear", tint = NomsyColors.Subtitle)
+                        }
+                    }
+                    IconButton(onClick = { focusManager.clearFocus() }) {
+                        Icon(Icons.Default.Search, contentDescription = "Search", tint = NomsyColors.Subtitle)
+                    }
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    focusManager.clearFocus()
+                    expanded = true
+                }
+            )
+        )
+
+        DropdownMenu(
+            expanded = expanded && searchResults.isNotEmpty(),
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .width(300.dp)
+                .background(NomsyColors.Background)
+        ) {
+            searchResults.take(5).forEach { food ->
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .border(1.dp, NomsyColors.Title, RoundedCornerShape(8.dp))
+                        .clickable {
+                            onSelectFood(food) // fill fields
+                            searchQuery = food.food_name // update local state only
+                            expanded = false
+                            focusManager.clearFocus()
+                        }
+                        .padding(12.dp)
+                ) {
+                    Text(food.food_name, color = NomsyColors.Texts)
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun LabeledInputRow(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    unit: String? = null
+    unit: String? = null,
+    isNumeric: Boolean = false
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -361,25 +523,31 @@ fun LabeledInputRow(
             modifier = Modifier.width(80.dp),
             color = NomsyColors.Texts
         )
+
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { newValue ->
+                if (!isNumeric || newValue.all { it.isDigit() }) {
+                    onValueChange(newValue)
+                }
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = if (isNumeric) KeyboardType.Number else KeyboardType.Text
+            ),
             singleLine = true,
             modifier = Modifier
                 .weight(1f)
                 .height(56.dp)
-                .width(10.dp)
                 .padding(end = if (unit != null) 8.dp else 0.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 textColor = NomsyColors.Texts,
                 cursorColor = NomsyColors.Title,
                 focusedBorderColor = NomsyColors.Title,
                 unfocusedBorderColor = NomsyColors.Subtitle,
-                focusedLabelColor = NomsyColors.Title,
-                unfocusedLabelColor = NomsyColors.Subtitle,
                 backgroundColor = NomsyColors.PictureBackground
             )
         )
+
         if (unit != null) {
             Text(
                 text = unit,
@@ -391,6 +559,7 @@ fun LabeledInputRow(
         }
     }
 }
+
 
 
 @Composable

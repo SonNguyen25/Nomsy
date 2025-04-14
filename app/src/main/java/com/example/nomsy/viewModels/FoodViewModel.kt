@@ -3,29 +3,18 @@ package com.example.nomsy.viewModels
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.*
-import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.models.Food
 import com.example.nomsy.data.remote.SpoonacularApiService
-import com.example.nomsy.data.repository.AuthRepository
-import com.example.nomsy.data.repository.FoodRepository
-import com.example.nomsy.data.repository.IFoodRepository
-import com.example.nomsy.data.repository.IUserRepository
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.label.ImageLabeling
-import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.example.nomsy.data.remote.MealTrackerRetrofitClient
+import android.util.Log
+import com.example.nomsy.data.remote.NutritionTotals
 
 class FoodViewModel(application: Application) : AndroidViewModel(application) {
-//    private val userDatabase = UserDatabase.getDatabase(application)
-    private val foodRepository: IFoodRepository = FoodRepository()
-
-
-    private val _foods = MutableLiveData<Result<List<Food>>>()
-    val foods: LiveData<Result<List<Food>>> = _foods
-
-    // LiveData to hold the recognized food name from ML Kit.
+    // LiveData to hold the recognized food name
     private val _recognizedFood = MutableLiveData<String>()
     val recognizedFood: LiveData<String> get() = _recognizedFood
 
@@ -33,44 +22,12 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     private val _foodDetail = MutableLiveData<Food?>()
     val foodDetail: LiveData<Food?> = _foodDetail
 
-    // Processes an image using Google ML Kit and updates the recognized food name.
-    fun processFoodImage(context: Context, bitmap: Bitmap) {
-        // Create an InputImage from the bitmap.
-        val image = InputImage.fromBitmap(bitmap, 0)
-        // Get an instance of the default image labeler.
-        val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+    val allFoods = mutableStateListOf<Food>()
 
-        // Process the image using ML Kit.
-        labeler.process(image)
-            .addOnSuccessListener { labels ->
-                // For simplicity, take the first label as the recognized food name.
-                if (labels.isNotEmpty()) {
-                    _recognizedFood.value = labels.first().text
-                    // Optionally, trigger a call to your nutrition API here using the food name.
-                }
-            }
-            .addOnFailureListener { exception ->
-                // Log the exception or handle error as necessary.
-                exception.printStackTrace()
-            }
-    }
+    val searchResults = mutableStateListOf<Food>()
 
-    fun addFood(food: Food) {
-        // This can be expanded to update the UI based on addFood result if needed.
-        foodRepository.addFood(food)
-    }
-
-    fun loadFoods(userId: String) {
-        _foods.value = Result.loading()
-        foodRepository.getFoods(userId).observeForever {
-//            _foods.value = it
-        }
-    }
-
-    fun searchFood(name: String) {
-        // TODO: call your backend API to look up 'name' and post to _foodDetail
-        // e.g. repository.searchFood(name).observeForever { _foodDetail.postValue(it.data) }
-    }
+    private val _dailySummary = MutableLiveData<NutritionTotals>()
+    val dailySummary: LiveData<NutritionTotals> get() = _dailySummary
 
     fun analyzeWithSpoonacular(bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -78,6 +35,57 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
             food?.let {
                 _recognizedFood.postValue(it.food_name)
                 _foodDetail.postValue(it)
+            }
+        }
+    }
+
+    fun searchFoodsFromApi(query: String) {
+        viewModelScope.launch {
+            try {
+                val response = MealTrackerRetrofitClient.mealTrackerApi.getAllFoods()
+                if (response.isSuccessful) {
+                    searchResults.clear()
+                    val foods = response.body()?.foods?.filter {
+                        it.food_name.contains(query, ignoreCase = true)
+                    } ?: emptyList()
+                    searchResults.addAll(foods)
+                }
+            } catch (e: Exception) {
+                Log.e("FoodViewModel", "Search API failed: ${e.message}")
+            }
+        }
+    }
+
+    fun fetchAllFoods() {
+        viewModelScope.launch {
+            try {
+                val response = MealTrackerRetrofitClient.mealTrackerApi.getAllFoods()
+                if (response.isSuccessful) {
+                    val foods = response.body()?.foods ?: emptyList()
+                    allFoods.clear()
+                    allFoods.addAll(foods)
+                    searchResults.clear()
+                    searchResults.addAll(foods)
+                } else {
+                    Log.e("FoodViewModel", "Failed to fetch foods: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("FoodViewModel", "Exception during fetchAllFoods: ${e.message}")
+            }
+        }
+    }
+
+    fun fetchDailySummary(date: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = MealTrackerRetrofitClient.mealTrackerApi.getDailySummary(date)
+                if (response.isSuccessful) {
+                    _dailySummary.postValue(response.body()?.totals)
+                } else {
+                    Log.e("FoodViewModel", "Daily summary fetch error: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("FoodViewModel", "Exception during daily summary fetch: ${e.message}")
             }
         }
     }
