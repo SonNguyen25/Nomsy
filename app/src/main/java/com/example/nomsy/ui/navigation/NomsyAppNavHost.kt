@@ -1,5 +1,6 @@
 package com.example.nomsy.ui.navigation
 
+import android.app.Application
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
@@ -39,8 +40,14 @@ import com.example.nomsy.viewModels.*
 @Composable
 fun NomsyAppNavHost() {
     val navController = rememberNavController()
-    val authViewModel: AuthViewModel = viewModel()
-    val profileViewModel: ProfileViewModel = viewModel()
+    val context = LocalContext.current
+    val authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(context.applicationContext as Application)
+    )
+    val profileViewModel: ProfileViewModel = viewModel(
+        factory = ProfileViewModelFactory(context.applicationContext as Application)
+    )
+
     val homeViewModel: HomeViewModel = viewModel()
     val foodViewModel: FoodViewModel = viewModel()
 
@@ -121,7 +128,6 @@ fun NomsyAppNavHost() {
             }
 
             composable(BottomNavItem.Recipes.route) {
-                val context = LocalContext.current
                 val db = RecipeDatabase.getInstance(context)
                 val repository = RecipeRepository(RecipeRetrofitInstance.api, db.recipeDAO())
                 val factory = RecipeViewModelFactory(repository)

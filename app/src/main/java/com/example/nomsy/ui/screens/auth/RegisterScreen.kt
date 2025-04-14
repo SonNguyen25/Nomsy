@@ -47,11 +47,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: IAuthViewModel = viewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }

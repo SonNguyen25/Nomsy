@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -24,10 +25,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.ui.components.OnboardingBaseScreen
 import com.example.nomsy.ui.theme.NomsyColors
-import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 
 @Composable
-fun OnboardingAgeScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun OnboardingAgeScreen(navController: NavController, authViewModel: IAuthViewModel = viewModel()) {
     var age by remember { mutableStateOf("") }
     val context = LocalContext.current
 
@@ -59,7 +60,7 @@ fun OnboardingAgeScreen(navController: NavController, authViewModel: AuthViewMod
                     unfocusedBorderColor = NomsyColors.Subtitle,
                     backgroundColor = NomsyColors.PictureBackground
                 ),
-                modifier = Modifier.fillMaxWidth(0.8f)
+                modifier = Modifier.fillMaxWidth(0.8f).testTag("age_input"),
             )
         },
         buttonText = "Next",
