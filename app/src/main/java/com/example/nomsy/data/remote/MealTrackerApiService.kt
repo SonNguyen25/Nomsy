@@ -10,7 +10,19 @@ interface MealTrackerApiService {
 
     @GET("daily-summary")
     suspend fun getDailySummary(@Query("date") date: String): Response<DailySummaryResponse>
+
+    @DELETE("/meal")
+    suspend fun deleteMeal(
+        @Query("date") date: String,
+        @Query("food_name") foodName: String
+    ): Response<DeleteMealResponse>
 }
+
+// model for delete meal response
+data class DeleteMealResponse(
+    val message: String,
+    val success: Boolean
+)
 
 // Request model for adding a meal
 data class AddMealRequest(

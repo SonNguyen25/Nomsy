@@ -45,4 +45,8 @@ interface MealTrackerDao {
         insertMeals(meals)
     }
 
+    // DELETE FOOD by name and date
+    @Query("DELETE FROM meals WHERE date = :date AND food_name = :food_name")
+    suspend fun deleteMealByDateAndName(date: String, food_name: String): Int
+
 }

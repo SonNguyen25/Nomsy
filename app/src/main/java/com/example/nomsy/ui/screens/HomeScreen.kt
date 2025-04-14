@@ -1,6 +1,7 @@
 package com.example.nomsy.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -22,6 +23,7 @@ import com.example.nomsy.data.local.models.User
 import com.example.nomsy.ui.components.*
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
+import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.HomeViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 import java.util.Locale
@@ -31,8 +33,16 @@ import java.util.Locale
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = viewModel(),
+    authViewModel: AuthViewModel,
     profileViewModel: ProfileViewModel = viewModel(),
 ) {
+    // FETCHES PROFILE DATA
+    val username = authViewModel.getCurrentUsername() // Get the username
+    LaunchedEffect(username) {
+        if (username.isNotEmpty()) {
+            profileViewModel.fetchByUsername(username)
+        }
+    }
 
     val scrollState = rememberScrollState()
     val date = viewModel.selectedDate.collectAsState().value
@@ -43,8 +53,7 @@ fun HomeScreen(
 
     var (waterGoal, calorieGoal, proteinGoal, carbsGoal, fatGoal) = List(5) { 0 }
     var showAddFoodDialog by remember { mutableStateOf(false) }
-
-
+    
     // nutrition goals early
     when (profileResult) {
         is Result.Success -> {
@@ -163,7 +172,10 @@ fun HomeScreen(
 
                 is Result.Loading -> {
                     androidx.compose.material.CircularProgressIndicator(
-                        color = NomsyColors.Title
+                        color = NomsyColors.Title,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+
                     )
                 }
 
@@ -219,7 +231,9 @@ fun HomeScreen(
             when (mealsResult) {
                 is Result.Loading -> {
                     androidx.compose.material.CircularProgressIndicator(
-                        color = NomsyColors.Title
+                        color = NomsyColors.Title,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
                     )
                 }
 
@@ -247,7 +261,11 @@ fun HomeScreen(
 
                             MealListSection(
                                 title = displayMealType,
-                                meals = meals
+                                meals = meals,
+                                onDelete = { meal ->
+                                    Log.d("HomeScreen", "Delete requested for: ${meal.food_name}")
+                                    viewModel.deleteMeal("2025-04-$date", meal.food_name)
+                                }
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }
@@ -262,9 +280,8 @@ fun HomeScreen(
                     )
                 }
             }
+            Spacer(Modifier.height(50.dp))
         }
-        Spacer(Modifier.height(32.dp))
-        Spacer(Modifier.height(32.dp))
 
 
         // Add food floating action button

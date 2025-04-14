@@ -78,21 +78,36 @@ fun NomsyAppNavHost() {
         }
     ) { innerPadding ->
         NavHost(
-            navController    = navController,
+            navController = navController,
             startDestination = "login",
-            modifier         = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding)
         ) {
             // Authentication flow
-            composable("login")               { LoginScreen(navController, authViewModel) }
-            composable("register")            { RegisterScreen(navController, authViewModel) }
-            composable("onboarding_welcome")  { OnboardingWelcomeScreen(navController) }
-            composable("onboarding_name")     { OnboardingNameScreen(navController, authViewModel) }
-            composable("onboarding_age")      { OnboardingAgeScreen(navController, authViewModel) }
-            composable("onboarding_height")   { OnboardingHeightScreen(navController, authViewModel) }
-            composable("onboarding_weight")   { OnboardingWeightScreen(navController, authViewModel) }
-            composable("onboarding_fitness_goal") { OnboardingFitnessGoalScreen(navController, authViewModel) }
-            composable("onboarding_nutrition"){ OnboardingNutritionScreen(navController, authViewModel) }
-            composable("registration_complete") { RegistrationCompleteScreen(navController, authViewModel) }
+            composable("login") { LoginScreen(navController, authViewModel) }
+            composable("register") { RegisterScreen(navController, authViewModel) }
+            composable("onboarding_welcome") { OnboardingWelcomeScreen(navController) }
+            composable("onboarding_name") { OnboardingNameScreen(navController, authViewModel) }
+            composable("onboarding_age") { OnboardingAgeScreen(navController, authViewModel) }
+            composable("onboarding_height") { OnboardingHeightScreen(navController, authViewModel) }
+            composable("onboarding_weight") { OnboardingWeightScreen(navController, authViewModel) }
+            composable("onboarding_fitness_goal") {
+                OnboardingFitnessGoalScreen(
+                    navController,
+                    authViewModel
+                )
+            }
+            composable("onboarding_nutrition") {
+                OnboardingNutritionScreen(
+                    navController,
+                    authViewModel
+                )
+            }
+            composable("registration_complete") {
+                RegistrationCompleteScreen(
+                    navController,
+                    authViewModel
+                )
+            }
 
             // Main app screens with bottom bar
             composable(BottomNavItem.Statistics.route) { StatisticsScreen() }
@@ -101,6 +116,7 @@ fun NomsyAppNavHost() {
                     navController = navController,
                     viewModel = homeViewModel,
                     profileViewModel = profileViewModel,
+                    authViewModel = authViewModel
                 )
             }
 
@@ -113,23 +129,24 @@ fun NomsyAppNavHost() {
 
                 recipesScreen(
                     navController = navController,
-                    viewModel = recipeViewModel)
+                    viewModel = recipeViewModel
+                )
             }
 
             composable(BottomNavItem.Profile.route) {
                 ProfileScreen(
-                    navController       = navController,
-                    authViewModel       = authViewModel,
-                    profileViewModel    = profileViewModel
+                    navController = navController,
+                    authViewModel = authViewModel,
+                    profileViewModel = profileViewModel
                 )
             }
 
             // Edit profile screen – no bottom bar
             composable("edit_profile") {
                 EditProfileScreen(
-                    navController       = navController,
-                    profileViewModel    = profileViewModel,
-                    authViewModel       = authViewModel
+                    navController = navController,
+                    profileViewModel = profileViewModel,
+                    authViewModel = authViewModel
                 )
             }
         }

@@ -157,6 +157,39 @@ class MealTrackerRepository(
         }
     }
 
+
+    suspend fun deleteMeal(date: String, foodName: String): Result<Boolean> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d("MealTrackerRepository", "Deleting meal: $foodName on date: $date")
+
+                // Call the API to delete the meal
+                val response = mealApiService.deleteMeal(date, foodName)
+
+                if (response.isSuccessful) {
+                    val deleteResponse = response.body()
+                    Log.d("MealTrackerRepository", "API delete response: $deleteResponse")
+
+                    if (deleteResponse?.success == true) {
+
+                        val rowsDeleted = mealDao.deleteMealByDateAndName(date, foodName)
+
+                        Result.Success(true)
+                    } else {
+                        Result.Error(Exception(deleteResponse?.message ?: "Failed to delete meal"))
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Result.Error(Exception("deletion failed: ${response.code()} - $errorBody"))
+                }
+            } catch (e: Exception) {
+                Log.e("MealTrackerRepository", "deletion failed with exception ", e)
+                Result.Error(e)
+            }
+        }
+    }
+
+
     // i dunno if ur using this
     suspend fun addMeal(
         date: String,
