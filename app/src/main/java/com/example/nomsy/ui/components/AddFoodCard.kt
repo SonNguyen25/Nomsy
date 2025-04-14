@@ -7,7 +7,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.nomsy.data.local.models.Food
 import com.example.nomsy.ui.theme.NomsyColors
 import kotlinx.coroutines.CoroutineScope
@@ -42,8 +40,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -79,11 +75,24 @@ fun addFoodCard(
     val mealType = mealTypeState.value
     val setMealType: (String) -> Unit = { mealTypeState.value = it }
 
+    val foodViewModel: FoodViewModel = viewModel()
+    val foodDetail by foodViewModel.foodDetail.observeAsState()
+
     //Calculate the percentages
     val calPercent = (calories.toFloatOrNull() ?: 0f) / dailyGoals["calories"]!! * 100
     val proteinPercent = (protein.toFloatOrNull() ?: 0f) / dailyGoals["protein"]!! * 100
     val carbsPercent = (carbs.toFloatOrNull() ?: 0f) / dailyGoals["carbs"]!! * 100
     val fatPercent = (fat.toFloatOrNull() ?: 0f) / dailyGoals["fat"]!! * 100
+
+    LaunchedEffect(foodDetail) {
+        foodDetail?.let {
+            foodName = it.food_name
+            calories = it.calories.toString()
+            protein = it.protein.toString()
+            carbs = it.carbs.toString()
+            fat = it.fat.toString()
+        }
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         Box(
@@ -178,14 +187,16 @@ fun addFoodCard(
                         Button(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
+                                    val foodData = if (inputMethod == "Picture") foodDetail else null
+
                                     val json = JSONObject().apply {
-                                        put("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                                        put("date", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                                         put("meal_type", mealType.lowercase())
-                                        put("food_name", foodName)
-                                        put("calories", calories.toIntOrNull() ?: 0)
-                                        put("carbs", carbs.toIntOrNull() ?: 0)
-                                        put("protein", protein.toIntOrNull() ?: 0)
-                                        put("fat", fat.toIntOrNull() ?: 0)
+                                        put("food_name", foodData?.food_name ?: foodName)
+                                        put("calories", foodData?.calories ?: calories.toIntOrNull() ?: 0)
+                                        put("carbs", foodData?.carbs ?: carbs.toIntOrNull() ?: 0)
+                                        put("protein", foodData?.protein ?: protein.toIntOrNull() ?: 0)
+                                        put("fat", foodData?.fat ?: fat.toIntOrNull() ?: 0)
                                     }
 
                                     val client = OkHttpClient()
@@ -198,9 +209,7 @@ fun addFoodCard(
                                     try {
                                         val response = client.newCall(request).execute()
                                         if (response.isSuccessful) {
-                                            withContext(Dispatchers.Main) {
-                                                onDismiss()
-                                            }
+                                            withContext(Dispatchers.Main) { onDismiss() }
                                             Log.e("AddMeal", "Meal Added Successfully")
                                         } else {
                                             Log.e("AddMeal", "Error: ${response.body?.string()}")

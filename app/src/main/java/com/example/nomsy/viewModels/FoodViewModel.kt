@@ -3,10 +3,7 @@ package com.example.nomsy.viewModels
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.models.Food
 import com.example.nomsy.data.remote.SpoonacularApiService
@@ -17,6 +14,8 @@ import com.example.nomsy.data.repository.IUserRepository
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FoodViewModel(application: Application) : AndroidViewModel(application) {
 //    private val userDatabase = UserDatabase.getDatabase(application)
@@ -74,21 +73,14 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun analyzeWithSpoonacular(bitmap: Bitmap) {
-        val image = InputImage.fromBitmap(bitmap, 0)
-        val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
-
-        labeler.process(image)
-            .addOnSuccessListener { labels ->
-                val foodName = labels.firstOrNull()?.text ?: return@addOnSuccessListener
-                _recognizedFood.postValue(foodName)
-
-                SpoonacularApiService.guessNutrition(foodName) { food ->
-                    _foodDetail.postValue(food)
-                }
+        viewModelScope.launch(Dispatchers.IO) {
+            val food = SpoonacularApiService.analyzeFoodImage(bitmap)
+            food?.let {
+                _recognizedFood.postValue(it.food_name)
+                _foodDetail.postValue(it)
             }
-            .addOnFailureListener {
-                it.printStackTrace()
-            }
+        }
     }
+
 
 }

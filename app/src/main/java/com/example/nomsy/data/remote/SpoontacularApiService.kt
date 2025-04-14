@@ -2,51 +2,80 @@ package com.example.nomsy.data.remote
 
 import android.graphics.Bitmap
 import android.util.Base64
+import android.util.Log
 import com.example.nomsy.data.local.models.Food
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 
 object SpoonacularApiService {
-    private const val API_KEY = "5426cfe3532a41c18494f673dfc03870"
+    private const val API_KEY = "b1841f15dcc444d99a6bb5a44cb1351b"
 
-    fun guessNutrition(foodName: String, onResult: (Food?) -> Unit) {
-        val url = "https://api.spoonacular.com/recipes/guessNutrition?title=${foodName}&apiKey=$API_KEY"
+    suspend fun analyzeFoodImage(bitmap: Bitmap): Food? {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        val byteArray = stream.toByteArray()
 
-        val request = Request.Builder()
-            .url(url)
-            .get()
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("file", "image.jpg", byteArray.toRequestBody("image/jpeg".toMediaTypeOrNull()))
+            .addFormDataPart("apiKey", API_KEY)
             .build()
 
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                onResult(null)
+        val request = Request.Builder()
+            .url("https://api.spoonacular.com/food/images/analyze")
+            .addHeader("x-api-key", API_KEY)
+            .post(requestBody)
+            .build()
+
+        val client = OkHttpClient()
+
+        return try {
+            val response = client.newCall(request).execute()
+
+            Log.d("Client Response", response.toString())
+
+            if (!response.isSuccessful) {
+                Log.e("Spoonacular", "Request failed: ${response.code}")
+                Log.e("Spoonacular", "Raw body: ${response.body?.string()}")
+                return null
             }
 
-            override fun onResponse(call: Call, response: Response) {
-                response.body?.string()?.let {
-                    try {
-                        val json = JSONObject(it)
-                        val food = Food(
-                            id = "", // Generate or leave blank for now
-                            date = "", // Fill in when saving
-                            meal_type = "",
-                            food_name = foodName,
-                            calories = json.getJSONObject("calories").getDouble("value").toInt(),
-                            carbs = json.getJSONObject("carbs").getDouble("value").toInt(),
-                            protein = json.getJSONObject("protein").getDouble("value").toInt(),
-                            fat = json.getJSONObject("fat").getDouble("value").toInt()
-                        )
-                        onResult(food)
-                    } catch (e: Exception) {
-                        onResult(null)
-                    }
-                } ?: onResult(null)
+            val bodyString = response.body?.string() ?: return null
+            val json = JSONObject(bodyString)
+
+            if (!json.has("category") || !json.has("nutrition")) {
+                Log.e("Spoonacular", "Missing category or nutrition: $bodyString")
+                return null
             }
-        })
+
+            val category = json.getJSONObject("category").optString("name", "Unknown")
+
+            val nutrition = json.getJSONObject("nutrition")
+            val calories = nutrition.getJSONObject("calories").getDouble("value").toInt()
+            val protein = nutrition.getJSONObject("protein").getDouble("value").toInt()
+            val carbs = nutrition.getJSONObject("carbs").getDouble("value").toInt()
+            val fat = nutrition.getJSONObject("fat").getDouble("value").toInt()
+
+            Food(
+                id = "",
+                date = "",
+                meal_type = "",
+                food_name = category,
+                calories = calories,
+                protein = protein,
+                carbs = carbs,
+                fat = fat
+            )
+
+        } catch (e: Exception) {
+            Log.e("Spoonacular", "Analyze Error: ${e.message}", e)
+            null
+        }
     }
+
+
 
 }
