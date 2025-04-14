@@ -34,8 +34,10 @@ android {
         }
 
         debug {
-
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
         }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
