@@ -1,10 +1,14 @@
 package com.example.nomsy.data.remote
 
 
-import androidx.room.PrimaryKey
 import com.example.nomsy.data.local.models.Food
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface MealTrackerApiService {
     @POST("meals")
@@ -27,6 +31,8 @@ interface MealTrackerApiService {
 
 }
 
+// REQUEST AND RESPONSE MODELS - sorry it's not organized
+
 data class AdjustWaterRequest(
     val date: String,
     val delta: Double
@@ -37,18 +43,15 @@ data class WaterResponse(
     val water: Double
 )
 
-
 data class FoodResponse(
     val foods: List<Food>
 )
 
-// model for delete meal response
 data class DeleteMealResponse(
     val message: String,
     val success: Boolean
 )
 
-// Request model for adding a meal
 data class AddMealRequest(
     val date: String,
     val meal_type: String,
@@ -59,13 +62,11 @@ data class AddMealRequest(
     val fat: Int
 )
 
-// Response model for adding a meal
 data class AddMealResponse(
     val message: String,
     val mealId: String
 )
 
-// Response models for daily summary
 data class DailySummaryResponse(
     val date: String,
     val totals: NutritionTotals,
@@ -86,6 +87,4 @@ data class MealItem(
     val carbs: Int,
     val protein: Int,
     val fat: Int
-) {
-
-}
+)

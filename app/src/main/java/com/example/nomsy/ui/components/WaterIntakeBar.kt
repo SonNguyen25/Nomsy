@@ -1,18 +1,28 @@
 package com.example.nomsy.ui.components
 
+//noinspection UsingMaterialAndMaterial3Libraries
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocalDrink
 import androidx.compose.material.icons.filled.Remove
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -21,8 +31,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -81,7 +95,7 @@ fun WaterIntakeBar(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Water intake bar - click to open dialog
+        // bar - click to open dialog
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -93,7 +107,7 @@ fun WaterIntakeBar(
                 )
                 .clickable { showDialog = true }
         ) {
-            // Filled portion
+            // filled portion
             Box(
                 modifier = Modifier
                     .fillMaxWidth((waterAmount / goal).coerceIn(0f, 1f))
@@ -105,7 +119,7 @@ fun WaterIntakeBar(
                     )
             )
 
-            // Text
+            // amount of water text
             Text(
                 text = "${waterAmount.format(1)} L",
                 modifier = Modifier.align(Alignment.Center),
@@ -115,7 +129,7 @@ fun WaterIntakeBar(
         }
     }
 
-    // Water intake dialog
+    // Water intake popup dialog
     if (showDialog) {
         WaterIntakeDialog(
             currentIntake = waterAmount,
@@ -128,6 +142,7 @@ fun WaterIntakeBar(
     }
 }
 
+// the popup to adjust water
 @Composable
 fun WaterIntakeDialog(
     currentIntake: Float,
@@ -163,7 +178,7 @@ fun WaterIntakeDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Water amount display with buttons
+                // display
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -221,7 +236,7 @@ fun WaterIntakeDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Action buttons
+                // cancel and update buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
@@ -250,7 +265,7 @@ fun WaterIntakeDialog(
     }
 }
 
-// Extension function to format float to 1 decimal place as string
+// helper to format float to 1 decimal place as string
 fun Float.format(digits: Int): String {
     val multiplier = 10.0.pow(digits.toDouble()).toFloat()
     return (round(this * multiplier) / multiplier).toString()

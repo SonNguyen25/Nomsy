@@ -36,7 +36,7 @@ class HomeViewModel(application: Application) :
     // Meals by type
     override val mealsByType = MutableLiveData<Result<Map<String, List<MealItem>>>>()
 
-    // Water intake dont think we need this since its in nutrition totals
+    // Water intake
     private val _waterIntake = MutableStateFlow(0.0)
     override val waterIntake: StateFlow<Double> = _waterIntake
 
