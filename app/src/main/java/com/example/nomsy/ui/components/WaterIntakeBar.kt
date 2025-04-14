@@ -81,7 +81,7 @@ fun WaterIntakeBar(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Water intake bar
+        // Water intake bar - click to open dialog
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -171,7 +171,10 @@ fun WaterIntakeDialog(
                 ) {
                     IconButton(
                         onClick = {
-                            waterAmount = (waterAmount - 0.1f).coerceAtLeast(0f)
+                            if (waterAmount > 0) {
+                                waterAmount = (waterAmount - 0.1f).coerceAtLeast(0f)
+                            }
+
                             textInput = waterAmount.format(1)
                         }
                     ) {
@@ -202,7 +205,9 @@ fun WaterIntakeDialog(
 
                     IconButton(
                         onClick = {
-                            waterAmount = waterAmount + 0.1f
+                            if (waterAmount < 2.05) {
+                                waterAmount = (waterAmount + 0.1f).coerceAtMost(2f)
+                            }
                             textInput = waterAmount.format(1)
                         }
                     ) {

@@ -10,6 +10,9 @@ interface MealTrackerApiService {
     @POST("meals")
     suspend fun addMeal(@Body mealRequest: AddMealRequest): Response<AddMealResponse>
 
+    @PATCH("water")
+    suspend fun adjustWater(@Body data: AdjustWaterRequest): WaterResponse
+
     @GET("daily-summary")
     suspend fun getDailySummary(@Query("date") date: String): Response<DailySummaryResponse>
 
@@ -23,6 +26,16 @@ interface MealTrackerApiService {
     suspend fun getAllFoods(): Response<FoodResponse>
 
 }
+
+data class AdjustWaterRequest(
+    val date: String,
+    val delta: Double
+)
+
+data class WaterResponse(
+    val date: String,
+    val water: Double
+)
 
 
 data class FoodResponse(

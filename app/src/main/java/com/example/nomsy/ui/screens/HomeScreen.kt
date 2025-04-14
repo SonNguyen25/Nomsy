@@ -46,6 +46,7 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
     val date = viewModel.selectedDate.collectAsState().value
+    val formattedDate = remember(date) { "2025-04-$date" }
     val profileResult by profileViewModel.profile.observeAsState()
     val nutritionResult by viewModel.nutritionTotals.observeAsState(initial = Result.Loading)
     val mealsResult by viewModel.mealsByType.observeAsState(initial = Result.Loading)
@@ -163,7 +164,7 @@ fun HomeScreen(
                         goal = waterGoal.toFloat(),
                         onWaterIntakeChange = {
                             viewModel.updateWaterIntake(
-                                "2025-04-$date",
+                                formattedDate,
                                 newWaterIntake = it.toDouble()
                             )
                         }
@@ -239,7 +240,7 @@ fun HomeScreen(
 
                 is Result.Error -> {
                     Text(
-                        text = "error has occured",
+                        text = "error has occurred",
                         color = NomsyColors.Subtitle
                     )
                 }
@@ -264,7 +265,7 @@ fun HomeScreen(
                                 meals = meals,
                                 onDelete = { meal ->
                                     Log.d("HomeScreen", "Delete requested for: ${meal.food_name}")
-                                    viewModel.deleteMeal("2025-04-$date", meal.food_name)
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
                                 }
                             )
                             Spacer(modifier = Modifier.height(16.dp))

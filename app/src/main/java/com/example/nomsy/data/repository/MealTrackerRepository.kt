@@ -162,18 +162,14 @@ class MealTrackerRepository(
         return withContext(Dispatchers.IO) {
             try {
                 Log.d("MealTrackerRepository", "Deleting meal: $foodName on date: $date")
-
-                // Call the API to delete the meal
                 val response = mealApiService.deleteMeal(date, foodName)
-
                 if (response.isSuccessful) {
                     val deleteResponse = response.body()
                     Log.d("MealTrackerRepository", "API delete response: $deleteResponse")
 
                     if (deleteResponse?.success == true) {
 
-                        val rowsDeleted = mealDao.deleteMealByDateAndName(date, foodName)
-
+                        mealDao.deleteMealByDateAndName(date, foodName)
                         Result.Success(true)
                     } else {
                         Result.Error(Exception(deleteResponse?.message ?: "Failed to delete meal"))
@@ -186,6 +182,18 @@ class MealTrackerRepository(
                 Log.e("MealTrackerRepository", "deletion failed with exception ", e)
                 Result.Error(e)
             }
+        }
+    }
+
+    suspend fun updateWaterIntakeDelta(date: String, delta: Double, newAmount: Double): Double {
+        try {
+            val request = AdjustWaterRequest(date, delta)
+            val response = mealApiService.adjustWater(request)
+            mealDao.updateWaterIntake(date, newAmount)
+            return response.water
+        } catch (e: Exception) {
+            Log.e("Repository", "Error updating water", e)
+            throw e
         }
     }
 
