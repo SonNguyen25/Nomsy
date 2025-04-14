@@ -23,6 +23,7 @@ import com.example.nomsy.data.local.models.User
 import com.example.nomsy.ui.components.*
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
+import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.HomeViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 import java.util.Locale
@@ -32,8 +33,16 @@ import java.util.Locale
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = viewModel(),
+    authViewModel: AuthViewModel,
     profileViewModel: ProfileViewModel = viewModel(),
 ) {
+    // FETCHES PROFILE DATA
+    val username = authViewModel.getCurrentUsername() // Get the username
+    LaunchedEffect(username) {
+        if (username.isNotEmpty()) {
+            profileViewModel.fetchByUsername(username)
+        }
+    }
 
     val scrollState = rememberScrollState()
     val date = viewModel.selectedDate.collectAsState().value
