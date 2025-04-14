@@ -19,7 +19,7 @@ interface FoodDao {
     @Query("SELECT * FROM foods WHERE date = :date")
     suspend fun getFoodsByDate(date: String): List<Food>
 
-    @Query("SELECT * FROM foods WHERE date = :date AND mealType = :mealType")
+    @Query("SELECT * FROM foods WHERE date = :date AND meal_Type = :mealType")
     suspend fun getFoodsByDateAndType(date: String, mealType: String): List<Food>
 
     @Query("DELETE FROM foods WHERE date = :date")
@@ -27,4 +27,11 @@ interface FoodDao {
     
     @Query("DELETE FROM foods")
     suspend fun clearAll()
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFood(food: Food)
+
+    @Query("SELECT * FROM foods ORDER BY date DESC")
+    suspend fun getAllFoods(): List<Food>
 }

@@ -1,5 +1,6 @@
 package com.example.nomsy.ui.components
 
+import android.graphics.Bitmap
 import android.os.Build
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,11 +38,21 @@ import org.json.JSONObject
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nomsy.viewModels.FoodViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -54,7 +65,7 @@ fun addFoodCard(
 
     val dailyGoals = mapOf(
         "calories" to 2000f,
-        "protein" to 50f,
+        "protein" to 250f,
         "carbs" to 250f,
         "fat" to 70f
     )
@@ -74,7 +85,6 @@ fun addFoodCard(
     val carbsPercent = (carbs.toFloatOrNull() ?: 0f) / dailyGoals["carbs"]!! * 100
     val fatPercent = (fat.toFloatOrNull() ?: 0f) / dailyGoals["fat"]!! * 100
 
-
     Dialog(onDismissRequest = onDismiss) {
         Box(
             modifier = Modifier
@@ -83,138 +93,144 @@ fun addFoodCard(
                 .border(1.dp, NomsyColors.Title, shape = RoundedCornerShape(8.dp))
                 .background(NomsyColors.Background, shape = RoundedCornerShape(16.dp))
         ) {
-            // Scrollable content
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxSize()
-                    .padding(bottom = 80.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Toggle
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+            Column(modifier = Modifier.fillMaxSize()) {
+
+                // Static black toggle header
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black)
+                        .padding(vertical = 12.dp)
                 ) {
-                    listOf("Manual", "Picture").forEach { method ->
-                        val isSelected = inputMethod == method
-                        val underlineWidth by animateDpAsState(
-                            targetValue = if (isSelected) 70.dp else 0.dp,
-                            label = "Underline Animation"
-                        )
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .clickable { inputMethod = method }
-                                .padding(8.dp)
-                        ) {
-                            Text(
-                                text = method,
-                                color = if (isSelected) NomsyColors.Title else NomsyColors.Subtitle,
-                                style = MaterialTheme.typography.titleMedium
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        listOf("Manual", "Picture").forEach { method ->
+                            val isSelected = inputMethod == method
+                            val underlineWidth by animateDpAsState(
+                                targetValue = if (isSelected) 70.dp else 0.dp,
+                                label = "Underline Animation"
                             )
 
-                            Box(
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
-                                    .height(2.dp)
-                                    .width(underlineWidth)
-                                    .background(NomsyColors.Title)
-                            )
+                                    .clickable { inputMethod = method }
+                                    .padding(8.dp)
+                            ) {
+                                Text(
+                                    text = method,
+                                    color = if (isSelected) NomsyColors.Title else NomsyColors.Subtitle,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                Box(
+                                    modifier = Modifier
+                                        .height(2.dp)
+                                        .width(underlineWidth)
+                                        .background(NomsyColors.Title)
+                                )
+                            }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (inputMethod == "Manual") {
-                    ManualInputForm(
-                        foodName, { foodName = it },
-                        calories, { calories = it },
-                        carbs, { carbs = it },
-                        protein, { protein = it },
-                        fat, { fat = it },
-                        mealType, setMealType,
-                        calPercent,
-                        proteinPercent,
-                        carbsPercent,
-                        fatPercent
-                    )
-
-                } else {
-                    PictureCaptureSection()
+                // Scrollable form content
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (inputMethod == "Manual") {
+                        ManualInputForm(
+                            foodName, { foodName = it },
+                            calories, { calories = it },
+                            protein, { protein = it },
+                            carbs, { carbs = it },
+                            fat, { fat = it },
+                            mealType, setMealType,
+                            calPercent,
+                            proteinPercent,
+                            carbsPercent,
+                            fatPercent
+                        )
+                    } else {
+                        PictureCaptureSection()
+                    }
                 }
-            }
 
-            // Sticky footer
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .background(NomsyColors.Background)
-                    .padding(16.dp)
-            ) {
-                Row(
+                // Sticky footer (shorter)
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                        .background(NomsyColors.Background)
+                        .padding(8.dp)
                 ) {
-                    Button(
-                        onClick = {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                val json = JSONObject().apply {
-                                    put("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
-                                    put("meal_type", mealType.lowercase())
-                                    put("food_name", foodName)
-                                    put("calories", calories.toIntOrNull() ?: 0)
-                                    put("carbs", carbs.toIntOrNull() ?: 0)
-                                    put("protein", protein.toIntOrNull() ?: 0)
-                                    put("fat", fat.toIntOrNull() ?: 0)
-                                }
-
-                                val client = OkHttpClient()
-                                val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
-                                val request = Request.Builder()
-                                    .url("https://sonnguyen25.pythonanywhere.com/meals")
-                                    .post(body)
-                                    .build()
-
-                                try {
-                                    val response = client.newCall(request).execute()
-                                    if (response.isSuccessful) {
-                                        withContext(Dispatchers.Main) {
-                                            onDismiss()
-                                        }
-                                        Log.e("AddMeal", "Meal Added Successfully")
-                                    } else {
-                                        Log.e("AddMeal", "Error: ${response.body?.string()}")
-                                    }
-                                } catch (e: Exception) {
-                                    Log.e("AddMeal", "Exception: ${e.message}")
-                                }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = NomsyColors.Background
-                        ),
-                        border = BorderStroke(1.dp, NomsyColors.Title)
-
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Text("Submit")
-                    }
+                        Button(
+                            onClick = {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val json = JSONObject().apply {
+                                        put("date", LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                                        put("meal_type", mealType.lowercase())
+                                        put("food_name", foodName)
+                                        put("calories", calories.toIntOrNull() ?: 0)
+                                        put("carbs", carbs.toIntOrNull() ?: 0)
+                                        put("protein", protein.toIntOrNull() ?: 0)
+                                        put("fat", fat.toIntOrNull() ?: 0)
+                                    }
 
-                    TextButton(
-                        onClick = onDismiss,
-                        border = BorderStroke(1.dp, NomsyColors.Title)) {
-                        Text("Close", color = NomsyColors.Subtitle)
+                                    val client = OkHttpClient()
+                                    val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
+                                    val request = Request.Builder()
+                                        .url("https://sonnguyen25.pythonanywhere.com/meals")
+                                        .post(body)
+                                        .build()
+
+                                    try {
+                                        val response = client.newCall(request).execute()
+                                        if (response.isSuccessful) {
+                                            withContext(Dispatchers.Main) {
+                                                onDismiss()
+                                            }
+                                            Log.e("AddMeal", "Meal Added Successfully")
+                                        } else {
+                                            Log.e("AddMeal", "Error: ${response.body?.string()}")
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("AddMeal", "Exception: ${e.message}")
+                                    }
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = NomsyColors.Background
+                            ),
+                            border = BorderStroke(1.dp, NomsyColors.Title)
+                        ) {
+                            Text("Submit")
+                        }
+
+                        TextButton(
+                            onClick = onDismiss,
+                            border = BorderStroke(1.dp, NomsyColors.Title)
+                        ) {
+                            Text("Close", color = NomsyColors.Subtitle)
+                        }
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun ManualInputForm(
@@ -244,33 +260,77 @@ fun ManualInputForm(
             onMealTypeChange = onMealTypeChange
         )
 
-        Text("Daily Goals Completion", color = NomsyColors.Subtitle)
+        Text(
+            "Daily Goals Completion",
+            color = NomsyColors.Title,
+            fontWeight = FontWeight.Bold,
+            style = androidx.compose.material.MaterialTheme.typography.h6,
+        )
 
-        NutrientProgressBar("Calories", calPercent, NomsyColors.Title)
-        NutrientProgressBar("Protein", proteinPercent, NomsyColors.Title)
-        NutrientProgressBar("Carbs", carbsPercent, NomsyColors.Title)
-        NutrientProgressBar("Fat", fatPercent, NomsyColors.Title)
+        // Wrapped 2 per row
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                NutrientCircle("Calories", calPercent, NomsyColors.Title, modifier = Modifier.weight(1f))
+                NutrientCircle("Protein", proteinPercent, NomsyColors.Title, modifier = Modifier.weight(1f))
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                NutrientCircle("Carbs", carbsPercent, NomsyColors.Title, modifier = Modifier.weight(1f))
+                NutrientCircle("Fat", fatPercent, NomsyColors.Title, modifier = Modifier.weight(1f))
+            }
+        }
     }
 }
 
 @Composable
-fun NutrientProgressBar(label: String, percent: Float, color: Color) {
-    Column {
-        LinearProgressIndicator(
-            progress = (percent / 100f).coerceIn(0f, 1f),
-            color = color,
-            trackColor = NomsyColors.Subtitle.copy(alpha = 0.2f),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(6.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+fun NutrientCircle(
+    label: String,
+    percent: Float,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    var animationPlayed by remember { mutableStateOf(false) }
+    val animatedPercentage = animateFloatAsState(
+        targetValue = if (animationPlayed) percent.coerceIn(0f, 100f) / 100f else 0f,
+        animationSpec = tween(durationMillis = 1000),
+        label = "AnimatedPercentage"
+    )
+
+    LaunchedEffect(Unit) {
+        animationPlayed = true
+    }
+
+    Box(
+        modifier = modifier
+            .size(100.dp)
+            .padding(8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                color = NomsyColors.Subtitle.copy(alpha = 0.2f),
+                style = Stroke(width = 10f)
+            )
+            val sweepAngle = 360f * animatedPercentage.value
+            drawArc(
+                color = color,
+                startAngle = 270f,
+                sweepAngle = sweepAngle,
+                useCenter = false,
+                style = Stroke(width = 10f, cap = StrokeCap.Round),
+                size = Size(size.width, size.height),
+                topLeft = Offset.Zero
+            )
+        }
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(label, fontSize = 12.sp, color = NomsyColors.Texts)
-            Text("${percent.toInt()}%", fontSize = 12.sp, color = NomsyColors.Texts)
+            Text("${percent.toInt()}%", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = NomsyColors.Texts)
         }
     }
 }
@@ -369,10 +429,18 @@ fun MealTypeSelector(
 
 @Composable
 fun PictureCaptureSection() {
-    var imageBitmap by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+    val context = LocalContext.current
+    val foodViewModel: FoodViewModel = viewModel()
+    val recognizedFood by foodViewModel.recognizedFood.observeAsState("")
+    val foodDetail by foodViewModel.foodDetail.observeAsState()
+
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
         imageBitmap = bitmap
+        bitmap?.let {
+            foodViewModel.analyzeWithSpoonacular(it)
+        }
     }
 
     val boxSize = 500.dp
@@ -386,7 +454,7 @@ fun PictureCaptureSection() {
             modifier = Modifier
                 .size(boxSize)
                 .clip(RoundedCornerShape(cornerRadius))
-                .background(Color.LightGray)
+                .background(NomsyColors.PictureBackground)
                 .border(1.dp, NomsyColors.Title, RoundedCornerShape(cornerRadius)),
             contentAlignment = Alignment.Center
         ) {
@@ -406,13 +474,30 @@ fun PictureCaptureSection() {
 
         Button(
             onClick = { launcher.launch(null) },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = NomsyColors.Title
-            ),) {
+            colors = ButtonDefaults.buttonColors(containerColor = NomsyColors.Title)
+        ) {
             Icon(
                 imageVector = Icons.Default.PhotoCamera,
                 contentDescription = "Take Picture"
             )
+        }
+
+        if (recognizedFood.isNotBlank()) {
+            Text(
+                text = "Detected: $recognizedFood",
+                color = NomsyColors.Title,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+
+        foodDetail?.let {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Food: ${it.food_name}", color = NomsyColors.Texts)
+                Text("Calories: ${it.calories} kcal", color = NomsyColors.Texts)
+                Text("Carbs: ${it.carbs} g", color = NomsyColors.Texts)
+                Text("Protein: ${it.protein} g", color = NomsyColors.Texts)
+                Text("Fat: ${it.fat} g", color = NomsyColors.Texts)
+            }
         }
     }
 }
