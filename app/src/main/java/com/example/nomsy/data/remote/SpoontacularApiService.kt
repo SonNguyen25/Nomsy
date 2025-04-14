@@ -2,6 +2,7 @@ package com.example.nomsy.data.remote
 
 import android.graphics.Bitmap
 import android.util.Base64
+import android.util.Log
 import com.example.nomsy.data.local.models.Food
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -14,7 +15,8 @@ object SpoonacularApiService {
     private const val API_KEY = "5426cfe3532a41c18494f673dfc03870"
 
     fun guessNutrition(foodName: String, onResult: (Food?) -> Unit) {
-        val url = "https://api.spoonacular.com/recipes/guessNutrition?title=${foodName}&apiKey=$API_KEY"
+        val url =
+            "https://api.spoonacular.com/recipes/guessNutrition?title=${foodName}&apiKey=$API_KEY"
 
         val request = Request.Builder()
             .url(url)
@@ -30,6 +32,7 @@ object SpoonacularApiService {
                 response.body?.string()?.let {
                     try {
                         val json = JSONObject(it)
+                        Log.d("Spoonacular", json.toString())
                         val food = Food(
                             id = "", // Generate or leave blank for now
                             date = "", // Fill in when saving

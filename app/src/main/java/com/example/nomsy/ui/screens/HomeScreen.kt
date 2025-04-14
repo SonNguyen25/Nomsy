@@ -1,6 +1,7 @@
 package com.example.nomsy.ui.screens
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -247,7 +248,11 @@ fun HomeScreen(
 
                             MealListSection(
                                 title = displayMealType,
-                                meals = meals
+                                meals = meals,
+                                onDelete = { meal ->
+                                    Log.d("HomeScreen", "Delete requested for: ${meal.food_name}")
+                                    viewModel.deleteMeal("2025-04-$date", meal.food_name)
+                                }
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }

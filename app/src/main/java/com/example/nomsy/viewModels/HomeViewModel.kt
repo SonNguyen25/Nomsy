@@ -143,5 +143,10 @@ HomeViewModel(application: Application) :
         }
     }
 
-
+    fun deleteMeal(date: String, foodName: String) {
+        viewModelScope.launch {
+            mealRepository.deleteMeal(date, foodName)
+        }
+        loadData()
+    }
 }
