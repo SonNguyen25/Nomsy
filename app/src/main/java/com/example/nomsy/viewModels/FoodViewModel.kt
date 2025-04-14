@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.remote.SpoonacularApiService
 import com.example.nomsy.data.repository.AuthRepository
 import com.example.nomsy.data.repository.FoodRepository
 import com.example.nomsy.data.repository.IFoodRepository
@@ -71,4 +72,23 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         // TODO: call your backend API to look up 'name' and post to _foodDetail
         // e.g. repository.searchFood(name).observeForever { _foodDetail.postValue(it.data) }
     }
+
+    fun analyzeWithSpoonacular(bitmap: Bitmap) {
+        val image = InputImage.fromBitmap(bitmap, 0)
+        val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+
+        labeler.process(image)
+            .addOnSuccessListener { labels ->
+                val foodName = labels.firstOrNull()?.text ?: return@addOnSuccessListener
+                _recognizedFood.postValue(foodName)
+
+                SpoonacularApiService.guessNutrition(foodName) { food ->
+                    _foodDetail.postValue(food)
+                }
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+            }
+    }
+
 }

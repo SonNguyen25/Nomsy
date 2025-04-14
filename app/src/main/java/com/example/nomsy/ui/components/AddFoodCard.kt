@@ -65,8 +65,7 @@ fun addFoodCard(
 
     val dailyGoals = mapOf(
         "calories" to 2000f,
-        "protein" to 50f,
-        "carbs" to 250f,
+        "protein" to 250f,
         "carbs" to 250f,
         "fat" to 70f
     )
@@ -149,8 +148,8 @@ fun addFoodCard(
                         ManualInputForm(
                             foodName, { foodName = it },
                             calories, { calories = it },
-                            carbs, { carbs = it },
                             protein, { protein = it },
+                            carbs, { carbs = it },
                             fat, { fat = it },
                             mealType, setMealType,
                             calPercent,
@@ -337,7 +336,6 @@ fun NutrientCircle(
 }
 
 
-
 @Composable
 fun LabeledInputRow(
     label: String,
@@ -429,18 +427,20 @@ fun MealTypeSelector(
 }
 
 
-
 @Composable
 fun PictureCaptureSection() {
     val context = LocalContext.current
     val foodViewModel: FoodViewModel = viewModel()
     val recognizedFood by foodViewModel.recognizedFood.observeAsState("")
+    val foodDetail by foodViewModel.foodDetail.observeAsState()
 
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
         imageBitmap = bitmap
-        bitmap?.let { foodViewModel.processFoodImage(context, it) }
+        bitmap?.let {
+            foodViewModel.analyzeWithSpoonacular(it)
+        }
     }
 
     val boxSize = 500.dp
@@ -489,7 +489,15 @@ fun PictureCaptureSection() {
                 modifier = Modifier.padding(8.dp)
             )
         }
+
+        foodDetail?.let {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Food: ${it.food_name}", color = NomsyColors.Texts)
+                Text("Calories: ${it.calories} kcal", color = NomsyColors.Texts)
+                Text("Carbs: ${it.carbs} g", color = NomsyColors.Texts)
+                Text("Protein: ${it.protein} g", color = NomsyColors.Texts)
+                Text("Fat: ${it.fat} g", color = NomsyColors.Texts)
+            }
+        }
     }
 }
-
-
