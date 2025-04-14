@@ -53,8 +53,7 @@ fun HomeScreen(
 
     var (waterGoal, calorieGoal, proteinGoal, carbsGoal, fatGoal) = List(5) { 0 }
     var showAddFoodDialog by remember { mutableStateOf(false) }
-
-
+    
     // nutrition goals early
     when (profileResult) {
         is Result.Success -> {
@@ -173,7 +172,10 @@ fun HomeScreen(
 
                 is Result.Loading -> {
                     androidx.compose.material.CircularProgressIndicator(
-                        color = NomsyColors.Title
+                        color = NomsyColors.Title,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+
                     )
                 }
 
@@ -229,7 +231,9 @@ fun HomeScreen(
             when (mealsResult) {
                 is Result.Loading -> {
                     androidx.compose.material.CircularProgressIndicator(
-                        color = NomsyColors.Title
+                        color = NomsyColors.Title,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
                     )
                 }
 
