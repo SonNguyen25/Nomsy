@@ -189,8 +189,6 @@ class MealTrackerRepository(
         }
     }
 
-
-    // i dunno if ur using this
     suspend fun addMeal(
         date: String,
         mealType: String,
@@ -204,8 +202,8 @@ class MealTrackerRepository(
 
             val request = AddMealRequest(
                 date = date,
-                mealType = mealType,
-                foodName = foodName,
+                meal_type = mealType,
+                food_name = foodName,
                 calories = calories,
                 carbs = carbs,
                 protein = protein,
