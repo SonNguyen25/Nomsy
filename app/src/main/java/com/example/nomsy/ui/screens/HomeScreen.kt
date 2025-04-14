@@ -53,7 +53,7 @@ fun HomeScreen(
 
     var (waterGoal, calorieGoal, proteinGoal, carbsGoal, fatGoal) = List(5) { 0 }
     var showAddFoodDialog by remember { mutableStateOf(false) }
-    
+
     // nutrition goals early
     when (profileResult) {
         is Result.Success -> {
@@ -110,7 +110,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     val nutrition = (nutritionResult as Result.Success<DailySummaryEntity?>).data
-                    // load nutrition progress circles and water intake guages
+                    // load nutrition progress circles and water intake gauges
                     // Large calorie circle
                     CalorieCircle(
                         currentCalories = (nutrition?.totalCalories ?: 69),
