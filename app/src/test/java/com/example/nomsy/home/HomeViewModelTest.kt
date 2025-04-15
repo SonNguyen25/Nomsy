@@ -45,7 +45,7 @@ import org.robolectric.RuntimeEnvironment
 import java.io.IOException
 
 
-@RunWith(JUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
 class HomeViewModelTest {
 

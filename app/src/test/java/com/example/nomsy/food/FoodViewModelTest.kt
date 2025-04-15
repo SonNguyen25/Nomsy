@@ -1,6 +1,7 @@
 package com.example.nomsy.food
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.data.remote.*
 import com.example.nomsy.data.remote.MealTrackerRetrofitClient
@@ -28,7 +29,7 @@ import retrofit2.Response
 import java.lang.reflect.Field
 
 @ExperimentalCoroutinesApi
-@RunWith(JUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 class FoodViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -40,12 +41,9 @@ class FoodViewModelTest {
 
     @Before
     fun setup() {
-
         Dispatchers.setMain(mainDispatcher)
 
-
         fakeApi = FakeMealTrackerApiService()
-
 
         val clientClass = MealTrackerRetrofitClient::class.java
         val delegateField: Field = clientClass.getDeclaredField("mealTrackerApi\$delegate")
@@ -55,8 +53,8 @@ class FoodViewModelTest {
             .apply { isAccessible = true }
         valueField.set(lazyImpl, fakeApi)
 
-
-        vm = FoodViewModel(RuntimeEnvironment.getApplication())
+        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
+        vm = FoodViewModel(app)
     }
 
     @After
