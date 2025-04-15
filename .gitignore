@@ -42,3 +42,5 @@ replay_pid*
 .kotlin/
 .idea/androidTestResultsUserPreferences.xml
 .idea/deploymentTargetSelector.xml
+.idea/androidTestResultsUserPreferences.xml
+.idea/deploymentTargetSelector.xml

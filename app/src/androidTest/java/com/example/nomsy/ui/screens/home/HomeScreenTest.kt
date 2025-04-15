@@ -237,6 +237,30 @@ class HomeScreenTest {
     }
 
     @Test
+    fun changeDatePrev() {
+        // Check date selector is displayed
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("4/14/2025").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Previous day").performClick()
+        composeTestRule.onNodeWithText("4/13/2025").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Previous day").performClick()
+        composeTestRule.onNodeWithText("4/12/2025").assertIsDisplayed()
+    }
+
+    @Test
+    fun changeDateNext() {
+        // Check date selector is displayed
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("4/14/2025").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Previous day").performClick()
+        composeTestRule.onNodeWithText("4/13/2025").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Next day").performClick()
+        composeTestRule.onNodeWithText("4/14/2025").assertIsDisplayed()
+    }
+
+    @Test
     fun displayCalorieTotal() {
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.waitForIdle()
