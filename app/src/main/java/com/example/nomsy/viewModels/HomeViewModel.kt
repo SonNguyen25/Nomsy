@@ -64,8 +64,7 @@ class HomeViewModel(application: Application) :
     }
 
     fun refreshData() {
-        val dateStr = "2025-04-${selectedDate.value}"
-        loadDataForDate(dateStr)
+        loadDataForDate("2025-04-${selectedDate.value}")
     }
 
     // Load all data for the current date

@@ -45,7 +45,9 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
     val date = viewModel.selectedDate.collectAsState().value
+
     val profileResult by profileViewModel.profile.observeAsState()
+
     val nutritionResult by viewModel.nutritionTotals.observeAsState(initial = Result.Loading)
     val mealsResult by viewModel.mealsByType.observeAsState(initial = Result.Loading)
     val waterIntake by viewModel.waterIntake.collectAsState()
@@ -301,6 +303,7 @@ fun HomeScreen(
 
     if (showAddFoodDialog) {
         addFoodCard(
+            date = "2025-04-12",
             onDismiss = { showAddFoodDialog = false },
             onMealAdded = {
                 viewModel.refreshData()

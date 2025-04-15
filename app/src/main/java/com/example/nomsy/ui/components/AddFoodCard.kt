@@ -56,6 +56,7 @@ import com.example.nomsy.utils.Result
 
 @Composable
 fun addFoodCard(
+    date: String,
     food: Food? = null,
     onDismiss: () -> Unit,
     onMealAdded: () -> Unit,
@@ -75,7 +76,7 @@ fun addFoodCard(
 
     val foodViewModel: FoodViewModel = viewModel()
     val foodDetail by foodViewModel.foodDetail.observeAsState()
-    val date = LocalDate.now().toString().substring(0, 10)
+
     LaunchedEffect(Unit) {
         foodViewModel.fetchDailySummary(date)
     }
@@ -244,7 +245,8 @@ fun addFoodCard(
                                 val foodData = if (inputMethod == "Picture") foodDetail else null
 
                                 val mealRequest = AddMealRequest(
-                                    date = LocalDate.now().toString().substring(0, 10),
+                                    // This is put here to demo and simplify
+                                    date = date,
                                     meal_type = mealType.lowercase(),
                                     food_name = foodName,
                                     calories = foodData?.calories ?: calories.toIntOrNull() ?: 0,
