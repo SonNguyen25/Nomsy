@@ -21,6 +21,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,12 +29,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 
 @Composable
 fun RegistrationCompleteScreen(
     navController: NavController,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: IAuthViewModel = viewModel()
 ) {
     val registerResult = authViewModel.registerResult?.observeAsState()
 
@@ -51,7 +52,7 @@ fun RegistrationCompleteScreen(
             registerResult?.value?.let { result ->
                 when (result) {
                     is Result.Loading -> {
-                        CircularProgressIndicator(color = NomsyColors.Title)
+                        CircularProgressIndicator(modifier = Modifier.testTag("loading_indicator"), color = NomsyColors.Title)
                         Text(
                             text = "Creating your account...",
                             color = NomsyColors.Texts,

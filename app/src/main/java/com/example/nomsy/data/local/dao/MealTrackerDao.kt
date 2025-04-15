@@ -33,7 +33,6 @@ interface MealTrackerDao {
     @Query("SELECT * FROM daily_summaries WHERE date = :date")
     fun getDailySummaryByDate(date: String): Flow<DailySummaryEntity?>
 
-    // this is deprecated
     @Query("UPDATE daily_summaries SET waterLiters = :waterLiters WHERE date = :date")
     suspend fun updateWaterIntake(date: String, waterLiters: Double)
 

@@ -1,0 +1,55 @@
+package com.example.nomsy.ui.screens.auth
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.nomsy.ui.components.FitnessGoalButton
+import junit.framework.TestCase.assertTrue
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class FitnessGoalButtonTest {
+
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    @Test
+    fun testButtonStates() {
+        var clicked = false
+
+        composeTestRule.setContent {
+            Column {
+                FitnessGoalButton(
+                    text = "Test Button",
+                    isSelected = false,
+                    onClick = { clicked = true }
+                )
+
+                FitnessGoalButton(
+                    text = "Selected Button",
+                    isSelected = true,
+                    onClick = { }
+                )
+            }
+        }
+
+        // Test unselected button
+        composeTestRule.onNodeWithText("Test Button")
+            .assertIsDisplayed()
+            .assertHasClickAction()
+            .performClick()
+
+        assertTrue(clicked)
+
+        // Test selected button
+        composeTestRule.onNodeWithText("Selected Button")
+            .assertIsDisplayed()
+            .assertHasClickAction()
+    }
+}

@@ -34,8 +34,10 @@ android {
         }
 
         debug {
-
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
         }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -80,6 +82,7 @@ dependencies {
     implementation("androidx.compose.material3:material3-android:1.2.1")
     implementation(libs.vision.common)
     implementation(libs.image.labeling.default.common)
+    implementation(libs.androidx.espresso.core)
     debugImplementation("androidx.fragment:fragment-testing:1.8.5")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     androidTestImplementation("androidx.navigation:navigation-testing:2.8.5")
@@ -173,11 +176,12 @@ dependencies {
     // object recognition
     implementation("com.google.mlkit:image-labeling:17.0.9")
 
-    //test - mock class
+    //testing
 //    androidTestImplementation("io.mockk:mockk:1.12.0")
-    androidTestImplementation("io.mockk:mockk-android:1.12.0")
+//    androidTestImplementation("io.mockk:mockk-android:1.12.0")
+    testImplementation("org.robolectric:robolectric:4.10.3")
     testImplementation("com.google.truth:truth:1.1.3")
     androidTestImplementation("com.google.truth:truth:1.1.3")
 //    androidTestImplementation("io.mockk:mockk-android-agent:1.12.0")
-    testImplementation("io.mockk:mockk:1.12.0")
+//    testImplementation("io.mockk:mockk:1.12.0")
 }

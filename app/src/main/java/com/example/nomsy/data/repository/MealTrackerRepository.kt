@@ -1,30 +1,30 @@
 package com.example.nomsy.data.repository
 
-import android.content.Context
 import android.util.Log
 import com.example.nomsy.data.local.dao.MealTrackerDao
 import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.entities.MealEntity
 import com.example.nomsy.data.local.entities.toMealItem
-import com.example.nomsy.data.remote.*
+import com.example.nomsy.data.remote.AddMealRequest
+import com.example.nomsy.data.remote.AdjustWaterRequest
+import com.example.nomsy.data.remote.MealItem
+import com.example.nomsy.data.remote.MealTrackerApiService
+import com.example.nomsy.data.remote.MealTrackerRetrofitClient
 import com.example.nomsy.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
 class MealTrackerRepository(
     private val mealApiService: MealTrackerApiService = MealTrackerRetrofitClient.mealTrackerApi,
     private val mealDao: MealTrackerDao,
-) {
+) : IMealTrackerRepository {
     // Get nutrition totals for a specific date
-    suspend fun getDailyNutritionTotals(date: String): Result<Flow<DailySummaryEntity?>> {
+    override suspend fun getDailyNutritionTotals(date: String): Result<Flow<DailySummaryEntity?>> {
         return try {
             val response = mealApiService.getDailySummary(date)
             if (response.isSuccessful) {
@@ -57,7 +57,7 @@ class MealTrackerRepository(
     }
 
     // Get meals for a specific date
-    suspend fun getMealsByDate(date: String): Result<Map<String, List<MealItem>>> {
+    override suspend fun getMealsByDate(date: String): Result<Map<String, List<MealItem>>> {
         return try {
             // Fetch from remote API
             val response = mealApiService.getDailySummary(date)
@@ -158,22 +158,18 @@ class MealTrackerRepository(
     }
 
 
-    suspend fun deleteMeal(date: String, foodName: String): Result<Boolean> {
+    override suspend fun deleteMeal(date: String, foodName: String): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
                 Log.d("MealTrackerRepository", "Deleting meal: $foodName on date: $date")
-
-                // Call the API to delete the meal
                 val response = mealApiService.deleteMeal(date, foodName)
-
                 if (response.isSuccessful) {
                     val deleteResponse = response.body()
                     Log.d("MealTrackerRepository", "API delete response: $deleteResponse")
 
                     if (deleteResponse?.success == true) {
 
-                        val rowsDeleted = mealDao.deleteMealByDateAndName(date, foodName)
-
+                        mealDao.deleteMealByDateAndName(date, foodName)
                         Result.Success(true)
                     } else {
                         Result.Error(Exception(deleteResponse?.message ?: "Failed to delete meal"))
@@ -189,7 +185,24 @@ class MealTrackerRepository(
         }
     }
 
-    suspend fun addMeal(
+    override suspend fun updateWaterIntakeDelta(
+        date: String,
+        delta: Double,
+        newAmount: Double
+    ): Double {
+        try {
+            val request = AdjustWaterRequest(date, delta)
+            val response = mealApiService.adjustWater(request)
+            mealDao.updateWaterIntake(date, newAmount)
+            return response.water
+        } catch (e: Exception) {
+            Log.e("Repository", "Error updating water", e)
+            throw e
+        }
+    }
+
+    // add food card....
+    override suspend fun addMeal(
         date: String,
         mealType: String,
         foodName: String,
@@ -224,15 +237,6 @@ class MealTrackerRepository(
             } else {
                 Result.Error(Exception("Error ${response.code()}: ${response.message()}"))
             }
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
-
-    suspend fun updateWaterIntake(date: String, waterLiters: Double): Result<Unit> {
-        return try {
-            mealDao.updateWaterIntake(date, waterLiters)
-            Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e)
         }

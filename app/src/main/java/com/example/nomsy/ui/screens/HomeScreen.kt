@@ -4,15 +4,31 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,19 +36,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.models.User
-import com.example.nomsy.ui.components.*
+import com.example.nomsy.ui.components.CalorieCircle
+import com.example.nomsy.ui.components.DateSelector
+import com.example.nomsy.ui.components.MacronutrientCircle
+import com.example.nomsy.ui.components.MealListSection
+import com.example.nomsy.ui.components.WaterIntakeBar
+import com.example.nomsy.ui.components.addFoodCard
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.AuthViewModel
-import com.example.nomsy.viewModels.HomeViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
+import com.example.nomsy.viewModels.IHomeViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 import java.util.Locale
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: HomeViewModel = viewModel(),
-    authViewModel: AuthViewModel,
+    viewModel: IHomeViewModel = viewModel(),
+    authViewModel: IAuthViewModel,
     profileViewModel: ProfileViewModel = viewModel(),
 ) {
     // FETCHES PROFILE DATA
@@ -45,9 +66,8 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
     val date = viewModel.selectedDate.collectAsState().value
-
+    val formattedDate = remember(date) { "2025-04-$date" }
     val profileResult by profileViewModel.profile.observeAsState()
-
     val nutritionResult by viewModel.nutritionTotals.observeAsState(initial = Result.Loading)
     val mealsResult by viewModel.mealsByType.observeAsState(initial = Result.Loading)
     val waterIntake by viewModel.waterIntake.collectAsState()
@@ -164,7 +184,7 @@ fun HomeScreen(
                         goal = waterGoal.toFloat(),
                         onWaterIntakeChange = {
                             viewModel.updateWaterIntake(
-                                "2025-04-$date",
+                                formattedDate,
                                 newWaterIntake = it.toDouble()
                             )
                         }
@@ -240,7 +260,7 @@ fun HomeScreen(
 
                 is Result.Error -> {
                     Text(
-                        text = "error has occured",
+                        text = "error has occurred",
                         color = NomsyColors.Subtitle
                     )
                 }
@@ -265,7 +285,7 @@ fun HomeScreen(
                                 meals = meals,
                                 onDelete = { meal ->
                                     Log.d("HomeScreen", "Delete requested for: ${meal.food_name}")
-                                    viewModel.deleteMeal("2025-04-$date", meal.food_name)
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
                                 }
                             )
                             Spacer(modifier = Modifier.height(16.dp))
