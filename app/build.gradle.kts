@@ -176,11 +176,12 @@ dependencies {
     // object recognition
     implementation("com.google.mlkit:image-labeling:17.0.9")
 
-    //test - mock class
+    //testing
 //    androidTestImplementation("io.mockk:mockk:1.12.0")
-    androidTestImplementation("io.mockk:mockk-android:1.12.0")
+//    androidTestImplementation("io.mockk:mockk-android:1.12.0")
+    testImplementation("org.robolectric:robolectric:4.10.3")
     testImplementation("com.google.truth:truth:1.1.3")
     androidTestImplementation("com.google.truth:truth:1.1.3")
 //    androidTestImplementation("io.mockk:mockk-android-agent:1.12.0")
-    testImplementation("io.mockk:mockk:1.12.0")
+//    testImplementation("io.mockk:mockk:1.12.0")
 }

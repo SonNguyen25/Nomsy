@@ -25,6 +25,7 @@ import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.HomeViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 import java.util.Locale
 
@@ -33,7 +34,7 @@ import java.util.Locale
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = viewModel(),
-    authViewModel: AuthViewModel,
+    authViewModel: IAuthViewModel,
     profileViewModel: ProfileViewModel = viewModel(),
 ) {
     // FETCHES PROFILE DATA
