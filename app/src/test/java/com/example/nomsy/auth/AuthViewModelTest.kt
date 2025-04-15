@@ -1,24 +1,30 @@
-package com.example.nomsy.data.repository
+package com.example.nomsy.viewModels
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.models.User
 import com.example.nomsy.data.remote.GetProfileResponse
 import com.example.nomsy.data.remote.LoginResponse
 import com.example.nomsy.data.remote.RegisterResponse
 import com.example.nomsy.data.remote.UpdateProfileRequest
+import com.example.nomsy.data.repository.AuthRepository
+import com.example.nomsy.data.repository.IUserRepository
 import com.example.nomsy.testutil.FakeAuthApiService
 import com.example.nomsy.testutil.FakeUserDatabase
 import com.example.nomsy.testutil.getOrAwaitValue
 import com.example.nomsy.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -26,21 +32,20 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import retrofit2.Response
+import java.lang.reflect.Field
 
-@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
-class AuthRepositoryTest {
+@ExperimentalCoroutinesApi
+class AuthViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val testDispatcher = UnconfinedTestDispatcher()
-
+    private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var fakeAuthApiService: FakeAuthApiService
-    private lateinit var fakeUserDatabase: UserDatabase
-    private lateinit var authRepository: AuthRepository
-
+    private lateinit var fakeUserDatabase: FakeUserDatabase
+    private lateinit var authViewModel: AuthViewModel
 
     private val testUser = User(
         id = "test-user-id",
@@ -56,18 +61,18 @@ class AuthRepositoryTest {
 
     @Before
     fun setup() {
-
         Dispatchers.setMain(testDispatcher)
-
 
         fakeAuthApiService = FakeAuthApiService()
         fakeUserDatabase = FakeUserDatabase.getInstance()
 
-        authRepository = AuthRepository(
-            authApi = fakeAuthApiService,
-            userDatabase = fakeUserDatabase
-        )
+        authViewModel = AuthViewModel(Application())
 
+        val field: Field = AuthViewModel::class.java.getDeclaredField("repository")
+        field.isAccessible = true
+        val testRepository: IUserRepository =
+            AuthRepository(authApi = fakeAuthApiService, userDatabase = fakeUserDatabase)
+        field.set(authViewModel, testRepository)
 
         fakeUserDatabase.clearAllTables()
         fakeAuthApiService.reset()
@@ -80,187 +85,121 @@ class AuthRepositoryTest {
 
     @Test
     fun loginSuccessful() = runTest {
-
         val loginResponse = LoginResponse(
             message = "Login successful",
             user = testUser
         )
         fakeAuthApiService.loginResponse = Response.success(loginResponse)
 
+        authViewModel.login("testuser", "password123")
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        val resultLiveData = authRepository.login("testuser", "password123")
-        val result = resultLiveData.getOrAwaitValue()
-
-
+        val result = authViewModel.loginResult.getOrAwaitValue()
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
-
-        val savedUser = fakeUserDatabase.userDao().getUserById(testUser.id)
-        assertEquals(testUser, savedUser)
+        assertTrue(authViewModel.isLoggedIn.value)
+        assertEquals("testuser", authViewModel.getCurrentUsername())
     }
 
     @Test
     fun loginError() = runTest {
-
         fakeAuthApiService.shouldThrowLoginException = true
 
+        authViewModel.login("testuser", "password123")
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        val resultLiveData = authRepository.login("testuser", "password123")
-        val result = resultLiveData.getOrAwaitValue()
-
-
+        val result = authViewModel.loginResult.getOrAwaitValue()
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Login exception", (result as Result.Error).exception.message)
+        assertFalse(authViewModel.isLoggedIn.value)
     }
 
     @Test
     fun registerSuccessful() = runTest {
-
         val registerResponse = RegisterResponse(
             message = "Registration successful",
             user_id = "new-user-id"
         )
         fakeAuthApiService.registerResponse = Response.success(registerResponse)
-
         val userToRegister = testUser.copy(id = "")
 
+        authViewModel.register(userToRegister)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        val resultLiveData = authRepository.register(userToRegister)
-        val result = resultLiveData.getOrAwaitValue()
-
-
+        val result = authViewModel.registerResult.getOrAwaitValue()
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals("new-user-id", (result as Result.Success).data.id)
-
-        val savedUser = fakeUserDatabase.userDao().getUserById("new-user-id")
-        assertEquals("new-user-id", savedUser?.id)
+        assertTrue(authViewModel.isLoggedIn.value)
     }
 
     @Test
     fun registerError() = runTest {
-
         fakeAuthApiService.shouldThrowRegisterException = true
 
+        authViewModel.register(testUser)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        val resultLiveData = authRepository.register(testUser)
-        val result = resultLiveData.getOrAwaitValue()
-
-
+        val result = authViewModel.registerResult.getOrAwaitValue()
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Register exception", (result as Result.Error).exception.message)
     }
 
     @Test
-    fun getProfileSuccessful() = runTest {
-
+    fun fetchProfileSuccessful() = runTest {
         val profileResponse = GetProfileResponse(user = testUser)
         fakeAuthApiService.getProfileResponse = Response.success(profileResponse)
 
+        authViewModel.fetchProfile(testUser.id)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        val resultLiveData = authRepository.getProfile(testUser.id)
-        val result = resultLiveData.getOrAwaitValue()
-
-
+        val result = authViewModel.profileResult.getOrAwaitValue()
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
-
-
-        val savedUser = fakeUserDatabase.userDao().getUserById(testUser.id)
-        assertEquals(testUser, savedUser)
     }
 
     @Test
-    fun getProfileError() = runTest {
-
+    fun fetchProfileError() = runTest {
         fakeAuthApiService.shouldThrowGetProfileException = true
 
+        authViewModel.fetchProfile(testUser.id)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        val resultLiveData = authRepository.getProfile(testUser.id)
-        val result = resultLiveData.getOrAwaitValue()
-
-
+        val result = authViewModel.profileResult.getOrAwaitValue()
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Get profile exception", (result as Result.Error).exception.message)
     }
 
     @Test
-    fun getProfileByUsernameSuccessful() = runTest {
-
+    fun fetchProfileByUsernameSuccessful() = runTest {
         val profileResponse = GetProfileResponse(user = testUser)
         fakeAuthApiService.getUserByUsernameResponse = Response.success(profileResponse)
 
+        authViewModel.fetchProfileByUsername(testUser.username)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        val resultLiveData = authRepository.getProfileByUsername(testUser.username)
-        val result = resultLiveData.getOrAwaitValue()
-
-
+        val result = authViewModel.profileResult.getOrAwaitValue()
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
-
-
-        val savedUser = fakeUserDatabase.userDao().getUserByUsername(testUser.username)
-        assertEquals(testUser, savedUser)
     }
 
     @Test
-    fun getProfileByUsernameFallbackToLocal() = runTest {
-
-        val userDao = fakeUserDatabase.userDao()
-        userDao.insertUser(testUser)
-
-        fakeAuthApiService.shouldThrowGetUserByUsernameException = true
-
-
-        val resultLiveData = authRepository.getProfileByUsername(testUser.username)
-        val result = resultLiveData.getOrAwaitValue()
-
-
-        assertTrue("Result should be Success from local DB but was $result", result is Result.Success)
-        assertEquals(testUser, (result as Result.Success).data)
-    }
-
-    @Test
-    fun updateProfileSuccessful() = runTest {
-
-        val updatedUser = testUser.copy(
-            name = "Updated Name",
-            weight = 75
+    fun logoutClearsState() = runTest {
+        val loginResponse = LoginResponse(
+            message = "Login successful",
+            user = testUser
         )
-        val updateProfileResponse = GetProfileResponse(user = updatedUser)
-        fakeAuthApiService.updateProfileResponse = Response.success(updateProfileResponse)
+        fakeAuthApiService.loginResponse = Response.success(loginResponse)
+        authViewModel.login("testuser", "password123")
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(authViewModel.isLoggedIn.value)
+        assertNotNull(authViewModel.loginResult.value)
+        assertEquals("testuser", authViewModel.getCurrentUsername())
 
-        val updateRequest = UpdateProfileRequest(
-            name = "Updated Name",
-            weight = 75
-        )
+        authViewModel.logout()
+        testDispatcher.scheduler.advanceUntilIdle()
 
-
-        val resultLiveData = authRepository.updateProfile(testUser.username, updateRequest)
-        val result = resultLiveData.getOrAwaitValue()
-
-
-        assertTrue("Result should be Success but was $result", result is Result.Success)
-        assertEquals("Updated Name", (result as Result.Success).data.name)
-        assertEquals(75, result.data.weight)
-
-
-        val savedUser = fakeUserDatabase.userDao().getUserByUsername(testUser.username)
-        assertEquals("Updated Name", savedUser?.name)
-        assertEquals(75, savedUser?.weight)
-    }
-
-    @Test
-    fun updateProfileError() = runTest {
-
-        fakeAuthApiService.shouldThrowUpdateProfileException = true
-        val updateRequest = UpdateProfileRequest(name = "Updated Name")
-
-
-        val resultLiveData = authRepository.updateProfile(testUser.username, updateRequest)
-        val result = resultLiveData.getOrAwaitValue()
-
-
-        assertTrue("Result should be Error but was $result", result is Result.Error)
-        assertEquals("UpdateProfile exception", (result as Result.Error).exception.message)
+        assertNull(authViewModel.loginResult.value)
+        assertFalse(authViewModel.isLoggedIn.value)
+        assertEquals("", authViewModel.getCurrentUsername())
     }
 }

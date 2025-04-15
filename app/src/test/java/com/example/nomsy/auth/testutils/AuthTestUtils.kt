@@ -18,8 +18,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 fun <T> LiveData<T>.getOrAwaitValue(
-    skipLoading: Boolean = true, // New parameter to control skipping Loading states.
-    time: Long = 10, // timeout in seconds
+    skipLoading: Boolean = true,
+    time: Long = 10,
     timeUnit: TimeUnit = TimeUnit.SECONDS,
     afterObserve: () -> Unit = {}
 ): T {
@@ -28,7 +28,6 @@ fun <T> LiveData<T>.getOrAwaitValue(
     val observer = object : Observer<T> {
         override fun onChanged(value: T) {
             if (skipLoading && value is Result.Loading) {
-                // Skip the Loading state and wait for a final (non-Loading) state.
                 return
             }
             data = value
