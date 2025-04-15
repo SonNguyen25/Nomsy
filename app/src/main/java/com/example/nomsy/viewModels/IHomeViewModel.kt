@@ -16,4 +16,5 @@ interface IHomeViewModel {
     fun decrementDate()
     fun updateWaterIntake(date: String, newWaterIntake: Double)
     fun deleteMeal(date: String, foodName: String)
+    fun refreshData()
 }

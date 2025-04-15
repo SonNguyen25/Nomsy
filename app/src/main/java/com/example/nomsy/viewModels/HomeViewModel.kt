@@ -73,7 +73,7 @@ class HomeViewModel(application: Application) :
         loadDataForDate("2025-04-${selectedDate.value}")
     }
 
-    fun refreshData() {
+    override fun refreshData() {
         loadDataForDate("2025-04-${selectedDate.value}")
     }
 
@@ -153,7 +153,7 @@ class HomeViewModel(application: Application) :
             val roundedNewWaterIntake = (Math.round(newWaterIntake * 10) / 10.0)
             // calculate delta (difference between current and new) api takes dif instead of new val
             val delta = roundedNewWaterIntake - _waterIntake.value
-            _waterIntake.value = roundedNewWaterIntake / 10.0
+            _waterIntake.value = roundedNewWaterIntake
             val updatedTotal =
                 mealRepository.updateWaterIntakeDelta(date, delta, roundedNewWaterIntake)
             _waterIntake.value = updatedTotal
