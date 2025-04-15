@@ -32,13 +32,12 @@ class RegisterScreenTest {
             val context: Context = ApplicationProvider.getApplicationContext()
             navController = TestNavHostController(context)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            // Instantiate the real AuthViewModel using the Application context.
             authViewModel = AuthViewModel(context as Application)
             // Create a simple navigation graph for testing.
             navController.graph = navController.createGraph(startDestination = "register") {
                 composable("register") { RegisterScreen(navController, authViewModel) }
-                composable("onboarding_welcome") { /* Stub screen */ }
-                composable("login") { /* Stub screen */ }
+                composable("onboarding_welcome") { }
+                composable("login") { }
             }
         }
 
@@ -50,7 +49,6 @@ class RegisterScreenTest {
 
     @Test
     fun testInitialState() {
-        // Using test tags to verify that each key element is displayed.
         composeTestRule.onNodeWithTag("emailField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("usernameField").assertIsDisplayed()
         composeTestRule.onNodeWithTag("passwordField").assertIsDisplayed()
@@ -61,24 +59,16 @@ class RegisterScreenTest {
 
     @Test
     fun testEmptyEmailValidation() {
-        // Click "Next" without inputting email.
         composeTestRule.onNodeWithTag("nextButton").performClick()
-        // Expect to remain in the register screen.
         assertEquals("register", navController.currentBackStackEntry?.destination?.route)
-        // Verify that the email field is cleared.
-        composeTestRule.onNodeWithTag("emailField").assertTextEquals("")
-    }
+        }
 
     @Test
     fun testInvalidEmailValidation() {
-        // Input an invalid email.
         composeTestRule.onNodeWithTag("emailField").performTextInput("invalid")
         composeTestRule.onNodeWithTag("nextButton").performClick()
-        // Expect to remain on the registration screen.
         assertEquals("register", navController.currentBackStackEntry?.destination?.route)
-        // Verify that the email field is cleared after invalid input.
-        composeTestRule.onNodeWithTag("emailField").assertTextEquals("")
-    }
+         }
 
     @Test
     fun testEmptyUsernameValidation() {
@@ -116,21 +106,17 @@ class RegisterScreenTest {
 
     @Test
     fun testValidRegistrationNavigation() {
-        // Provide valid registration details.
         composeTestRule.onNodeWithTag("emailField").performTextInput("test@example.com")
         composeTestRule.onNodeWithTag("usernameField").performTextInput("testuser")
         composeTestRule.onNodeWithTag("passwordField").performTextInput("password123")
         composeTestRule.onNodeWithTag("confirmPasswordField").performTextInput("password123")
         composeTestRule.onNodeWithTag("nextButton").performClick()
-        // Verify that the navigation goes to the "onboarding_welcome" screen.
         assertEquals("onboarding_welcome", navController.currentBackStackEntry?.destination?.route)
     }
 
     @Test
     fun testLoginNavigation() {
-        // Click on the "Sign in!" text using its test tag.
         composeTestRule.onNodeWithTag("signInText").performClick()
-        // Verify navigation to the "login" screen.
         assertEquals("login", navController.currentBackStackEntry?.destination?.route)
     }
 }

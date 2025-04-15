@@ -332,7 +332,13 @@ fun OnboardingNutritionScreen(navController: NavController, authViewModel: AuthV
                     )
 
                     authViewModel.register(user)
-                    navController.navigate("registration_complete")
+                    navController.navigate("registration_complete") {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+
+                }
                 }
             }
         }
