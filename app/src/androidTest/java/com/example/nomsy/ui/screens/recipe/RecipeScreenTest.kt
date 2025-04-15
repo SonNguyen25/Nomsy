@@ -1,76 +1,96 @@
-//package com.example.nomsy.ui.screens.recipe
-//
-//import android.content.Context
-//import androidx.compose.ui.test.*
-//import androidx.compose.ui.test.junit4.createComposeRule
-//import androidx.navigation.compose.ComposeNavigator
-//import androidx.navigation.compose.composable
-//import androidx.navigation.createGraph
-//import androidx.navigation.testing.TestNavHostController
-//import androidx.test.core.app.ApplicationProvider
-//import androidx.test.ext.junit.runners.AndroidJUnit4
-//import com.example.nomsy.viewModels.RecipeViewModel
-//import com.example.nomsy.ui.screens.recipes.recipesScreen
-//import kotlinx.coroutines.Dispatchers
-//import kotlinx.coroutines.ExperimentalCoroutinesApi
-//import kotlinx.coroutines.test.StandardTestDispatcher
-//import kotlinx.coroutines.test.runTest
-//import kotlinx.coroutines.test.setMain
-//import org.junit.Before
-//import org.junit.Rule
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//
-//@RunWith(AndroidJUnit4::class)
-//class RecipeScreenTest {
-//
-//    @get:Rule
-//    val composeTestRule = createComposeRule()
-//
-//    private lateinit var navController: TestNavHostController
-//    private lateinit var viewModel: RecipeViewModel
-//    private val testDispatcher = StandardTestDispatcher()
-//
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    @Before
-//    fun setup() {
-//        composeTestRule.runOnUiThread {
-//            viewModel = RecipeViewModel(FakeRecipeRepository())
-//
-//            navController = TestNavHostController(ApplicationProvider.getApplicationContext())
-//            navController.navigatorProvider.addNavigator(ComposeNavigator())
-//
-//            val graph = navController.createGraph(startDestination = "recipes") {
-//                composable("recipes") {
-//                    recipesScreen(
-//                        navController = navController,
-//                        viewModel = viewModel
-//                    )
-//                }
-//            }
-//            navController.setGraph(graph)
-//        }
-//
-//        composeTestRule.setContent {
-//            recipesScreen(
-//                navController = navController,
-//                viewModel = viewModel
-//            )
-//        }
-//    }
-//
-//
-//
-//    @Test
-//    fun displaysTitleAndRecipeCardAndOpensPopup() {
-//        composeTestRule.mainClock.advanceTimeByFrame()
-//        composeTestRule.waitUntil(timeoutMillis = 5_000) {
-//            viewModel.recipes.value.isNotEmpty()
-//        }
-//        composeTestRule.waitForIdle()
-//
-//        composeTestRule.onNodeWithTag("CookBookTitle").assertIsDisplayed()
-//        composeTestRule.onNodeWithTag("Category_Seafood").assertIsDisplayed()
-//        composeTestRule.onNodeWithTag("RecipeCard_1").assertIsDisplayed()
-//    }
-//}
+package com.example.nomsy.ui.screens.recipe
+
+import android.content.Context
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
+import com.example.nomsy.ui.screens.recipes.recipesScreen
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+
+class RecipesScreenTest {
+
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    private val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+
+
+    @Test
+    fun displaysTitleAndRecipeCardAndOpensPopup() {
+        val fakeViewModel = FakeRecipeViewModel()
+
+        composeTestRule.setContent {
+            recipesScreen(navController = navController, viewModel = fakeViewModel)
+        }
+
+        // Check title is displayed
+        composeTestRule.onNodeWithTag("CookBookTitle").assertIsDisplayed()
+
+        // Check RecipeList loads (Wait for lazy column items)
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("RecipeList").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Wait for card with tag
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("RecipeCard_1").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Click the card
+        composeTestRule.onNodeWithTag("RecipeCard_1").performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("RecipeTitle", useUnmergedTree = true)
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+
+        composeTestRule
+            .onNodeWithTag("RecipePopUp", useUnmergedTree = true)
+            .onChildren()
+            .filter(hasTestTag("RecipeTitle"))
+            .assertCountEquals(1)
+    }
+
+    @Test
+    fun searchFiltersResults() {
+        val fakeViewModel = FakeRecipeViewModel()
+
+        composeTestRule.setContent {
+            recipesScreen(navController = navController, viewModel = fakeViewModel)
+        }
+
+        // Enter search text
+        composeTestRule.onNodeWithTag("SearchBar").performTextInput("Pasta")
+
+        // Tap the search icon
+        composeTestRule.onNodeWithTag("SearchIconButton").performClick()
+
+        composeTestRule.waitUntil(timeoutMillis = 3_000) {
+            composeTestRule.onAllNodesWithTag("RecipeCard_3").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        composeTestRule.onNodeWithTag("RecipeCard_3").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("RecipeCard_1").assertDoesNotExist()
+    }
+
+    @Test
+    fun displaysCategoryAndRecipeCard() {
+        val fakeViewModel = FakeRecipeViewModel()
+        val navController = TestNavHostController(ApplicationProvider.getApplicationContext<Context>())
+
+        composeTestRule.setContent {
+            recipesScreen(
+                navController = navController,
+                viewModel = fakeViewModel
+            )
+        }
+
+        composeTestRule.onNodeWithTag("CookBookTitle").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("SearchBar").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("RecipeCard_1").assertIsDisplayed()
+    }
+}
