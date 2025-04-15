@@ -25,7 +25,6 @@ object AuthRetrofitClient {
     val authApi: AuthApiService by lazy {
         retrofit.create(AuthApiService::class.java)
     }
-
 }
 
 object MealTrackerRetrofitClient {

@@ -7,17 +7,14 @@ import com.example.nomsy.utils.Result
 import kotlinx.coroutines.flow.StateFlow
 
 
-interface HomeViewModelInterface {
+interface IHomeViewModel {
     val nutritionTotals: LiveData<Result<DailySummaryEntity?>>
     val mealsByType: LiveData<Result<Map<String, List<MealItem>>>>
     val waterIntake: StateFlow<Double>
     val selectedDate: StateFlow<Int>
-    
     fun incrementDate()
-
     fun decrementDate()
-
     fun updateWaterIntake(date: String, newWaterIntake: Double)
-
     fun deleteMeal(date: String, foodName: String)
+    fun refreshData()
 }

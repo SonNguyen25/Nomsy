@@ -50,14 +50,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nomsy.data.remote.AddMealRequest
-import com.example.nomsy.data.remote.MealTrackerRetrofitClient
 import com.example.nomsy.viewModels.FoodViewModel
 import kotlinx.coroutines.*
+import com.example.nomsy.utils.Result
 
 @Composable
 fun addFoodCard(
+    date: String,
     food: Food? = null,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onMealAdded: () -> Unit,
 ) {
     var inputMethod by remember { mutableStateOf("Manual") }
     val context = LocalContext.current
@@ -74,7 +76,7 @@ fun addFoodCard(
 
     val foodViewModel: FoodViewModel = viewModel()
     val foodDetail by foodViewModel.foodDetail.observeAsState()
-    val date = LocalDate.now().toString().substring(0, 10)
+
     LaunchedEffect(Unit) {
         foodViewModel.fetchDailySummary(date)
     }
@@ -99,6 +101,7 @@ fun addFoodCard(
     val carbsGoal = dailyGoals["carbs"] ?: 0f
     val fatGoal = dailyGoals["fat"] ?: 0f
 
+    // So that when the goal is fetched as 0, calculation can still be done
     fun safePercentage(numerator: Float, denominator: Float): Float {
         return if (denominator > 0f && !numerator.isNaN() && !denominator.isNaN()) {
             (numerator / denominator) * 100
@@ -121,6 +124,27 @@ fun addFoodCard(
             fat = it.fat.toString()
         }
     }
+
+    val mealResult by foodViewModel.mealResult.observeAsState()
+
+    LaunchedEffect(mealResult) {
+        mealResult?.let { result ->
+            when (result) {
+                is Result.Success -> {
+                    Toast.makeText(context, "Meal successfully added!", Toast.LENGTH_SHORT).show()
+                    foodViewModel.clearMealResult()
+                    onMealAdded() // refresh home page
+                    onDismiss()
+                }
+                is Result.Error -> {
+                    Toast.makeText(context, "Failed to add meal.", Toast.LENGTH_SHORT).show()
+                    foodViewModel.clearMealResult()
+                }
+                is Result.Loading -> {}
+            }
+        }
+    }
+
 
     Dialog(onDismissRequest = onDismiss) {
         Box(
@@ -199,7 +223,7 @@ fun addFoodCard(
                         )
 
                     } else {
-                        PictureCaptureSection()
+                        PictureCaptureForm()
                     }
                 }
 
@@ -218,43 +242,20 @@ fun addFoodCard(
                     ) {
                         Button(
                             onClick = {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    val foodData = if (inputMethod == "Picture") foodDetail else null
+                                val foodData = if (inputMethod == "Picture") foodDetail else null
 
-                                    val mealRequest = AddMealRequest(
-                                        date = LocalDate.now().toString().substring(0, 10),
-                                        meal_type = mealType.lowercase(),
-                                        food_name = foodName,
-                                        calories = foodData?.calories ?: calories.toIntOrNull() ?: 0,
-                                        carbs = foodData?.carbs ?: carbs.toIntOrNull() ?: 0,
-                                        protein = foodData?.protein ?: protein.toIntOrNull() ?: 0,
-                                        fat = foodData?.fat ?: fat.toIntOrNull() ?: 0
-                                    )
+                                val mealRequest = AddMealRequest(
+                                    // This is put here to demo and simplify
+                                    date = date,
+                                    meal_type = mealType.lowercase(),
+                                    food_name = foodName,
+                                    calories = foodData?.calories ?: calories.toIntOrNull() ?: 0,
+                                    carbs = foodData?.carbs ?: carbs.toIntOrNull() ?: 0,
+                                    protein = foodData?.protein ?: protein.toIntOrNull() ?: 0,
+                                    fat = foodData?.fat ?: fat.toIntOrNull() ?: 0
+                                )
 
-                                    Log.d("AddMealOutput", mealRequest.toString())
-
-                                    try {
-                                        val response = MealTrackerRetrofitClient.mealTrackerApi.addMeal(mealRequest)
-                                        if (response.isSuccessful) {
-                                            withContext(Dispatchers.Main) { onDismiss() }
-                                            withContext(Dispatchers.Main) {
-                                                Toast.makeText(context, "Meal Successfully Added", Toast.LENGTH_SHORT).show()
-                                                onDismiss()
-                                            }
-                                            Log.d("AddMeal", "Meal added: ${response.body()?.message}")
-                                        } else {
-                                            val errorMessage = response.errorBody()?.string()
-                                            Log.e("AddMeal", "AddMeal error: $errorMessage")
-                                            withContext(Dispatchers.Main) {
-                                                Toast.makeText(context, "Failed to add meal: ${errorMessage ?: "Unknown error"}", Toast.LENGTH_SHORT).show()
-                                            }
-                                            Log.e("AddMeal", "AddMeal error: ${response.errorBody()?.string()}")
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.e("AddMeal", "AddMeal exception: ${e.message}")
-                                    }
-
-                                }
+                                foodViewModel.submitMeal(mealRequest)
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = NomsyColors.Background
@@ -276,7 +277,6 @@ fun addFoodCard(
         }
     }
 }
-
 
 @Composable
 fun ManualInputForm(
@@ -310,7 +310,6 @@ fun ManualInputForm(
             onSelectFood = onSelectFood,
             onQueryChange = onFoodNameChange
         )
-
 
         LabeledInputRow("Name:", foodName, onFoodNameChange)
         LabeledInputRow("Calories:", calories, onCaloriesChange, unit = "kcal", isNumeric = true)
@@ -492,8 +491,8 @@ fun SearchFoodDropdown(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                         .border(1.dp, NomsyColors.Title, RoundedCornerShape(8.dp))
                         .clickable {
-                            onSelectFood(food) // fill fields
-                            searchQuery = food.food_name // update local state only
+                            onSelectFood(food)
+                            searchQuery = food.food_name
                             expanded = false
                             focusManager.clearFocus()
                         }
@@ -606,7 +605,7 @@ fun MealTypeSelector(
 
 
 @Composable
-fun PictureCaptureSection() {
+fun PictureCaptureForm() {
     val context = LocalContext.current
     val foodViewModel: FoodViewModel = viewModel()
     val recognizedFood by foodViewModel.recognizedFood.observeAsState("")
