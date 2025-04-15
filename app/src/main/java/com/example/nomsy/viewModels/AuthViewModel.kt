@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.nomsy.data.local.UserDatabase
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.data.repository.AuthRepository
 import com.example.nomsy.data.repository.IUserRepository
 import com.example.nomsy.utils.Result

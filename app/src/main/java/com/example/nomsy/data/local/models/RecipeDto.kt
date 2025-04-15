@@ -1,5 +1,7 @@
 package com.example.nomsy.data.local.models
 
+import com.example.nomsy.data.local.entities.Recipe
+
 data class RecipeDto(
     val idMeal: String,
     val strMeal: String,

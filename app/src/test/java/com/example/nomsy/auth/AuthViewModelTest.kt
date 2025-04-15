@@ -2,11 +2,10 @@ package com.example.nomsy.viewModels
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.data.remote.GetProfileResponse
 import com.example.nomsy.data.remote.LoginResponse
 import com.example.nomsy.data.remote.RegisterResponse
-import com.example.nomsy.data.remote.UpdateProfileRequest
 import com.example.nomsy.data.repository.AuthRepository
 import com.example.nomsy.data.repository.IUserRepository
 import com.example.nomsy.testutil.FakeAuthApiService
@@ -16,7 +15,6 @@ import com.example.nomsy.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain

@@ -1,6 +1,6 @@
 package com.example.nomsy.viewModels
 
-import com.example.nomsy.data.local.models.Recipe
+import com.example.nomsy.data.local.entities.Recipe
 import kotlinx.coroutines.flow.StateFlow
 
 interface IRecipeViewModel {

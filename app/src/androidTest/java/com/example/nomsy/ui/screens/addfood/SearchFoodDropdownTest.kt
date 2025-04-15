@@ -1,12 +1,9 @@
 package com.example.nomsy.ui.screens.addfood
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.core.app.ApplicationProvider
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.ui.components.SearchFoodDropdown
-import com.example.nomsy.viewModels.FoodViewModel
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test

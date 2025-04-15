@@ -3,7 +3,7 @@ package com.example.nomsy.data.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.example.nomsy.data.local.UserDatabase
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.data.remote.AuthApiService
 import com.example.nomsy.data.remote.AuthRetrofitClient
 import com.example.nomsy.data.remote.LoginRequest

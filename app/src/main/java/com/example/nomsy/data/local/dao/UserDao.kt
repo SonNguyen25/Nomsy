@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 
 @Dao
 interface UserDao {

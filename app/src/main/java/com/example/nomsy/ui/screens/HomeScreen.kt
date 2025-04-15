@@ -33,7 +33,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.entities.DailySummaryEntity
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.ui.components.CalorieCircle
 import com.example.nomsy.ui.components.DateSelector
 import com.example.nomsy.ui.components.MacronutrientCircle

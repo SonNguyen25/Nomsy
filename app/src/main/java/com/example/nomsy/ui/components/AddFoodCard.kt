@@ -8,19 +8,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.ui.theme.NomsyColors
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nomsy.data.remote.AddMealRequest
-import com.example.nomsy.viewModels.FoodViewModel
-import kotlinx.coroutines.*
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.IFoodViewModel
 

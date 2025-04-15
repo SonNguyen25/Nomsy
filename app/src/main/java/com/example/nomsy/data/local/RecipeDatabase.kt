@@ -6,8 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.nomsy.data.local.dao.RecipeDAO
-import com.example.nomsy.data.local.models.Recipe
-import com.example.nomsy.data.local.Converters
+import com.example.nomsy.data.local.entities.Recipe
 
 @Database(entities = [Recipe::class], version = 1)
 @TypeConverters(Converters::class)

@@ -9,7 +9,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
-import com.example.nomsy.data.local.models.Recipe
+import com.example.nomsy.data.local.entities.Recipe
 import org.hamcrest.Matchers.*
 import org.junit.*
 

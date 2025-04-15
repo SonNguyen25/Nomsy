@@ -2,7 +2,7 @@ package com.example.nomsy.ui.screens.addfood
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import org.junit.Rule
 import org.junit.Test
 import com.example.nomsy.ui.components.PictureCaptureForm

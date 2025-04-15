@@ -10,10 +10,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.ui.theme.NomsyColors
-import com.example.nomsy.viewModels.FoodViewModel
 import com.example.nomsy.viewModels.IFoodViewModel
 
 

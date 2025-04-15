@@ -3,7 +3,7 @@ package com.example.nomsy.viewModels
 import android.graphics.Bitmap
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LiveData
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.data.remote.AddMealRequest
 import com.example.nomsy.data.remote.AddMealResponse
 import com.example.nomsy.data.remote.NutritionTotals

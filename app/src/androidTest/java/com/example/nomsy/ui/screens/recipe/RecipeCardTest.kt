@@ -1,13 +1,8 @@
 package com.example.nomsy.ui.screens.recipe
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.unpackInt1
-import com.example.nomsy.data.local.models.Recipe
+import com.example.nomsy.data.local.entities.Recipe
 import com.example.nomsy.ui.components.recipesCard
 import org.junit.Rule
 import org.junit.Test

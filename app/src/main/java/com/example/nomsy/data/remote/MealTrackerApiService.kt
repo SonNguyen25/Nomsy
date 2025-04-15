@@ -1,7 +1,7 @@
 package com.example.nomsy.data.remote
 
 
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE

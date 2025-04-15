@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.nomsy.data.local.UserDatabase
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.data.remote.UpdateProfileRequest
 import com.example.nomsy.data.repository.AuthRepository
 import com.example.nomsy.utils.Result

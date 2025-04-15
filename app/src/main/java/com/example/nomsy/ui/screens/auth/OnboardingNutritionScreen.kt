@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.ui.components.OnboardingBaseScreen
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.viewModels.IAuthViewModel
