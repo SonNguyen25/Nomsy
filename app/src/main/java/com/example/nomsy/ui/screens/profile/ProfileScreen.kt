@@ -1,13 +1,29 @@
 package com.example.nomsy.ui.screens.profile
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,15 +36,15 @@ import com.example.nomsy.data.local.models.User
 import com.example.nomsy.ui.components.ProfileContent
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.AuthViewModel
-import com.example.nomsy.viewModels.ProfileViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
+import com.example.nomsy.viewModels.IProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    authViewModel: AuthViewModel = viewModel(),
-    profileViewModel: ProfileViewModel = viewModel()
+    authViewModel: IAuthViewModel = viewModel(),
+    profileViewModel: IProfileViewModel = viewModel()
 ) {
     val username = authViewModel.getCurrentUsername()
     val profileResult by profileViewModel.profile.observeAsState()
@@ -81,6 +97,7 @@ fun ProfileScreen(
                             color = NomsyColors.Title
                         )
                     }
+
                     is Result.Error -> {
                         Text(
                             text = "Error loading profile",
@@ -88,9 +105,11 @@ fun ProfileScreen(
                             modifier = Modifier.align(Alignment.Center)
                         )
                     }
+
                     is Result.Success -> {
                         Column(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .fillMaxHeight(0.9f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -115,6 +134,7 @@ fun ProfileScreen(
                             }
                         }
                     }
+
                     null -> {
                         // initial state before load
                     }

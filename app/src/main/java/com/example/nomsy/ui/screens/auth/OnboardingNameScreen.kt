@@ -23,10 +23,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.ui.components.OnboardingBaseScreen
 import com.example.nomsy.ui.theme.NomsyColors
-import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 
 @Composable
-fun OnboardingNameScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun OnboardingNameScreen(
+    navController: NavController,
+    authViewModel: IAuthViewModel = viewModel()
+) {
     var name by remember { mutableStateOf("") }
     val context = LocalContext.current
 
@@ -57,7 +60,9 @@ fun OnboardingNameScreen(navController: NavController, authViewModel: AuthViewMo
                     unfocusedBorderColor = NomsyColors.Subtitle,
                     backgroundColor = NomsyColors.PictureBackground
                 ),
-                modifier = Modifier.testTag("name_input").fillMaxWidth(0.8f)
+                modifier = Modifier
+                    .testTag("name_input")
+                    .fillMaxWidth(0.8f)
             )
         },
         buttonText = "Next",
