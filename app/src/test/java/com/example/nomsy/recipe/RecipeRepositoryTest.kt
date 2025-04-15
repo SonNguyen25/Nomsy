@@ -11,9 +11,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import java.io.IOException
 
 @ExperimentalCoroutinesApi
+@RunWith(JUnit4::class)
 class RecipeRepositoryTest {
 
     private lateinit var fakeApi: FakeRecipeAPIService
