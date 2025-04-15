@@ -43,7 +43,6 @@ import com.example.nomsy.viewModels.ProfileViewModelFactory
 import com.example.nomsy.viewModels.RecipeViewModel
 import com.example.nomsy.viewModels.RecipeViewModelFactory
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NomsyAppNavHost(navController: NavHostController) {
 //    val navController = rememberNavController()

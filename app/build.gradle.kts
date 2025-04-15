@@ -185,4 +185,5 @@ dependencies {
     androidTestImplementation("com.google.truth:truth:1.1.3")
 //    androidTestImplementation("io.mockk:mockk-android-agent:1.12.0")
 //    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation(kotlin("test"))
 }

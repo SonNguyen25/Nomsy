@@ -26,7 +26,6 @@ class RecipeCardTest {
         strArea = "",
     )
 
-
     @Test
     fun recipeCardDisplaysCorrectly() {
         composeTestRule.setContent {
@@ -37,10 +36,14 @@ class RecipeCardTest {
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag("RecipeCard").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("RecipeImage").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("RecipeTitle").assertTextContains("Spaghetti Bolognese")
-        composeTestRule.onNodeWithTag("RecipeTags").assertTextContains("Pasta • Italian")
+        composeTestRule.onNodeWithTag("RecipeCard", useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag("RecipeImage", useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag("RecipeTitle", useUnmergedTree = true)
+            .assertTextContains("Spaghetti Bolognese")
+        composeTestRule.onNodeWithTag("RecipeTags", useUnmergedTree = true)
+            .assertTextContains("Pasta • Italian")
     }
 
     @Test

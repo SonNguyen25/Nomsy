@@ -29,7 +29,6 @@ class RecipePopUpTest {
         ingredients = listOf("Spaghetti", "Eggs", "Pancetta", "Parmesan")
     )
 
-
     @Before
     fun setup() {
         Intents.init()
@@ -55,7 +54,6 @@ class RecipePopUpTest {
             IntentMatchers.hasData(Uri.parse("https://youtube.com/watch?v=dummy"))
         ))
     }
-
 
     @Test
     fun recipePopUp() {
