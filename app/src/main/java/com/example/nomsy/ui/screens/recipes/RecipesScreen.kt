@@ -191,29 +191,3 @@ fun recipesScreen(
         recipePopUp(recipe = recipe, onDismiss = { selectedRecipe = null })
     }
 }
-
-// Fake data for preview/testing
-val sampleRecipes = listOf(
-    Recipe(
-        idMeal = "1",
-        strMeal = "Sashimi Combo",
-        strInstructions = "Slice and serve chilled.",
-        strMealThumb = "https://www.themealdb.com/images/media/meals/1548772327.jpg",
-        strYoutube = null,
-        strCategory = "Seafood",
-        strArea = "Japanese",
-        strTags = "Fish,Fresh",
-        ingredients = listOf("Egg", "Garlic", "Yellowtail", "Salmon", "Onion")
-    ),
-    Recipe(
-        idMeal = "2",
-        strMeal = "Teriyaki Chicken",
-        strInstructions = "Grill with teriyaki sauce.",
-        strMealThumb = "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
-        strYoutube = null,
-        strCategory = "Chicken",
-        strArea = "Japanese",
-        strTags = "Grilled,Savory",
-        ingredients = listOf("Chicken", "Soy Sauce", "Sugar", "Garlic")
-    )
-)

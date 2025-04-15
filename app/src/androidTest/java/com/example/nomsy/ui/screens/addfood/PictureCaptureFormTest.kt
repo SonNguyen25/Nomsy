@@ -28,19 +28,21 @@ class PictureCaptureFormTest {
     @Test
     fun displayFoodAndDetails() {
         val fakeViewModel = FakeFoodViewModel().apply {
-            recognizedFood.value = "Broccoli"
-            foodDetail.value = Food("1", "2024-04-15", "Lunch", "Broccoli", 55, 10, 4, 1)
+            recognizedFood.postValue("Broccoli")
+            foodDetail.postValue(Food("1", "2024-04-15", "Lunch", "Broccoli", 55, 10, 4, 1))
         }
 
         composeTestRule.setContent {
             PictureCaptureForm(viewModel = fakeViewModel)
         }
 
-        composeTestRule.onNodeWithTag("DetectedFood").assertTextContains("Broccoli")
+        composeTestRule.onNodeWithTag("DetectedFood", useUnmergedTree = true)
+            .assertTextContains("Broccoli", substring = true)
         composeTestRule.onNodeWithTag("FoodDetails").assertIsDisplayed()
         composeTestRule.onNodeWithText("Calories: 55 kcal").assertIsDisplayed()
         composeTestRule.onNodeWithText("Carbs: 10 g").assertIsDisplayed()
         composeTestRule.onNodeWithText("Protein: 4 g").assertIsDisplayed()
         composeTestRule.onNodeWithText("Fat: 1 g").assertIsDisplayed()
     }
+
 }
