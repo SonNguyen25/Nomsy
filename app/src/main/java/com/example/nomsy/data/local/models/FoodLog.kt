@@ -3,6 +3,19 @@ package com.example.nomsy.data.local.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+
+// NOT USING.
+//
+/**
+ * NOT SURE WHY THIS IS HERE.
+ *
+ *
+ *
+ *
+ *
+ */
+
+
 @Entity(tableName = "food_logs")
 data class FoodLog(
     @PrimaryKey val id: String,
