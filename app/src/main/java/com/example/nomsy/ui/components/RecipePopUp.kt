@@ -23,6 +23,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.nomsy.data.local.models.Recipe
 import com.example.nomsy.ui.theme.NomsyColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.platform.testTag
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -40,10 +41,10 @@ fun recipePopUp(
                 .border(1.dp, NomsyColors.Title, shape = RoundedCornerShape(8.dp))
                 .background(NomsyColors.Background, shape = RoundedCornerShape(16.dp))
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .testTag("RecipePopUp"),
             horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
+        ) {
             GlideImage(
                 model = recipe.strMealThumb,
                 contentDescription = recipe.strMeal,
@@ -52,49 +53,59 @@ fun recipePopUp(
                     .height(200.dp)
                     .padding(bottom = 12.dp)
                     .clip(RoundedCornerShape(12.dp))
+                    .testTag("RecipeImage")
             )
 
             Text(
                 text = recipe.strMeal,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = NomsyColors.Title
+                color = NomsyColors.Title,
+                modifier = Modifier.testTag("RecipeTitle")
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text("Category: ${recipe.strCategory}", color = NomsyColors.Subtitle)
-            Text("Area: ${recipe.strArea}", color = NomsyColors.Subtitle)
+            Text(
+                text = "Category: ${recipe.strCategory}",
+                color = NomsyColors.Subtitle,
+                modifier = Modifier.testTag("RecipeCategory")
+            )
+
+            Text(
+                text = "Area: ${recipe.strArea}",
+                color = NomsyColors.Subtitle,
+                modifier = Modifier.testTag("RecipeArea")
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Ingredients
             Text(
                 text = "Ingredients",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp,
                 color = NomsyColors.Title,
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .testTag("IngredientsHeader")
             )
+
             Spacer(modifier = Modifier.height(4.dp))
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("IngredientsList")
             ) {
-                recipe.ingredients.forEach { ingredient ->
+                recipe.ingredients.forEachIndexed { index, ingredient ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .border(
-                                width = 1.dp,
-                                color = NomsyColors.Title,
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .background(
-                                color = NomsyColors.Background,
-                            )
+                            .border(1.dp, NomsyColors.Title, RoundedCornerShape(8.dp))
+                            .background(NomsyColors.Background)
                             .padding(12.dp)
+                            .testTag("Ingredient_$index")
                     ) {
                         Text(
                             text = ingredient,
@@ -105,16 +116,16 @@ fun recipePopUp(
                 }
             }
 
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Instructions
             Text(
                 text = "Instructions",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp,
                 color = NomsyColors.Title,
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .testTag("InstructionsHeader")
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -122,7 +133,8 @@ fun recipePopUp(
             Text(
                 text = recipe.strInstructions,
                 color = NomsyColors.Texts,
-                lineHeight = 20.sp
+                lineHeight = 20.sp,
+                modifier = Modifier.testTag("RecipeInstructions")
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -137,19 +149,18 @@ fun recipePopUp(
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                             context.startActivity(intent)
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = NomsyColors.Background
-                        ),
-                        border = BorderStroke(1.dp, NomsyColors.Title)
+                        colors = ButtonDefaults.buttonColors(containerColor = NomsyColors.Background),
+                        border = BorderStroke(1.dp, NomsyColors.Title),
+                        modifier = Modifier.testTag("WatchVideoButton")
                     ) {
-                        Text(
-                            text = "Watch Video",
-                            color = NomsyColors.Title
-                        )
+                        Text(text = "Watch Video", color = NomsyColors.Title)
                     }
                 }
 
-                TextButton(onClick = onDismiss) {
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.testTag("CloseButton")
+                ) {
                     Text("Close", color = NomsyColors.Subtitle)
                 }
             }

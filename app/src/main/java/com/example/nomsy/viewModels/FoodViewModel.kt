@@ -13,27 +13,27 @@ import com.example.nomsy.data.remote.*
 import com.example.nomsy.data.repository.FoodRepository
 import com.example.nomsy.utils.Result
 
-class FoodViewModel(application: Application) : AndroidViewModel(application) {
+class FoodViewModel(application: Application) : AndroidViewModel(application), IFoodViewModel {
     // LiveData to hold the recognized food name
     private val _recognizedFood = MutableLiveData<String>()
-    val recognizedFood: LiveData<String> get() = _recognizedFood
+    override val recognizedFood: LiveData<String> get() = _recognizedFood
 
     // Hold the single food detail from your API
     private val _foodDetail = MutableLiveData<Food?>()
-    val foodDetail: LiveData<Food?> = _foodDetail
+    override val foodDetail: LiveData<Food?> = _foodDetail
 
-    val allFoods = mutableStateListOf<Food>()
+    override val allFoods = mutableStateListOf<Food>()
 
-    val searchResults = mutableStateListOf<Food>()
+    override val searchResults = mutableStateListOf<Food>()
 
     private val _mealResult = MutableLiveData<Result<AddMealResponse>>()
-    val mealResult: LiveData<Result<AddMealResponse>> get() = _mealResult
+    override val mealResult: LiveData<Result<AddMealResponse>?> get() = _mealResult
 
 
     private val _dailySummary = MutableLiveData<NutritionTotals>()
-    val dailySummary: LiveData<NutritionTotals> get() = _dailySummary
+    override val dailySummary: LiveData<NutritionTotals?> get() = _dailySummary
 
-    fun analyzeWithSpoonacular(bitmap: Bitmap) {
+    override fun analyzeWithSpoonacular(bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
             val food = SpoonacularApiService.analyzeFoodImage(bitmap)
             food?.let {
@@ -43,7 +43,7 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun searchFoodsFromApi(query: String) {
+    override fun searchFoodsFromApi(query: String) {
         viewModelScope.launch {
             try {
                 val response = MealTrackerRetrofitClient.mealTrackerApi.getAllFoods()
@@ -60,7 +60,7 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun fetchAllFoods() {
+    override fun fetchAllFoods() {
         viewModelScope.launch {
             try {
                 val response = MealTrackerRetrofitClient.mealTrackerApi.getAllFoods()
@@ -79,7 +79,7 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun fetchDailySummary(date: String) {
+    override fun fetchDailySummary(date: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = MealTrackerRetrofitClient.mealTrackerApi.getDailySummary(date)
@@ -95,7 +95,7 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // Adding a meal for the Database
-    fun submitMeal(request: AddMealRequest) {
+    override fun submitMeal(request: AddMealRequest) {
         viewModelScope.launch {
             FoodRepository().addMeal(request).observeForever {
                 _mealResult.value = it
@@ -104,7 +104,7 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     //Clear the stored value
-    fun clearMealResult() {
+    override fun clearMealResult() {
         _mealResult.value = null
     }
 }

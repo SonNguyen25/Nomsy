@@ -41,6 +41,7 @@ import com.example.nomsy.ui.components.addFoodCard
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.IAuthViewModel
+import com.example.nomsy.viewModels.IFoodViewModel
 import com.example.nomsy.viewModels.IHomeViewModel
 import com.example.nomsy.viewModels.IProfileViewModel
 
@@ -50,6 +51,7 @@ fun HomeScreen(
     viewModel: IHomeViewModel,
     authViewModel: IAuthViewModel,
     profileViewModel: IProfileViewModel,
+    foodViewModel: IFoodViewModel,
 ) {
     // FETCHES PROFILE DATA
     val username = authViewModel.getCurrentUsername() // Get the username
@@ -332,11 +334,12 @@ fun HomeScreen(
 
     if (showAddFoodDialog) {
         addFoodCard(
-            date = "2025-04-12",
+            date = "2025-04-${date}",
             onDismiss = { showAddFoodDialog = false },
             onMealAdded = {
                 viewModel.refreshData()
-            }
+            },
+            viewModel = foodViewModel,
         )
     }
 }

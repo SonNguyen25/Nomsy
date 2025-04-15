@@ -12,7 +12,7 @@ class RecipeRepository(
     private val api: RecipeAPIService,
     private val dao: RecipeDAO
 ) : IRecipeRepository {
-    suspend fun searchRecipes(query: String): List<Recipe> = withContext(Dispatchers.IO) {
+    override suspend fun searchRecipes(query: String): List<Recipe> = withContext(Dispatchers.IO) {
         return@withContext try {
             val result = api.searchMeals(query).meals?.map { it.toRecipe() }.orEmpty()
             dao.insertRecipes(result)
@@ -26,7 +26,7 @@ class RecipeRepository(
         }
     }
 
-    suspend fun getAllRecipes(): List<Recipe> = withContext(Dispatchers.IO) {
+    override suspend fun getAllRecipes(): List<Recipe> = withContext(Dispatchers.IO) {
         return@withContext try {
             val result = api.getAllRecipes().meals?.map { it.toRecipe() }.orEmpty()
             dao.insertRecipes(result)

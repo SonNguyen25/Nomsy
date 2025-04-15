@@ -2,55 +2,41 @@ package com.example.nomsy.ui.screens.recipes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.models.Recipe
-import com.example.nomsy.ui.components.recipePopUp
-import com.example.nomsy.ui.components.recipesCard
 import com.example.nomsy.ui.theme.NomsyColors
+import com.example.nomsy.ui.components.recipesCard
+import com.example.nomsy.viewModels.RecipeViewModel
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
+import com.example.nomsy.ui.components.recipePopUp
+import androidx.compose.ui.platform.testTag
 import com.example.nomsy.viewModels.IRecipeViewModel
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
 
@@ -85,7 +71,9 @@ fun recipesScreen(
                 fontSize = 28.sp,
                 color = NomsyColors.Title,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .testTag("CookBookTitle")
             )
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -100,7 +88,9 @@ fun recipesScreen(
                         color = NomsyColors.Texts.copy(alpha = 0.6f)
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("SearchBar"),
                 singleLine = true,
                 shape = RoundedCornerShape(15.dp),
                 textStyle = TextStyle(color = NomsyColors.Texts),
@@ -114,7 +104,8 @@ fun recipesScreen(
                 trailingIcon = {
                     Row {
                         if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
+                            IconButton(onClick = { searchQuery = "" },
+                                modifier = Modifier.testTag("ClearSearchButton")) {
                                 androidx.compose.material3.Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Clear",
@@ -129,7 +120,7 @@ fun recipesScreen(
                             } else {
                                 viewModel.search(searchQuery)
                             }
-                        }) {
+                        }, modifier = Modifier.testTag("SearchIconButton")) {
                             androidx.compose.material3.Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search",
@@ -158,7 +149,8 @@ fun recipesScreen(
         val recipeMap by viewModel.recipesByCategory.collectAsState()
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .testTag("RecipeList"),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             recipeMap.forEach { (category, recipesInCategory) ->
@@ -185,7 +177,7 @@ fun recipesScreen(
                             recipesCard(
                                 recipe = recipe,
                                 onClick = { selectedRecipe = recipe },
-                                modifier = Modifier.width(240.dp)
+                                modifier = Modifier.width(240.dp).testTag("RecipeCard_${recipe.idMeal}")
                             )
                         }
                     }
@@ -199,29 +191,3 @@ fun recipesScreen(
         recipePopUp(recipe = recipe, onDismiss = { selectedRecipe = null })
     }
 }
-
-// Fake data for preview/testing
-val sampleRecipes = listOf(
-    Recipe(
-        idMeal = "1",
-        strMeal = "Sashimi Combo",
-        strInstructions = "Slice and serve chilled.",
-        strMealThumb = "https://www.themealdb.com/images/media/meals/1548772327.jpg",
-        strYoutube = null,
-        strCategory = "Seafood",
-        strArea = "Japanese",
-        strTags = "Fish,Fresh",
-        ingredients = listOf("Egg", "Garlic", "Yellowtail", "Salmon", "Onion")
-    ),
-    Recipe(
-        idMeal = "2",
-        strMeal = "Teriyaki Chicken",
-        strInstructions = "Grill with teriyaki sauce.",
-        strMealThumb = "https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg",
-        strYoutube = null,
-        strCategory = "Chicken",
-        strArea = "Japanese",
-        strTags = "Grilled,Savory",
-        ingredients = listOf("Chicken", "Soy Sauce", "Sugar", "Garlic")
-    )
-)

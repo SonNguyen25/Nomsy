@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -24,13 +26,20 @@ import com.example.nomsy.ui.theme.NomsyColors
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun recipeImage(imageUrl: String?, content: String?, modifier: Modifier = Modifier) {
-    GlideImage(
-        model = imageUrl,
-        contentDescription = content,
-        contentScale = ContentScale.Crop,
-        modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
-    )
+    if (imageUrl.isNullOrBlank() || imageUrl == "null") {
+        Box(
+            modifier = modifier
+                .background(Color.Gray)
+        )
+    } else {
+        GlideImage(
+            model = imageUrl,
+            contentDescription = content,
+            contentScale = ContentScale.Crop,
+            modifier = modifier
+                .clip(RoundedCornerShape(20.dp))
+        )
+    }
 }
 
 @Composable
@@ -41,7 +50,8 @@ fun recipesCard(
 ) {
     Card(
         modifier = modifier
-            .clickable { onClick() },
+            .clickable { onClick() }
+            .testTag("RecipeCard"),
         shape = RoundedCornerShape(20.dp),
         elevation = 6.dp
     ) {
@@ -53,7 +63,9 @@ fun recipesCard(
             recipeImage(
                 imageUrl = recipe.strMealThumb,
                 content = recipe.strMeal,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("RecipeImage")
             )
 
             Box(
@@ -66,6 +78,7 @@ fun recipesCard(
                         shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp)
                     )
                     .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .testTag("RecipeInfoBox")
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
@@ -75,7 +88,9 @@ fun recipesCard(
                         color = NomsyColors.Title,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("RecipeTitle")
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -85,7 +100,9 @@ fun recipesCard(
                         color = NomsyColors.Subtitle,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("RecipeTags")
                     )
                 }
             }
