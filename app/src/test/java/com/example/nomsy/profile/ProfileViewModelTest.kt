@@ -24,12 +24,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import org.robolectric.RobolectricTestRunner
 import retrofit2.Response
 import java.lang.reflect.Field
 
-@RunWith(JUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
 class ProfileViewModelTest {
 
@@ -60,9 +59,7 @@ class ProfileViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
-//        val appContext = ApplicationProvider.getApplicationContext<Application>()
-
-        val appContext = Application()
+        val appContext = ApplicationProvider.getApplicationContext<Application>()
 
         fakeAuthApiService = FakeAuthApiService()
         fakeUserDatabase = FakeUserDatabase.getInstance()
