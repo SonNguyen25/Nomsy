@@ -11,7 +11,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.composable
 import androidx.navigation.createGraph
@@ -25,7 +24,10 @@ import com.example.nomsy.data.remote.UpdateProfileRequest
 import com.example.nomsy.ui.screens.HomeScreen
 import com.example.nomsy.ui.screens.addfood.FakeFoodViewModel
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.*
+import com.example.nomsy.viewModels.IAuthViewModel
+import com.example.nomsy.viewModels.IFoodViewModel
+import com.example.nomsy.viewModels.IHomeViewModel
+import com.example.nomsy.viewModels.IProfileViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,9 +43,6 @@ class HomeScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    // Minimal implementation of required dependencies
-
-    // Simple auth view model that just returns a test username
     class SimpleAuthViewModel : IAuthViewModel {
         override val loginResult = MutableLiveData<Result<User>?>(null)
         override val isLoggedIn = MutableStateFlow(true).asStateFlow()
@@ -73,9 +72,7 @@ class HomeScreenTest {
         override fun getUserFitnessGoal() = ""
     }
 
-    // Simple home view model with minimal test data
     class SimpleHomeViewModel : IHomeViewModel {
-        // Nutrition data
         private val _nutritionTotals = MutableLiveData<Result<DailySummaryEntity?>>(
             Result.Success(
                 DailySummaryEntity(
@@ -89,9 +86,7 @@ class HomeScreenTest {
             )
         )
         override val nutritionTotals: LiveData<Result<DailySummaryEntity?>> = _nutritionTotals
-
-        // Meal data
-        private val _mealsByType = MutableLiveData<Result<Map<String, List<MealItem>>>>(
+        val _mealsByType = MutableLiveData<Result<Map<String, List<MealItem>>>>(
             Result.Success(
 
                 mapOf(
@@ -109,17 +104,11 @@ class HomeScreenTest {
                 )
             )
         )
-
         override val mealsByType: LiveData<Result<Map<String, List<MealItem>>>> = _mealsByType
-
-        // Water intake
         private val _waterIntake = MutableStateFlow(2.0)
         override val waterIntake: StateFlow<Double> = _waterIntake.asStateFlow()
-
-        // Date
         override val selectedDate = MutableStateFlow(14)
 
-        // Methods
         override fun incrementDate() {
             if (selectedDate.value < 14) selectedDate.value += 1
         }
@@ -133,15 +122,32 @@ class HomeScreenTest {
         }
 
         override fun deleteMeal(date: String, foodName: String) {
-            // Do nothing for test
         }
 
         override fun refreshData() {
-            TODO("Not yet implemented")
+        }
+
+        //  error nutrition for testing
+        fun setNutritionError() {
+            _nutritionTotals.value = Result.Error(Exception("Test error"))
+        }
+
+        // loading nutrition for testing
+        fun setNutritionLoading() {
+            _nutritionTotals.value = Result.Loading
+        }
+
+        //  error states for meals
+        fun setMealsError() {
+            _mealsByType.value = Result.Error(Exception("Test error"))
+        }
+
+        //loading states for meals
+        fun setMealsLoading() {
+            _mealsByType.value = Result.Loading
         }
     }
 
-    // Simple profile view model that returns a test user profile
     class SimpleProfileViewModel : IProfileViewModel {
         private val testUser = User(
             id = "123",
@@ -160,33 +166,38 @@ class HomeScreenTest {
             ),
             password = "password"
         )
-
         private val _profile = MutableLiveData<Result<User>>(Result.Success(testUser))
         override val profile: LiveData<Result<User>> = _profile
-
         private val _updateResult = MutableLiveData<Result<User>?>(null)
         override val updateResult: MutableLiveData<Result<User>?> = _updateResult
-
         override fun fetchByUsername(username: String): Job {
-            // Already set in constructor
             return kotlinx.coroutines.CompletableDeferred<Unit>().also { it.complete(Unit) }
         }
 
         override fun updateProfile(username: String, req: UpdateProfileRequest): Job {
-            // Do nothing for test
             return kotlinx.coroutines.CompletableDeferred<Unit>().also { it.complete(Unit) }
         }
 
         override fun clearUpdateState() {
             _updateResult.value = null
         }
-    }
 
+        // error states for testing
+        fun setProfileError() {
+            _profile.value = Result.Error(Exception("Test error"))
+        }
+
+        // loading states for testing
+        fun setProfileLoading() {
+            _profile.value = Result.Loading
+        }
+
+    }
 
     private lateinit var navController: TestNavHostController
     private lateinit var authViewModel: IAuthViewModel
-    private lateinit var homeViewModel: IHomeViewModel
-    private lateinit var profileViewModel: IProfileViewModel
+    private lateinit var homeViewModel: SimpleHomeViewModel
+    private lateinit var profileViewModel: SimpleProfileViewModel
     private lateinit var foodViewModel: IFoodViewModel
 
     @Before
@@ -220,6 +231,83 @@ class HomeScreenTest {
 
     /**
      *  start testing here
+     * */
+
+    @Test
+    fun displayProfileLoadingState() {
+        // set loading state
+        composeTestRule.runOnUiThread {
+            profileViewModel.setProfileLoading()
+        }
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Loading profile").assertIsDisplayed()
+    }
+
+    @Test
+    fun displayProfileErrorState() {
+        composeTestRule.runOnUiThread {
+            profileViewModel.setProfileError()
+        }
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Error loading profile").assertIsDisplayed()
+    }
+
+    @Test
+    fun displayNutritionLoadingState() {
+        composeTestRule.runOnUiThread {
+            homeViewModel.setNutritionLoading()
+        }
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Loading nutrition data").assertIsDisplayed()
+    }
+
+    @Test
+    fun displayNutritionErrorState() {
+        composeTestRule.runOnUiThread {
+            homeViewModel.setNutritionError()
+        }
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Error loading profile").assertIsDisplayed()
+    }
+
+    @Test
+    fun displayMealsLoadingState() {
+        composeTestRule.runOnUiThread {
+            homeViewModel.setMealsLoading()
+        }
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithContentDescription("Loading meal data").assertIsDisplayed()
+    }
+
+    @Test
+    fun displayMealsErrorState() {
+        composeTestRule.runOnUiThread {
+            homeViewModel.setMealsError()
+        }
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("error has occurred").assertIsDisplayed()
+    }
+
+    @Test
+    fun displayEmptyMealsState() {
+        // Set meals to empty data
+        composeTestRule.runOnUiThread {
+            homeViewModel._mealsByType.value = Result.Success(emptyMap())
+        }
+
+        composeTestRule.mainClock.advanceTimeByFrame()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("No meals logged for this date").assertIsDisplayed()
+    }
+
+    /** loading and error above
      * */
 
     @Test
