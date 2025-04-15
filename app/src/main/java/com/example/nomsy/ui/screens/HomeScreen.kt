@@ -28,7 +28,6 @@ import com.example.nomsy.viewModels.HomeViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 import java.util.Locale
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -302,7 +301,10 @@ fun HomeScreen(
 
     if (showAddFoodDialog) {
         addFoodCard(
-            onDismiss = { showAddFoodDialog = false }
+            onDismiss = { showAddFoodDialog = false },
+            onMealAdded = {
+                viewModel.refreshData()
+            }
         )
     }
 }

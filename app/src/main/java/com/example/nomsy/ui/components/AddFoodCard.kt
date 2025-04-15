@@ -50,7 +50,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nomsy.data.remote.AddMealRequest
-import com.example.nomsy.data.remote.MealTrackerRetrofitClient
 import com.example.nomsy.viewModels.FoodViewModel
 import kotlinx.coroutines.*
 import com.example.nomsy.utils.Result
@@ -58,7 +57,8 @@ import com.example.nomsy.utils.Result
 @Composable
 fun addFoodCard(
     food: Food? = null,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onMealAdded: () -> Unit,
 ) {
     var inputMethod by remember { mutableStateOf("Manual") }
     val context = LocalContext.current
@@ -129,17 +129,17 @@ fun addFoodCard(
     LaunchedEffect(mealResult) {
         mealResult?.let { result ->
             when (result) {
+                is Result.Success -> {
+                    Toast.makeText(context, "Meal successfully added!", Toast.LENGTH_SHORT).show()
+                    foodViewModel.clearMealResult()
+                    onMealAdded() // refresh home page
+                    onDismiss()
+                }
                 is Result.Error -> {
                     Toast.makeText(context, "Failed to add meal.", Toast.LENGTH_SHORT).show()
                     foodViewModel.clearMealResult()
                 }
-                is Result.Success -> {
-                    Toast.makeText(context, "Meal successfully added!", Toast.LENGTH_SHORT).show()
-                    foodViewModel.clearMealResult()
-                    onDismiss()
-                }
-                is Result.Loading -> {
-                }
+                is Result.Loading -> {}
             }
         }
     }
@@ -222,7 +222,7 @@ fun addFoodCard(
                         )
 
                     } else {
-                        PictureCaptureSection()
+                        PictureCaptureForm()
                     }
                 }
 
@@ -603,7 +603,7 @@ fun MealTypeSelector(
 
 
 @Composable
-fun PictureCaptureSection() {
+fun PictureCaptureForm() {
     val context = LocalContext.current
     val foodViewModel: FoodViewModel = viewModel()
     val recognizedFood by foodViewModel.recognizedFood.observeAsState("")

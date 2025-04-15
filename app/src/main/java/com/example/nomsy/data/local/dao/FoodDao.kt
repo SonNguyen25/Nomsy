@@ -27,7 +27,6 @@ interface FoodDao {
     @Query("DELETE FROM foods")
     suspend fun clearAll()
 
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFood(food: Food)
 

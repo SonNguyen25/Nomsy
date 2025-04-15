@@ -20,9 +20,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.math.log
 
-
-class
-HomeViewModel(application: Application) :
+class HomeViewModel(application: Application) :
     AndroidViewModel(application) {
 
     private val database = MealTrackerDatabase.getInstance(application)
@@ -63,6 +61,11 @@ HomeViewModel(application: Application) :
     private fun loadData() {
         //our api takes YYYY-MM-DD format
         loadDataForDate("2025-04-${selectedDate.value}")
+    }
+
+    fun refreshData() {
+        val dateStr = "2025-04-${selectedDate.value}"
+        loadDataForDate(dateStr)
     }
 
     // Load all data for the current date
@@ -149,4 +152,6 @@ HomeViewModel(application: Application) :
         }
         loadData()
     }
+
+
 }
