@@ -5,19 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="RecipeCardTest (2)">
+      <SelectionState runConfigName="AddFoodCardTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ManualInputFormTest">
+      <SelectionState runConfigName="HomeScreenTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="MealTypeSelectorTest">
+      <SelectionState runConfigName="addFoodCard_pictureSubmission_triggersSubmitMeal()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="nutrientCircle_displaysLabelAndPercentage()">
+      <SelectionState runConfigName="manualSubmission()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SearchFoodDropdownTest">
+      <SelectionState runConfigName="pictureSubmission()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

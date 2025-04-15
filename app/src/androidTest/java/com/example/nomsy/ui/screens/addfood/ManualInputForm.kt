@@ -14,7 +14,7 @@ class ManualInputFormTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun manualInputForm_displaysFields_andHandlesInput() {
+    fun displayFieldsAndHandlesInput() {
         // State holders for capturing user input
         var foodName = "Egg"
         var calories = "100"
@@ -35,7 +35,8 @@ class ManualInputFormTest {
                 proteinPercent = 0.3f,
                 carbsPercent = 0.2f,
                 fatPercent = 0.4f,
-                onSelectFood = {}
+                onSelectFood = {},
+                viewModel = FakeFoodViewModel()
             )
         }
 

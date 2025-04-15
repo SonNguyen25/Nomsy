@@ -29,14 +29,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.viewModels.FoodViewModel
+import com.example.nomsy.viewModels.IFoodViewModel
 
 
 @Composable
-fun PictureCaptureForm() {
+fun PictureCaptureForm(viewModel: IFoodViewModel) {
     val context = LocalContext.current
-    val foodViewModel: FoodViewModel = viewModel()
-    val recognizedFood by foodViewModel.recognizedFood.observeAsState("")
-    val foodDetail by foodViewModel.foodDetail.observeAsState()
+    val recognizedFood by viewModel.recognizedFood.observeAsState("")
+    val foodDetail by viewModel.foodDetail.observeAsState()
 
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var cameraPermissionGranted by remember { mutableStateOf(false) }
@@ -47,7 +47,7 @@ fun PictureCaptureForm() {
     ) { bitmap ->
         imageBitmap = bitmap
         bitmap?.let {
-            foodViewModel.analyzeWithSpoonacular(it)
+            viewModel.analyzeWithSpoonacular(it)
         }
     }
 

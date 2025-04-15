@@ -13,7 +13,7 @@ class MealTypeSelectorTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun mealTypeSelector_clickUpdatesSelectedMealType() {
+    fun clickUpdateSelectedMealType() {
         var selected = "Breakfast"
 
         composeTestRule.setContent {

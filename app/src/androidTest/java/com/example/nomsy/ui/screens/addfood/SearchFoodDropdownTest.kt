@@ -17,7 +17,7 @@ class SearchFoodDropdownTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun searchFoodDropdown_displaysResults_and_selectsItem() {
+    fun displaysResultsAndSelectsItem() {
         val fakeFoods = listOf(
             Food("1", "2024-04-15", "Lunch", "Apple", 95, 25, 0, 0),
             Food("2", "2024-04-15", "Lunch", "Banana", 105, 27, 1, 0)
@@ -57,7 +57,7 @@ class SearchFoodDropdownTest {
     }
 
     @Test
-    fun searchFoodDropdown_clearButtonResetsQueryAndDropdown() {
+    fun clearButtonResetsQueryAndDropdown() {
         composeTestRule.setContent {
             val fakeViewModel = FakeFoodViewModel().apply {
                 searchResults.add(Food("1", "2024-04-15", "Lunch", "Apple", 95, 25, 0, 0))
@@ -88,7 +88,7 @@ class SearchFoodDropdownTest {
 
 
     @Test
-    fun searchFoodDropdown_searchIconClearsFocus() {
+    fun searchIconClearsFocus() {
         val fakeFoods = listOf(
             Food("1", "2024-04-15", "Lunch", "Banana", 105, 27, 1, 0)
         )

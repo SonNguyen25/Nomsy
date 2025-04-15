@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.composable
 import androidx.navigation.createGraph
@@ -22,10 +23,9 @@ import com.example.nomsy.data.local.models.User
 import com.example.nomsy.data.remote.MealItem
 import com.example.nomsy.data.remote.UpdateProfileRequest
 import com.example.nomsy.ui.screens.HomeScreen
+import com.example.nomsy.ui.screens.addfood.FakeFoodViewModel
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.IAuthViewModel
-import com.example.nomsy.viewModels.IHomeViewModel
-import com.example.nomsy.viewModels.IProfileViewModel
+import com.example.nomsy.viewModels.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -182,10 +182,12 @@ class HomeScreenTest {
         }
     }
 
+
     private lateinit var navController: TestNavHostController
     private lateinit var authViewModel: IAuthViewModel
     private lateinit var homeViewModel: IHomeViewModel
     private lateinit var profileViewModel: IProfileViewModel
+    private lateinit var foodViewModel: IFoodViewModel
 
     @Before
     fun setUp() {
@@ -203,13 +205,15 @@ class HomeScreenTest {
             authViewModel = SimpleAuthViewModel()
             homeViewModel = SimpleHomeViewModel()
             profileViewModel = SimpleProfileViewModel()
+            foodViewModel = FakeFoodViewModel()
         }
         composeTestRule.setContent {
             HomeScreen(
                 navController = navController,
                 viewModel = homeViewModel,
                 authViewModel = authViewModel,
-                profileViewModel = profileViewModel
+                profileViewModel = profileViewModel,
+                foodViewModel = foodViewModel
             )
         }
     }

@@ -22,6 +22,7 @@ import com.example.nomsy.data.remote.AddMealRequest
 import com.example.nomsy.viewModels.FoodViewModel
 import kotlinx.coroutines.*
 import com.example.nomsy.utils.Result
+import com.example.nomsy.viewModels.IFoodViewModel
 
 @Composable
 fun addFoodCard(
@@ -29,6 +30,7 @@ fun addFoodCard(
     food: Food? = null,
     onDismiss: () -> Unit,
     onMealAdded: () -> Unit,
+    viewModel: IFoodViewModel
 ) {
     var inputMethod by remember { mutableStateOf("Manual") }
     val context = LocalContext.current
@@ -43,13 +45,11 @@ fun addFoodCard(
     val setMealType: (String) -> Unit = { mealTypeState.value = it }
 
 
-    val foodViewModel: FoodViewModel = viewModel()
-    val foodDetail by foodViewModel.foodDetail.observeAsState()
-
+    val foodDetail by viewModel.foodDetail.observeAsState()
     LaunchedEffect(Unit) {
-        foodViewModel.fetchDailySummary(date)
+        viewModel.fetchDailySummary(date)
     }
-    val dailySummary by foodViewModel.dailySummary.observeAsState()
+    val dailySummary by viewModel.dailySummary.observeAsState()
 
     val dailyGoals = mapOf(
         "calories" to (dailySummary?.calories?.toFloat() ?: 2000f),
@@ -94,20 +94,20 @@ fun addFoodCard(
         }
     }
 
-    val mealResult by foodViewModel.mealResult.observeAsState()
+    val mealResult by viewModel.mealResult.observeAsState()
 
     LaunchedEffect(mealResult) {
         mealResult?.let { result ->
             when (result) {
                 is Result.Success -> {
                     Toast.makeText(context, "Meal successfully added!", Toast.LENGTH_SHORT).show()
-                    foodViewModel.clearMealResult()
+                    viewModel.clearMealResult()
                     onMealAdded() // refresh home page
                     onDismiss()
                 }
                 is Result.Error -> {
                     Toast.makeText(context, "Failed to add meal.", Toast.LENGTH_SHORT).show()
-                    foodViewModel.clearMealResult()
+                    viewModel.clearMealResult()
                 }
                 is Result.Loading -> {}
             }
@@ -188,11 +188,12 @@ fun addFoodCard(
                                 protein = it.protein.toString()
                                 carbs = it.carbs.toString()
                                 fat = it.fat.toString()
-                            }
+                            },
+                            viewModel = viewModel
                         )
 
                     } else {
-                        PictureCaptureForm()
+                        PictureCaptureForm(viewModel = viewModel)
                     }
                 }
 
@@ -224,7 +225,7 @@ fun addFoodCard(
                                     fat = foodData?.fat ?: fat.toIntOrNull() ?: 0
                                 )
 
-                                foodViewModel.submitMeal(mealRequest)
+                                viewModel.submitMeal(mealRequest)
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = NomsyColors.Background

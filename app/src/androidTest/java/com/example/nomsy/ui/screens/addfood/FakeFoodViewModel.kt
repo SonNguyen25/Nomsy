@@ -14,6 +14,9 @@ import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.IFoodViewModel
 
 class FakeFoodViewModel : IFoodViewModel {
+    var submittedMealRequest: AddMealRequest? = null
+    var clearMealResultCalled = false
+
     override val recognizedFood = MutableLiveData("")
     override val foodDetail = MutableLiveData<Food?>()
     override val allFoods = mutableStateListOf<Food>()
@@ -25,6 +28,13 @@ class FakeFoodViewModel : IFoodViewModel {
     override fun searchFoodsFromApi(query: String) {}
     override fun fetchAllFoods() {}
     override fun fetchDailySummary(date: String) {}
-    override fun submitMeal(request: AddMealRequest) {}
-    override fun clearMealResult() {}
+
+    override fun submitMeal(request: AddMealRequest) {
+        submittedMealRequest = request
+    }
+
+    override fun clearMealResult() {
+        clearMealResultCalled = true
+    }
 }
+

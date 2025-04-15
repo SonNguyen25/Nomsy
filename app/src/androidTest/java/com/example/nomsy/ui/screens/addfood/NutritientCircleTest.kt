@@ -12,7 +12,7 @@ class NutrientCircleTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun nutrientCircle_displaysLabelAndPercentage() {
+    fun displaysLabelAndPercentage() {
         composeTestRule.setContent {
             NutrientCircle(
                 label = "Protein",

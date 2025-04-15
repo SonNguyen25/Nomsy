@@ -29,22 +29,22 @@ fun ManualInputForm(
     proteinPercent: Float,
     carbsPercent: Float,
     fatPercent: Float,
-    onSelectFood: (Food) -> Unit
+    onSelectFood: (Food) -> Unit,
+    viewModel: IFoodViewModel
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        val foodViewModel: IFoodViewModel = viewModel()
 
         LaunchedEffect(Unit) {
-            if (foodViewModel.allFoods.isEmpty()) {
-                foodViewModel.fetchAllFoods()
+            if (viewModel.allFoods.isEmpty()) {
+                viewModel.fetchAllFoods()
             }
         }
 
         SearchFoodDropdown(
-            viewModel = foodViewModel,
+            viewModel = viewModel,
             foodName = foodName,
             onSelectFood = onSelectFood,
             onQueryChange = onFoodNameChange

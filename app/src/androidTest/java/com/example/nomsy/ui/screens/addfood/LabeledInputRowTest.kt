@@ -33,7 +33,7 @@ class LabeledInputRowTest {
     }
 
     @Test
-    fun labeledInputRowAcceptsOnlyNumbers_whenIsNumericTrue() {
+    fun whenIsNumericTrue() {
         composeTestRule.setContent {
             var text by remember { mutableStateOf("") }
             LabeledInputRow(
@@ -57,7 +57,7 @@ class LabeledInputRowTest {
     }
 
     @Test
-    fun labeledInputRowAcceptsAnyText_whenIsNumericFalse() {
+    fun whenIsNumericFalse() {
         composeTestRule.setContent {
             var text by remember { mutableStateOf("") }
             LabeledInputRow(
