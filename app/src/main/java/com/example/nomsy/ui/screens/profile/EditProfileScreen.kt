@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
@@ -48,14 +49,16 @@ import com.example.nomsy.ui.components.FitnessGoalButton
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
+import com.example.nomsy.viewModels.IProfileViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 import kotlin.random.Random
 
 @Composable
 fun EditProfileScreen(
     navController: NavController,
-    profileViewModel: ProfileViewModel = viewModel(),
-    authViewModel: AuthViewModel = viewModel()
+    profileViewModel: IProfileViewModel = viewModel(),
+    authViewModel: IAuthViewModel = viewModel()
 ) {
     val username = authViewModel.getCurrentUsername()
     val profileState by profileViewModel.profile.observeAsState()
@@ -153,7 +156,7 @@ fun EditProfileScreen(
                 when (profileState) {
                     is Result.Loading -> {
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(color = NomsyColors.Title)
+                            CircularProgressIndicator(color = NomsyColors.Title, modifier = Modifier.testTag("loading"))
                         }
                     }
                     is Result.Error -> {
@@ -239,21 +242,27 @@ fun EditProfileScreen(
                             text = "Cut",
                             isSelected = fitnessGoal == "cut",
                             onClick = { fitnessGoal = "cut" },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .testTag("cut")
+                                .weight(1f)
                         )
 
                         FitnessGoalButton(
                             text = "Maintain",
                             isSelected = fitnessGoal == "maintain",
                             onClick = { fitnessGoal = "maintain" },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .testTag("maintain")
+                                .weight(1f)
                         )
 
                         FitnessGoalButton(
                             text = "Bulk",
                             isSelected = fitnessGoal == "bulk",
                             onClick = { fitnessGoal = "bulk" },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .testTag("bulk")
+                                .weight(1f)
                         )
                     }
 
@@ -270,6 +279,7 @@ fun EditProfileScreen(
                             }
                             .align(Alignment.CenterHorizontally)
                             .padding(vertical = 8.dp)
+                            .testTag("lucky-text")
                     )
 
 
@@ -385,7 +395,7 @@ fun EditProfileScreen(
                 when (updateState) {
                     is Result.Loading -> {
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(color = NomsyColors.Title)
+                            CircularProgressIndicator(color = NomsyColors.Title, modifier = Modifier.testTag("loading"))
                         }
                     }
                     is Result.Success -> {

@@ -65,6 +65,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application), I
         repository.register(user)
             .observeForever { result ->
                 _registerResult.postValue(result)
+                _isLoggedIn.value = true
             }
     }
 

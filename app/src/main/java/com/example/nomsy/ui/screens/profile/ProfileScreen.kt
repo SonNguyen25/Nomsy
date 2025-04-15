@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,14 +22,16 @@ import com.example.nomsy.ui.components.ProfileContent
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
+import com.example.nomsy.viewModels.IProfileViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    authViewModel: AuthViewModel = viewModel(),
-    profileViewModel: ProfileViewModel = viewModel()
+    authViewModel: IAuthViewModel = viewModel(),
+    profileViewModel: IProfileViewModel = viewModel()
 ) {
     val username = authViewModel.getCurrentUsername()
     val profileResult by profileViewModel.profile.observeAsState()
@@ -77,7 +80,7 @@ fun ProfileScreen(
                 when (profileResult) {
                     is Result.Loading -> {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
+                            modifier = Modifier.testTag("loading_indicator").align(Alignment.Center),
                             color = NomsyColors.Title
                         )
                     }
@@ -108,6 +111,7 @@ fun ProfileScreen(
                                     contentColor = NomsyColors.Background
                                 ),
                                 modifier = Modifier
+                                    .testTag("logoutButton")
                                     .fillMaxWidth(0.6f)
                                     .height(48.dp)
                             ) {

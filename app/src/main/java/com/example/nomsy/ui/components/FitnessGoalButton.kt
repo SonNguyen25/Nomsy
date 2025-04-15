@@ -8,6 +8,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.nomsy.ui.theme.NomsyColors
@@ -26,7 +28,7 @@ fun FitnessGoalButton(
             contentColor = if (isSelected) Color.Black else NomsyColors.Texts
         ),
         shape = RoundedCornerShape(8.dp),
-        modifier = modifier.height(48.dp)
+        modifier = modifier.height(48.dp).semantics { this.selected = isSelected }
     ) {
         Text(
             text = text,
