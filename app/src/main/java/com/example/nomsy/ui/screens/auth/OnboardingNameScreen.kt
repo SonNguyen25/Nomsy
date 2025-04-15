@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,7 +57,7 @@ fun OnboardingNameScreen(navController: NavController, authViewModel: AuthViewMo
                     unfocusedBorderColor = NomsyColors.Subtitle,
                     backgroundColor = NomsyColors.PictureBackground
                 ),
-                modifier = Modifier.fillMaxWidth(0.8f)
+                modifier = Modifier.testTag("name_input").fillMaxWidth(0.8f)
             )
         },
         buttonText = "Next",

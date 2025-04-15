@@ -46,7 +46,7 @@ class HomeViewModel(application: Application) :
      * our dummy data only goes from 4/11- 4/13
      * **/
     // simplify the date to always start at 12
-    override val selectedDate = MutableStateFlow(12)
+    override val selectedDate = MutableStateFlow(14)
 
     // Formatted date for API calls
     private val formattedDate: Flow<String> = selectedDate.map { "2025-04-$it" }
@@ -153,7 +153,7 @@ class HomeViewModel(application: Application) :
             val roundedNewWaterIntake = (Math.round(newWaterIntake * 10) / 10.0)
             // calculate delta (difference between current and new) api takes dif instead of new val
             val delta = roundedNewWaterIntake - _waterIntake.value
-            _waterIntake.value = roundedNewWaterIntake / 10.0
+            _waterIntake.value = roundedNewWaterIntake
             val updatedTotal =
                 mealRepository.updateWaterIntakeDelta(date, delta, roundedNewWaterIntake)
             _waterIntake.value = updatedTotal
@@ -161,9 +161,9 @@ class HomeViewModel(application: Application) :
     }
 
 
-    // only allow 4/11, 4/12, 4/13 because that is our dummy data.
+    // only allow 4/11, 4/12, 4/13 , 4/14 because that is our dummy data.
     override fun incrementDate() {
-        if (selectedDate.value < 13) {
+        if (selectedDate.value < 14) {
             selectedDate.value += 1
         }
     }

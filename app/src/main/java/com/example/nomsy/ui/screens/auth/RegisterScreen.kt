@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -103,7 +104,7 @@ fun RegisterScreen(
                     )
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.testTag("emailField").fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -126,7 +127,7 @@ fun RegisterScreen(
                         tint = NomsyColors.Title
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.testTag("usernameField").fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -159,7 +160,7 @@ fun RegisterScreen(
                         modifier = Modifier.clickable { passwordVisible = !passwordVisible }
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.testTag("passwordField").fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -192,7 +193,7 @@ fun RegisterScreen(
                         modifier = Modifier.clickable { confirmPasswordVisible = !confirmPasswordVisible }
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.testTag("confirmPasswordField").fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -227,6 +228,7 @@ fun RegisterScreen(
                     }
                 },
                 modifier = Modifier
+                    .testTag("nextButton")
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -256,7 +258,7 @@ fun RegisterScreen(
                     }
                 },
                 color = NomsyColors.Texts,
-                modifier = Modifier.clickable { navController.navigate("login") }
+                modifier = Modifier.testTag("signInText").clickable { navController.navigate("login") }
             )
         }
     }

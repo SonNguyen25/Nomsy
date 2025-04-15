@@ -1,8 +1,5 @@
 package com.example.nomsy.ui.screens
 
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.models.User
@@ -46,15 +42,14 @@ import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.IAuthViewModel
 import com.example.nomsy.viewModels.IHomeViewModel
-import com.example.nomsy.viewModels.ProfileViewModel
-import java.util.Locale
+import com.example.nomsy.viewModels.IProfileViewModel
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: IHomeViewModel = viewModel(),
+    viewModel: IHomeViewModel,
     authViewModel: IAuthViewModel,
-    profileViewModel: ProfileViewModel = viewModel(),
+    profileViewModel: IProfileViewModel,
 ) {
     // FETCHES PROFILE DATA
     val username = authViewModel.getCurrentUsername() // Get the username
@@ -211,6 +206,42 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+//            // Meal sections with fixed data for prototype
+//            val breakfastMeals = remember {
+//                listOf(
+//                    MealItem("Scrambled Eggs", 220, 2, 14, 16),
+//                    MealItem("Whole Wheat Toast", 90, 15, 3, 1)
+//                )
+//            }
+//            val lunchMeals = remember {
+//                listOf(
+//                    MealItem("Grilled Chicken Salad", 350, 10, 32, 18)
+//                )
+//            }
+//            val dinnerMeals = remember {
+//                listOf(
+//                    MealItem("Salmon Fillet", 280, 0, 22, 18),
+//                    MealItem("Steamed Broccoli", 55, 10, 4, 0),
+//                    MealItem("Brown Rice", 120, 25, 3, 1)
+//                )
+//            }
+//
+//            MealListSection(
+//                title = "Breakfast",
+//                meals = breakfastMeals
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            MealListSection(
+//                title = "Lunch",
+//                meals = lunchMeals
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            MealListSection(
+//                title = "Dinner",
+//                meals = dinnerMeals
+//            )
+//            Spacer(modifier = Modifier.height(50.dp))
+
             // Display meals by meal type
             when (mealsResult) {
                 is Result.Loading -> {
@@ -237,22 +268,37 @@ fun HomeScreen(
                         )
                     } else {
                         // Display each meal type section
-                        mealsByType.forEach { (mealType, meals) ->
-                            // Capitalize first letter for display
-                            val displayMealType = mealType.replaceFirstChar {
-                                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                            }
-
+                        mealsByType["breakfast"]?.let {
                             MealListSection(
-                                title = displayMealType,
-                                meals = meals,
+                                title = "Breakfast",
+                                meals = it,
                                 onDelete = { meal ->
-                                    Log.d("HomeScreen", "Delete requested for: ${meal.food_name}")
                                     viewModel.deleteMeal(formattedDate, meal.food_name)
                                 }
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        mealsByType["lunch"]?.let {
+                            MealListSection(
+                                title = "Lunch",
+                                meals = it,
+                                onDelete = { meal ->
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        mealsByType["dinner"]?.let {
+                            MealListSection(
+                                title = "Dinner",
+                                meals = it,
+                                onDelete = { meal ->
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+
                     }
                 }
 

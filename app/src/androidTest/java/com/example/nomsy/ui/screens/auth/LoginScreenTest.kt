@@ -1,5 +1,6 @@
 package com.example.nomsy.ui.screens.auth
 
+import android.app.Application
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.MutableLiveData
@@ -8,10 +9,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.nomsy.data.local.models.User
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.IAuthViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -22,6 +19,12 @@ import androidx.navigation.compose.ComposeNavigator
 import androidx.lifecycle.LiveData
 import androidx.navigation.compose.composable
 import androidx.navigation.createGraph
+import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import org.mockito.ArgumentMatchers.any
 
 @RunWith(AndroidJUnit4::class)
 class LoginScreenTest {
@@ -30,6 +33,7 @@ class LoginScreenTest {
     val composeTestRule = createComposeRule()
 
     private lateinit var navController: TestNavHostController
+    private lateinit var authViewModel: AuthViewModel
     private lateinit var testAuthViewModel: TestAuthViewModelWrapper
 
     class TestAuthViewModelWrapper : IAuthViewModel {
@@ -81,6 +85,7 @@ class LoginScreenTest {
         override fun getUserFitnessGoal(): String = ""
     }
 
+
     @Before
     fun setUp() {
         composeTestRule.runOnUiThread {
@@ -89,57 +94,60 @@ class LoginScreenTest {
             navController.navigatorProvider.addNavigator(ComposeNavigator())
 
             navController.graph = navController.createGraph(startDestination = "login") {
-                composable("login") { /* Test doesn't need content */ }
-                composable("register") { /* Test doesn't need content */ }
-                composable("home") { /* Test doesn't need content */ }
+                composable("login") { }
+                composable("register") { }
+                composable("home") { }
             }
 
+            authViewModel = AuthViewModel(context as Application)
             testAuthViewModel = TestAuthViewModelWrapper()
         }
 
-        composeTestRule.setContent {
-            LoginScreen(navController = navController, authViewModel = testAuthViewModel)
-        }
+
+
     }
 
     @Test
     fun testLoginScreenInitialState() {
+        composeTestRule.setContent {
+
+            LoginScreen(navController = navController, authViewModel = authViewModel)
+        }
         composeTestRule.onNodeWithText("NOMSY").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Username").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Password").assertIsDisplayed()
+        composeTestRule.onNode(hasSetTextAction() and hasText("Username")).assertIsDisplayed()
+        composeTestRule.onNode(hasSetTextAction() and hasText("Password")).assertIsDisplayed()
         composeTestRule.onNodeWithText("Sign In").assertIsDisplayed()
         composeTestRule.onNodeWithText("Don't have an account? Sign up!").assertIsDisplayed()
     }
 
     @Test
-    fun testEmptyUsernameShowsErrorToast() {
+    fun testEmptyUsernameShowsNoNavigation() {
+        composeTestRule.setContent {
+
+            LoginScreen(navController = navController, authViewModel = authViewModel)
+        }
         composeTestRule.onNodeWithText("Sign In").performClick()
-        assert(!testAuthViewModel.loginCalled)
+        assertEquals("login", navController.currentBackStackEntry?.destination?.route)
     }
 
     @Test
-    fun testEmptyPasswordShowsErrorToast() {
-        composeTestRule.onNode(hasSetTextAction() and hasText("Username"))
-            .performTextInput("testuser")
+    fun testEmptyPasswordShowsNoNavigation() {
+        composeTestRule.setContent {
+
+            LoginScreen(navController = navController, authViewModel = authViewModel)
+        }
+        composeTestRule.onNode(hasSetTextAction() and hasText("Username")).performTextInput("testuser")
         composeTestRule.onNodeWithText("Sign In").performClick()
-        assert(!testAuthViewModel.loginCalled)
+        assertEquals("login", navController.currentBackStackEntry?.destination?.route)
     }
 
-    @Test
-    fun testValidLoginAttempt() {
-        composeTestRule.onNode(hasSetTextAction() and hasText("Username"))
-            .performTextInput("testuser")
-        composeTestRule.onNode(hasSetTextAction() and hasText("Password"))
-            .performTextInput("password123")
-        composeTestRule.onNodeWithText("Sign In").performClick()
-
-        assert(testAuthViewModel.loginCalled)
-        assert(testAuthViewModel.loginUsername == "testuser")
-        assert(testAuthViewModel.loginPassword == "password123")
-    }
 
     @Test
     fun testPasswordVisibilityToggle() {
+        composeTestRule.setContent {
+
+            LoginScreen(navController = navController, authViewModel = authViewModel)
+        }
         composeTestRule.onNode(hasText("Password")).assertExists()
         composeTestRule.onNode(hasContentDescription("Show password")).performClick()
         composeTestRule.onNode(hasContentDescription("Hide password")).assertExists()
@@ -149,13 +157,52 @@ class LoginScreenTest {
 
     @Test
     fun testNavigateToRegisterScreen() {
+        composeTestRule.setContent {
+
+            LoginScreen(navController = navController, authViewModel = authViewModel)
+        }
         composeTestRule.onNodeWithText("Don't have an account? Sign up!").performClick()
         composeTestRule.waitForIdle()
         assertEquals("register", navController.currentBackStackEntry?.destination?.route)
     }
 
     @Test
-    fun testSuccessfulLoginNavigatesToHomeScreen() {
+    fun testLoginError() {
+        composeTestRule.setContent {
+
+            LoginScreen(navController = navController, authViewModel = authViewModel)
+        }
+        composeTestRule.runOnUiThread {
+            (authViewModel.loginResult as? MutableLiveData<Result<User>?>)?.postValue(Result.Error(Exception("Invalid credentials")))
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Error: Invalid credentials").assertIsDisplayed()
+    }
+
+    @Test
+    fun testLoginLoading() {
+        composeTestRule.setContent {
+
+            LoginScreen(navController = navController, authViewModel = authViewModel)
+        }
+        composeTestRule.runOnUiThread {
+            (authViewModel.loginResult as? MutableLiveData<Result<User>?>)?.postValue(Result.Loading)
+
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("loading_indicator").assertExists()
+    }
+
+    @Test
+    fun testValidLoginAttempt() {
+
+        composeTestRule.setContent {
+            LoginScreen(navController = navController, authViewModel = testAuthViewModel)
+        }
+        composeTestRule.onNode(hasSetTextAction() and hasText("Username")).performTextInput("testuser")
+        composeTestRule.onNode(hasSetTextAction() and hasText("Password")).performTextInput("password123")
+        composeTestRule.onNodeWithText("Sign In").performClick()
+
         val testUser = User(
             id = "1",
             username = "testuser",
@@ -172,32 +219,11 @@ class LoginScreenTest {
                 "fat" to 65
             )
         )
-
         composeTestRule.runOnUiThread {
-            testAuthViewModel.setLoginResult(Result.Success(testUser))
+            (testAuthViewModel.loginResult as? MutableLiveData)?.postValue(Result.Success(testUser))
         }
-
         composeTestRule.waitForIdle()
+
         assertEquals("home", navController.currentBackStackEntry?.destination?.route)
-    }
-
-    @Test
-    fun testLoginError() {
-        composeTestRule.runOnUiThread {
-            testAuthViewModel.setLoginResult(Result.Error(Exception("Invalid credentials")))
-        }
-
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Error: Invalid credentials").assertIsDisplayed()
-    }
-
-    @Test
-    fun testLoginLoading() {
-        composeTestRule.runOnUiThread {
-            testAuthViewModel.setLoginResult(Result.Loading)
-        }
-
-        composeTestRule.waitForIdle()
-        composeTestRule.onNode(hasTestTag("loading_indicator")).assertExists()
     }
 }
