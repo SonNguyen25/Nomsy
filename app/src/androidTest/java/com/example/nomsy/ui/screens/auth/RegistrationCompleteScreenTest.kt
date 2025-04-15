@@ -2,12 +2,12 @@ package com.example.nomsy.ui.screens.auth
 
 import android.app.Application
 import android.content.Context
-import androidx.compose.material.Text
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.composable
 import androidx.navigation.createGraph
@@ -18,15 +18,10 @@ import com.example.nomsy.data.local.models.User
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.AuthViewModel
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.lifecycle.MutableLiveData
-import junit.framework.TestCase.assertFalse
 
 @RunWith(AndroidJUnit4::class)
 class RegistrationCompleteScreenTest {
@@ -45,12 +40,13 @@ class RegistrationCompleteScreenTest {
             navController.navigatorProvider.addNavigator(ComposeNavigator())
             authViewModel = AuthViewModel(context as Application)
 
-            navController.graph = navController.createGraph(startDestination = "registration_complete") {
-                composable("registration_complete") {
-                    RegistrationCompleteScreen(navController, authViewModel)
+            navController.graph =
+                navController.createGraph(startDestination = "registration_complete") {
+                    composable("registration_complete") {
+                        RegistrationCompleteScreen(navController, authViewModel)
+                    }
+                    composable("home") { }
                 }
-                composable("home") { }
-            }
         }
 
         composeTestRule.setContent {
@@ -97,7 +93,8 @@ class RegistrationCompleteScreenTest {
 
         // Verify that the success messages are displayed.
         composeTestRule.onNodeWithText("Welcome to Nomsy, Test User!").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Your account has been created successfully.").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Your account has been created successfully.")
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText("Get Started").assertIsDisplayed()
 
         composeTestRule.onNodeWithText("Get Started").performClick()
