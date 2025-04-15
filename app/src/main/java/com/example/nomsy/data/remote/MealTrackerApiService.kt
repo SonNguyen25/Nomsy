@@ -21,9 +21,7 @@ interface MealTrackerApiService {
 
     @GET("/foods")
     suspend fun getAllFoods(): Response<FoodResponse>
-
 }
-
 
 data class FoodResponse(
     val foods: List<Food>

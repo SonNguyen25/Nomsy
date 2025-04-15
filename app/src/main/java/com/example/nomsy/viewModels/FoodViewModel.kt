@@ -6,12 +6,12 @@ import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.*
 import com.example.nomsy.data.local.models.Food
-import com.example.nomsy.data.remote.SpoonacularApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.example.nomsy.data.remote.MealTrackerRetrofitClient
 import android.util.Log
-import com.example.nomsy.data.remote.NutritionTotals
+import com.example.nomsy.data.remote.*
+import com.example.nomsy.data.repository.FoodRepository
+import com.example.nomsy.utils.Result
 
 class FoodViewModel(application: Application) : AndroidViewModel(application) {
     // LiveData to hold the recognized food name
@@ -25,6 +25,10 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
     val allFoods = mutableStateListOf<Food>()
 
     val searchResults = mutableStateListOf<Food>()
+
+    private val _mealResult = MutableLiveData<Result<AddMealResponse>>()
+    val mealResult: LiveData<Result<AddMealResponse>> get() = _mealResult
+
 
     private val _dailySummary = MutableLiveData<NutritionTotals>()
     val dailySummary: LiveData<NutritionTotals> get() = _dailySummary
@@ -90,5 +94,17 @@ class FoodViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Adding a meal for the Database
+    fun submitMeal(request: AddMealRequest) {
+        viewModelScope.launch {
+            FoodRepository().addMeal(request).observeForever {
+                _mealResult.value = it
+            }
+        }
+    }
 
+    //Clear the stored value
+    fun clearMealResult() {
+        _mealResult.value = null
+    }
 }
