@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
@@ -47,8 +48,10 @@ import com.example.nomsy.data.remote.UpdateProfileRequest
 import com.example.nomsy.ui.components.FitnessGoalButton
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
+import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.IAuthViewModel
 import com.example.nomsy.viewModels.IProfileViewModel
+import com.example.nomsy.viewModels.ProfileViewModel
 import kotlin.random.Random
 
 @Composable
@@ -100,9 +103,7 @@ fun EditProfileScreen(
                     water = nutritionGoals["water"]?.toString() ?: ""
                 }
             }
-
-            else -> { /* Do nothing for Loading or Error states */
-            }
+            else -> { /* Do nothing for Loading or Error states */ }
         }
     }
 
@@ -154,21 +155,16 @@ fun EditProfileScreen(
 
                 when (profileState) {
                     is Result.Loading -> {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = NomsyColors.Title)
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = NomsyColors.Title, modifier = Modifier.testTag("loading"))
                         }
                     }
-
                     is Result.Error -> {
                         Text(
                             "Error loading profile: ${(profileState as Result.Error).exception.message}",
                             color = MaterialTheme.colors.error
                         )
                     }
-
                     else -> {}
                 }
 
@@ -205,9 +201,7 @@ fun EditProfileScreen(
 
                     OutlinedTextField(
                         value = height,
-                        onValueChange = {
-                            if (it.all { c -> c.isDigit() || c == '.' } || it.isEmpty()) height = it
-                        },
+                        onValueChange = { if (it.all { c -> c.isDigit() || c == '.' } || it.isEmpty()) height = it },
                         label = { Text("Height (cm)", color = NomsyColors.Texts) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -221,9 +215,7 @@ fun EditProfileScreen(
 
                     OutlinedTextField(
                         value = weight,
-                        onValueChange = {
-                            if (it.all { c -> c.isDigit() || c == '.' } || it.isEmpty()) weight = it
-                        },
+                        onValueChange = { if (it.all { c -> c.isDigit() || c == '.' } || it.isEmpty()) weight = it },
                         label = { Text("Weight (kg)", color = NomsyColors.Texts) },
                         modifier = Modifier.fillMaxWidth(),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -250,21 +242,27 @@ fun EditProfileScreen(
                             text = "Cut",
                             isSelected = fitnessGoal == "cut",
                             onClick = { fitnessGoal = "cut" },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .testTag("cut")
+                                .weight(1f)
                         )
 
                         FitnessGoalButton(
                             text = "Maintain",
                             isSelected = fitnessGoal == "maintain",
                             onClick = { fitnessGoal = "maintain" },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .testTag("maintain")
+                                .weight(1f)
                         )
 
                         FitnessGoalButton(
                             text = "Bulk",
                             isSelected = fitnessGoal == "bulk",
                             onClick = { fitnessGoal = "bulk" },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .testTag("bulk")
+                                .weight(1f)
                         )
                     }
 
@@ -281,18 +279,14 @@ fun EditProfileScreen(
                             }
                             .align(Alignment.CenterHorizontally)
                             .padding(vertical = 8.dp)
+                            .testTag("lucky-text")
                     )
 
 
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = water,
-                            onValueChange = {
-                                if (it.all(Char::isDigit) || it.isEmpty()) water = it
-                            },
+                            onValueChange = { if (it.all(Char::isDigit) || it.isEmpty()) water = it },
                             label = { Text("Water (L)", color = NomsyColors.Texts) },
                             modifier = Modifier.weight(1f),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -306,9 +300,7 @@ fun EditProfileScreen(
 
                         OutlinedTextField(
                             value = calories,
-                            onValueChange = {
-                                if (it.all(Char::isDigit) || it.isEmpty()) calories = it
-                            },
+                            onValueChange = { if (it.all(Char::isDigit) || it.isEmpty()) calories = it },
                             label = { Text("Calories", color = NomsyColors.Texts) },
                             modifier = Modifier.weight(1f),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -321,15 +313,10 @@ fun EditProfileScreen(
                         )
                     }
 
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = protein,
-                            onValueChange = {
-                                if (it.all(Char::isDigit) || it.isEmpty()) protein = it
-                            },
+                            onValueChange = { if (it.all(Char::isDigit) || it.isEmpty()) protein = it },
                             label = { Text("Protein", color = NomsyColors.Texts) },
                             modifier = Modifier.weight(1f),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -343,9 +330,7 @@ fun EditProfileScreen(
 
                         OutlinedTextField(
                             value = carbs,
-                            onValueChange = {
-                                if (it.all(Char::isDigit) || it.isEmpty()) carbs = it
-                            },
+                            onValueChange = { if (it.all(Char::isDigit) || it.isEmpty()) carbs = it },
                             label = { Text("Carbs", color = NomsyColors.Texts) },
                             modifier = Modifier.weight(1f),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -409,14 +394,10 @@ fun EditProfileScreen(
 
                 when (updateState) {
                     is Result.Loading -> {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = NomsyColors.Title)
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = NomsyColors.Title, modifier = Modifier.testTag("loading"))
                         }
                     }
-
                     is Result.Success -> {
                         Text(
                             "Profile updated!",
@@ -424,12 +405,10 @@ fun EditProfileScreen(
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
-
                     is Result.Error -> Text(
                         "Update failed: ${(updateState as Result.Error).exception.message}",
                         color = MaterialTheme.colors.error
                     )
-
                     null -> Unit
                 }
             }

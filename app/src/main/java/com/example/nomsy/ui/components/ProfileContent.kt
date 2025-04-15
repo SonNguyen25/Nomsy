@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,12 +54,14 @@ fun ProfileContent(user: User) {
                 text = user.name,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = NomsyColors.Title
+                color = NomsyColors.Title,
+                modifier = Modifier.testTag("name")
             )
             Text(
                 text = "Age: ${user.age}",
                 fontSize = 16.sp,
-                color = NomsyColors.Texts
+                color = NomsyColors.Texts,
+                modifier = Modifier.testTag("age")
             )
             Spacer(Modifier.height(24.dp))
         }
