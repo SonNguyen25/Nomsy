@@ -30,11 +30,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import retrofit2.Response
 
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.data.remote.*
 import com.example.nomsy.data.repository.FoodRepository
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 
 
 class FakeMealTrackerApiService : MealTrackerApiService {

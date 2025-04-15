@@ -7,7 +7,7 @@ import androidx.room.InvalidationTracker
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.dao.UserDao
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.utils.Result
 import com.example.nomsy.data.remote.*
 import kotlinx.coroutines.runBlocking

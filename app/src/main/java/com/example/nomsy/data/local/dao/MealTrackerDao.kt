@@ -3,8 +3,6 @@ package com.example.nomsy.data.local.dao;
 import androidx.room.*
 import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.entities.MealEntity
-import com.example.nomsy.data.local.models.Recipe
-import com.example.nomsy.data.local.models.User
 import kotlinx.coroutines.flow.Flow
 
 @Dao

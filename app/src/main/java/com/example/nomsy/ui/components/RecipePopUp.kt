@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.nomsy.data.local.models.Recipe
+import com.example.nomsy.data.local.entities.Recipe
 import com.example.nomsy.ui.theme.NomsyColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.testTag

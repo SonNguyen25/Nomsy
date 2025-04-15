@@ -1,6 +1,6 @@
 package com.example.nomsy.data.remote
 
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

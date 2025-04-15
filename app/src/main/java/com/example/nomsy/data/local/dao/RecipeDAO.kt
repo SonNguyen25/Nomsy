@@ -1,7 +1,7 @@
 package com.example.nomsy.data.local.dao
 
 import androidx.room.*
-import com.example.nomsy.data.local.models.Recipe
+import com.example.nomsy.data.local.entities.Recipe
 
 @Dao
 interface RecipeDAO {

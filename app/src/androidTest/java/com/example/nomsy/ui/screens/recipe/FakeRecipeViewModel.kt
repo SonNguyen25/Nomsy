@@ -1,6 +1,6 @@
 package com.example.nomsy.ui.screens.recipe
 
-import com.example.nomsy.data.local.models.Recipe
+import com.example.nomsy.data.local.entities.Recipe
 import com.example.nomsy.viewModels.IRecipeViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

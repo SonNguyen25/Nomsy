@@ -1,9 +1,8 @@
 package com.example.nomsy.data.remote
 
 import android.graphics.Bitmap
-import android.util.Base64
 import android.util.Log
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody

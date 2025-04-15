@@ -18,7 +18,7 @@ import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.nomsy.data.local.entities.DailySummaryEntity
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.data.remote.MealItem
 import com.example.nomsy.data.remote.UpdateProfileRequest
 import com.example.nomsy.ui.screens.HomeScreen

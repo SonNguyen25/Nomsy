@@ -1,11 +1,10 @@
 package com.example.nomsy.viewModels
 
 import android.app.Application
-import android.content.Context
 import android.graphics.Bitmap
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.*
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.util.Log

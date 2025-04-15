@@ -1,4 +1,4 @@
-package com.example.nomsy.data.local.models
+package com.example.nomsy.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

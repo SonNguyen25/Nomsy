@@ -17,14 +17,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.ui.components.ProfileContent
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.IAuthViewModel
 import com.example.nomsy.viewModels.IProfileViewModel
-import com.example.nomsy.viewModels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -2,7 +2,7 @@ package com.example.nomsy.data.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.nomsy.data.local.UserDatabase
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.data.remote.GetProfileResponse
 import com.example.nomsy.data.remote.LoginResponse
 import com.example.nomsy.data.remote.RegisterResponse

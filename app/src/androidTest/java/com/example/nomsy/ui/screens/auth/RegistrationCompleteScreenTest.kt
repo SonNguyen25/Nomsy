@@ -14,7 +14,7 @@ import androidx.navigation.createGraph
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.AuthViewModel
 import junit.framework.TestCase.assertEquals

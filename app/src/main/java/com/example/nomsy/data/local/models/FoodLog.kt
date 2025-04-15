@@ -2,6 +2,7 @@ package com.example.nomsy.data.local.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.nomsy.data.local.entities.Food
 
 
 // NOT USING.

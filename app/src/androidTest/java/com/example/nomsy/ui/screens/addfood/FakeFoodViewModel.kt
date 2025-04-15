@@ -1,11 +1,7 @@
 package com.example.nomsy.ui.screens.addfood
 import androidx.compose.runtime.mutableStateListOf
-import com.example.nomsy.data.local.models.Food
-import com.example.nomsy.viewModels.FoodViewModel
-import android.app.Application
+import com.example.nomsy.data.local.entities.Food
 import android.graphics.Bitmap
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.nomsy.data.remote.AddMealRequest
 import com.example.nomsy.data.remote.AddMealResponse

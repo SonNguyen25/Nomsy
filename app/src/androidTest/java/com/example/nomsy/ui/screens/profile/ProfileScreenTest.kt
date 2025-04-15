@@ -13,7 +13,7 @@ import androidx.navigation.createGraph
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.nomsy.data.local.models.User
+import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.ProfileViewModel
@@ -170,7 +170,8 @@ class ProfileScreenTest {
         composeTestRule.runOnUiThread {
             authViewModel.setCurrentUsername("testuser")
             (profileViewModel.profile as MutableLiveData<Result<User>>)
-                .postValue(Result.Success(User(
+                .postValue(Result.Success(
+                    User(
                     id = "1", username = "testuser", name = "Test User",
                     password = "password",
                     age = 25,
@@ -178,7 +179,8 @@ class ProfileScreenTest {
                     weight = 43,
                     fitness_goal = "bulk",
                     nutrition_goals = emptyMap()
-                )))
+                )
+                ))
         }
 
         assertEquals("testuser", authViewModel.getCurrentUsername())

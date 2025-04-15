@@ -1,10 +1,8 @@
 package com.example.nomsy.food
 
-import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.nomsy.data.local.models.Food
+import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.data.remote.*
-import com.example.nomsy.data.repository.FoodRepository
 import com.example.nomsy.data.remote.MealTrackerRetrofitClient
 import com.example.nomsy.testutil.getOrAwaitValue
 import com.example.nomsy.utils.Result
