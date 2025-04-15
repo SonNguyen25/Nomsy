@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 
 class HomeViewModel(application: Application) :
-    AndroidViewModel(application), HomeViewModelInterface {
+    AndroidViewModel(application), IHomeViewModel {
 
     private val database = MealTrackerDatabase.getInstance(application)
     private val mealDao = database.mealDao()
