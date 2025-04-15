@@ -1,6 +1,5 @@
 package com.example.nomsy.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -271,22 +270,37 @@ fun HomeScreen(
                         )
                     } else {
                         // Display each meal type section
-                        mealsByType.forEach { (mealType, meals) ->
-                            // Capitalize first letter for display
-                            val displayMealType = mealType.replaceFirstChar {
-                                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                            }
-
+                        mealsByType["breakfast"]?.let {
                             MealListSection(
-                                title = displayMealType,
-                                meals = meals,
+                                title = "Breakfast",
+                                meals = it,
                                 onDelete = { meal ->
-                                    Log.d("HomeScreen", "Delete requested for: ${meal.food_name}")
                                     viewModel.deleteMeal(formattedDate, meal.food_name)
                                 }
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        mealsByType["lunch"]?.let {
+                            MealListSection(
+                                title = "Lunch",
+                                meals = it,
+                                onDelete = { meal ->
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        mealsByType["dinner"]?.let {
+                            MealListSection(
+                                title = "Dinner",
+                                meals = it,
+                                onDelete = { meal ->
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
                     }
                 }
 
