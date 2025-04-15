@@ -1,8 +1,6 @@
 package com.example.nomsy.ui.screens
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.entities.DailySummaryEntity
 import com.example.nomsy.data.local.models.User
@@ -46,16 +43,15 @@ import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.IAuthViewModel
 import com.example.nomsy.viewModels.IHomeViewModel
-import com.example.nomsy.viewModels.ProfileViewModel
+import com.example.nomsy.viewModels.IProfileViewModel
 import java.util.Locale
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: IHomeViewModel = viewModel(),
+    viewModel: IHomeViewModel,
     authViewModel: IAuthViewModel,
-    profileViewModel: ProfileViewModel = viewModel(),
+    profileViewModel: IProfileViewModel,
 ) {
     // FETCHES PROFILE DATA
     val username = authViewModel.getCurrentUsername() // Get the username
