@@ -63,12 +63,12 @@ class MealTrackerRepository(
             val response = mealApiService.getDailySummary(date)
 
             if (response.isSuccessful) {
-                Log.d("MealTrackerRepository", "Meals get by date loaded successfully: $response")
+//                Log.d("MealTrackerRepository", "Meals get by date loaded successfully: $response")
                 val summaryResponse = response.body()
 
                 //DEBUGGING
                 if (summaryResponse != null) {
-                    Log.d("MealTrackerRepository", "Response meals: ${summaryResponse.meals}")
+//                    Log.d("MealTrackerRepository", "Response meals: ${summaryResponse.meals}")
 
                     // Print a sample meal if available
                     if (summaryResponse.meals.isNotEmpty()) {
@@ -161,11 +161,11 @@ class MealTrackerRepository(
     override suspend fun deleteMeal(date: String, foodName: String): Result<Boolean> {
         return withContext(Dispatchers.IO) {
             try {
-                Log.d("MealTrackerRepository", "Deleting meal: $foodName on date: $date")
+//                Log.d("MealTrackerRepository", "Deleting meal: $foodName on date: $date")
                 val response = mealApiService.deleteMeal(date, foodName)
                 if (response.isSuccessful) {
                     val deleteResponse = response.body()
-                    Log.d("MealTrackerRepository", "API delete response: $deleteResponse")
+//                    Log.d("MealTrackerRepository", "API delete response: $deleteResponse")
 
                     if (deleteResponse?.success == true) {
 
@@ -179,7 +179,7 @@ class MealTrackerRepository(
                     Result.Error(Exception("deletion failed: ${response.code()} - $errorBody"))
                 }
             } catch (e: Exception) {
-                Log.e("MealTrackerRepository", "deletion failed with exception ", e)
+//                Log.e("MealTrackerRepository", "deletion failed with exception ", e)
                 Result.Error(e)
             }
         }
@@ -196,7 +196,7 @@ class MealTrackerRepository(
             mealDao.updateWaterIntake(date, newAmount)
             return response.water
         } catch (e: Exception) {
-            Log.e("Repository", "Error updating water", e)
+//            Log.e("Repository", "Error updating water", e)
             throw e
         }
     }

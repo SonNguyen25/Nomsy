@@ -33,6 +33,7 @@ import retrofit2.Response
 import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.data.remote.*
 import com.example.nomsy.data.repository.FoodRepository
+import org.junit.runners.JUnit4
 
 
 class FakeMealTrackerApiService : MealTrackerApiService {
@@ -137,7 +138,7 @@ class FakeMealTrackerApiService : MealTrackerApiService {
 
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(JUnit4::class)
 class FoodRepositoryTest {
 
     @get:Rule

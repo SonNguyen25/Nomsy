@@ -21,13 +21,14 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.RobolectricTestRunner
 import retrofit2.Response
 import java.lang.reflect.Field
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(JUnit4::class)
 class FoodViewModelTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
