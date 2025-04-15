@@ -1,5 +1,6 @@
 package com.example.nomsy.ui.components
 
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
 import android.util.Log
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nomsy.data.remote.AddMealRequest
 import com.example.nomsy.viewModels.FoodViewModel
@@ -603,7 +605,6 @@ fun MealTypeSelector(
     }
 }
 
-
 @Composable
 fun PictureCaptureForm() {
     val context = LocalContext.current
@@ -612,12 +613,27 @@ fun PictureCaptureForm() {
     val foodDetail by foodViewModel.foodDetail.observeAsState()
 
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var cameraPermissionGranted by remember { mutableStateOf(false) }
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+    // Launcher to take a picture
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
         imageBitmap = bitmap
         bitmap?.let {
             foodViewModel.analyzeWithSpoonacular(it)
         }
+    }
+
+    // Launcher to request permission
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        cameraPermissionGranted = isGranted
+        if (isGranted) {
+            takePictureLauncher.launch(null)
+        }
+        // else do nothing, user denied permission
     }
 
     val boxSize = 500.dp
@@ -650,13 +666,22 @@ fun PictureCaptureForm() {
         }
 
         Button(
-            onClick = { launcher.launch(null) },
+            onClick = {
+                val permission = android.Manifest.permission.CAMERA
+                val isGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                if (isGranted) {
+                    takePictureLauncher.launch(null)
+                } else {
+                    cameraPermissionLauncher.launch(permission)
+                }
+            },
             colors = ButtonDefaults.buttonColors(containerColor = NomsyColors.Title)
         ) {
             Icon(
                 imageVector = Icons.Default.PhotoCamera,
                 contentDescription = "Take Picture"
             )
+            Spacer(Modifier.width(8.dp))
         }
 
         if (recognizedFood.isNotBlank()) {

@@ -28,6 +28,8 @@ interface IFoodRepository {
 }
 
 interface IRecipeRepository {
+    suspend fun getAllRecipes(): List<Recipe>
+    suspend fun searchRecipes(query: String): List<Recipe>
 }
 
 interface IMealTrackerRepository {

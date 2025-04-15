@@ -73,7 +73,7 @@ class HomeViewModel(application: Application) :
         loadDataForDate("2025-04-${selectedDate.value}")
     }
 
-    fun refreshData() {
+    override fun refreshData() {
         loadDataForDate("2025-04-${selectedDate.value}")
     }
 

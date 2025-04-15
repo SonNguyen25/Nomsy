@@ -211,43 +211,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-
-//            // Meal sections with fixed data for prototype
-//            val breakfastMeals = remember {
-//                listOf(
-//                    MealItem("Scrambled Eggs", 220, 2, 14, 16),
-//                    MealItem("Whole Wheat Toast", 90, 15, 3, 1)
-//                )
-//            }
-//            val lunchMeals = remember {
-//                listOf(
-//                    MealItem("Grilled Chicken Salad", 350, 10, 32, 18)
-//                )
-//            }
-//            val dinnerMeals = remember {
-//                listOf(
-//                    MealItem("Salmon Fillet", 280, 0, 22, 18),
-//                    MealItem("Steamed Broccoli", 55, 10, 4, 0),
-//                    MealItem("Brown Rice", 120, 25, 3, 1)
-//                )
-//            }
-//
-//            MealListSection(
-//                title = "Breakfast",
-//                meals = breakfastMeals
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
-//            MealListSection(
-//                title = "Lunch",
-//                meals = lunchMeals
-//            )
-//            Spacer(modifier = Modifier.height(16.dp))
-//            MealListSection(
-//                title = "Dinner",
-//                meals = dinnerMeals
-//            )
-//            Spacer(modifier = Modifier.height(50.dp))
-
             // Display meals by meal type
             when (mealsResult) {
                 is Result.Loading -> {
@@ -323,7 +286,7 @@ fun HomeScreen(
 
     if (showAddFoodDialog) {
         addFoodCard(
-            date = "2025-04-12",
+            date = "2025-04-${date}",
             onDismiss = { showAddFoodDialog = false },
             onMealAdded = {
                 viewModel.refreshData()

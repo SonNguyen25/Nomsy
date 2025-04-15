@@ -34,15 +34,15 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import com.example.nomsy.ui.components.recipePopUp
+import androidx.compose.ui.platform.testTag
+import com.example.nomsy.viewModels.IRecipeViewModel
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
 
 fun recipesScreen(
     navController: NavController,
-    viewModel: RecipeViewModel
+    viewModel: IRecipeViewModel
 ) {
     LaunchedEffect(Unit) {
         viewModel.loadAllRecipes()
@@ -69,7 +69,9 @@ fun recipesScreen(
                 fontSize = 28.sp,
                 color = NomsyColors.Title,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .testTag("CookBookTitle")
             )
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -84,7 +86,9 @@ fun recipesScreen(
                         color = NomsyColors.Texts.copy(alpha = 0.6f)
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("SearchBar"),
                 singleLine = true,
                 shape = RoundedCornerShape(15.dp),
                 textStyle = TextStyle(color = NomsyColors.Texts),
@@ -98,7 +102,8 @@ fun recipesScreen(
                 trailingIcon = {
                     Row {
                         if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
+                            IconButton(onClick = { searchQuery = "" },
+                                modifier = Modifier.testTag("ClearSearchButton")) {
                                 androidx.compose.material3.Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Clear",
@@ -113,7 +118,7 @@ fun recipesScreen(
                             } else {
                                 viewModel.search(searchQuery)
                             }
-                        }) {
+                        }, modifier = Modifier.testTag("SearchIconButton")) {
                             androidx.compose.material3.Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search",
@@ -142,7 +147,8 @@ fun recipesScreen(
         val recipeMap by viewModel.recipesByCategory.collectAsState()
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .testTag("RecipeList"),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             recipeMap.forEach { (category, recipesInCategory) ->
@@ -169,8 +175,8 @@ fun recipesScreen(
                             recipesCard(
                                 recipe = recipe,
                                 onClick = { selectedRecipe = recipe },
-                                modifier = Modifier.width(240.dp)
-                                )
+                                modifier = Modifier.width(240.dp).testTag("RecipeCard_${recipe.idMeal}")
+                            )
                         }
                     }
                 }
