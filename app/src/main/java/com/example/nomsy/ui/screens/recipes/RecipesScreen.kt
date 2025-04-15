@@ -56,7 +56,9 @@ fun recipesScreen(
     val listState = rememberLazyListState()
 
 
-    Column(modifier = Modifier.fillMaxSize().background(NomsyColors.Background)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(NomsyColors.Background)) {
         // Top bar
         Column(
             modifier = Modifier

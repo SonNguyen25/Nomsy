@@ -2,14 +2,10 @@ package com.example.nomsy.ui.screens.auth
 
 import android.app.Application
 import android.content.Context
-import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -79,7 +75,7 @@ class OnboardingNameScreenTest {
         nameField.assertTextEquals("John")
 
         assertEquals("onboarding_name", navController.currentBackStackEntry?.destination?.route)
-         }
+    }
 
     @Test
     fun testValidNameNavigation() {

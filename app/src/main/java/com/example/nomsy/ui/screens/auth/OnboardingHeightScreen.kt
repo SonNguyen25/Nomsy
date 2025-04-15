@@ -27,10 +27,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.ui.components.OnboardingBaseScreen
 import com.example.nomsy.ui.theme.NomsyColors
-import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 
 @Composable
-fun OnboardingHeightScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun OnboardingHeightScreen(
+    navController: NavController,
+    authViewModel: IAuthViewModel = viewModel()
+) {
     var height by remember { mutableStateOf("") }
     val context = LocalContext.current
 
@@ -85,12 +88,20 @@ fun OnboardingHeightScreen(navController: NavController, authViewModel: AuthView
                 height.isEmpty() -> {
                     Toast.makeText(context, "Please enter your height", Toast.LENGTH_SHORT).show()
                 }
+
                 height.toDoubleOrNull() == null -> {
-                    Toast.makeText(context, "Please enter a valid height", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Please enter a valid height", Toast.LENGTH_SHORT)
+                        .show()
                 }
+
                 height.toDouble() < 50 || height.toDouble() > 250 -> {
-                    Toast.makeText(context, "Please enter a realistic height (50-250 cm)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please enter a realistic height (50-250 cm)",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 else -> {
                     authViewModel.setUserHeight(height.toInt())
                     navController.navigate("onboarding_weight")
