@@ -8,6 +8,7 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.dao.UserDao
 import com.example.nomsy.data.local.models.User
+import com.example.nomsy.utils.Result
 import com.example.nomsy.data.remote.*
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -17,7 +18,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 fun <T> LiveData<T>.getOrAwaitValue(
-    time: Long = 10, // Increased timeout
+    skipLoading: Boolean = true, // New parameter to control skipping Loading states.
+    time: Long = 10, // timeout in seconds
     timeUnit: TimeUnit = TimeUnit.SECONDS,
     afterObserve: () -> Unit = {}
 ): T {
@@ -25,6 +27,10 @@ fun <T> LiveData<T>.getOrAwaitValue(
     val latch = CountDownLatch(1)
     val observer = object : Observer<T> {
         override fun onChanged(value: T) {
+            if (skipLoading && value is Result.Loading) {
+                // Skip the Loading state and wait for a final (non-Loading) state.
+                return
+            }
             data = value
             latch.countDown()
             this@getOrAwaitValue.removeObserver(this)
@@ -33,7 +39,7 @@ fun <T> LiveData<T>.getOrAwaitValue(
     this.observeForever(observer)
     afterObserve.invoke()
     if (!latch.await(time, timeUnit)) {
-        this.removeObserver(observer) // Clean up observer on timeout
+        this.removeObserver(observer)
         throw TimeoutException("LiveData value was never set.")
     }
     @Suppress("UNCHECKED_CAST")

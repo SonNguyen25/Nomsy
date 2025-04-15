@@ -13,7 +13,6 @@ import com.example.nomsy.testutil.getOrAwaitValue
 import com.example.nomsy.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -35,7 +34,7 @@ class AuthRepositoryTest {
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
 
     private lateinit var fakeAuthApiService: FakeAuthApiService
@@ -81,18 +80,18 @@ class AuthRepositoryTest {
 
     @Test
     fun login_successful() = runTest {
-         
+
         val loginResponse = LoginResponse(
             message = "Login successful",
             user = testUser
         )
         fakeAuthApiService.loginResponse = Response.success(loginResponse)
 
-         
+
         val resultLiveData = authRepository.login("testuser", "password123")
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
 
@@ -103,21 +102,21 @@ class AuthRepositoryTest {
 
     @Test
     fun login_error() = runTest {
-         
+
         fakeAuthApiService.shouldThrowLoginException = true
 
-         
+
         val resultLiveData = authRepository.login("testuser", "password123")
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Login exception", (result as Result.Error).exception.message)
     }
 
     @Test
     fun register_successful() = runTest {
-         
+
         val registerResponse = RegisterResponse(
             message = "Registration successful",
             user_id = "new-user-id"
@@ -127,11 +126,11 @@ class AuthRepositoryTest {
         // User without ID initially
         val userToRegister = testUser.copy(id = "")
 
-         
+
         val resultLiveData = authRepository.register(userToRegister)
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals("new-user-id", (result as Result.Success).data.id)
 
@@ -142,29 +141,29 @@ class AuthRepositoryTest {
 
     @Test
     fun register_error() = runTest {
-         
+
         fakeAuthApiService.shouldThrowRegisterException = true
 
-         
+
         val resultLiveData = authRepository.register(testUser)
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Register exception", (result as Result.Error).exception.message)
     }
 
     @Test
     fun getProfile_successful() = runTest {
-         
+
         val profileResponse = GetProfileResponse(user = testUser)
         fakeAuthApiService.getProfileResponse = Response.success(profileResponse)
 
-         
+
         val resultLiveData = authRepository.getProfile(testUser.id)
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
 
@@ -175,29 +174,29 @@ class AuthRepositoryTest {
 
     @Test
     fun getProfile_error() = runTest {
-         
+
         fakeAuthApiService.shouldThrowGetProfileException = true
 
-         
+
         val resultLiveData = authRepository.getProfile(testUser.id)
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Get profile exception", (result as Result.Error).exception.message)
     }
 
     @Test
     fun getProfileByUsername_successful() = runTest {
-         
+
         val profileResponse = GetProfileResponse(user = testUser)
         fakeAuthApiService.getUserByUsernameResponse = Response.success(profileResponse)
 
-         
+
         val resultLiveData = authRepository.getProfileByUsername(testUser.username)
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
 
@@ -212,20 +211,20 @@ class AuthRepositoryTest {
         val userDao = fakeUserDatabase.userDao()
         userDao.insertUser(testUser)
 
-         fakeAuthApiService.shouldThrowGetUserByUsernameException = true
+        fakeAuthApiService.shouldThrowGetUserByUsernameException = true
 
-         
+
         val resultLiveData = authRepository.getProfileByUsername(testUser.username)
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Success from local DB but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
     }
 
     @Test
     fun updateProfile_successful() = runTest {
-         
+
         val updatedUser = testUser.copy(
             name = "Updated Name",
             weight = 75
@@ -238,16 +237,16 @@ class AuthRepositoryTest {
             weight = 75
         )
 
-         
+
         val resultLiveData = authRepository.updateProfile(testUser.username, updateRequest)
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals("Updated Name", (result as Result.Success).data.name)
         assertEquals(75, result.data.weight)
 
-         
+
         val savedUser = fakeUserDatabase.userDao().getUserByUsername(testUser.username)
         assertEquals("Updated Name", savedUser?.name)
         assertEquals(75, savedUser?.weight)
@@ -255,15 +254,15 @@ class AuthRepositoryTest {
 
     @Test
     fun updateProfile_error() = runTest {
-         
+
         fakeAuthApiService.shouldThrowUpdateProfileException = true
         val updateRequest = UpdateProfileRequest(name = "Updated Name")
 
-         
+
         val resultLiveData = authRepository.updateProfile(testUser.username, updateRequest)
         val result = resultLiveData.getOrAwaitValue()
 
-         
+
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("UpdateProfile exception", (result as Result.Error).exception.message)
     }
