@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.example.nomsy.ui.theme.NomsyColors
 
@@ -43,7 +44,8 @@ fun MealTypeSelector(
                         shape = RoundedCornerShape(12.dp)
                     )
                     .clickable { onMealTypeChange(option) }
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = 12.dp)
+                    .testTag("MealOption_$option"),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

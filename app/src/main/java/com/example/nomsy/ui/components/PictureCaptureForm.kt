@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -86,7 +87,9 @@ fun PictureCaptureForm() {
                     contentScale = ContentScale.Crop
                 )
             } else {
-                Text("Capture to Analyze Calories!", color = NomsyColors.Subtitle)
+                Text("Capture to Analyze Calories!",
+                    color = NomsyColors.Subtitle,
+                    modifier = Modifier.testTag("PlaceholderText"))
             }
         }
 
@@ -100,6 +103,7 @@ fun PictureCaptureForm() {
                     cameraPermissionLauncher.launch(permission)
                 }
             },
+            modifier = Modifier.testTag("CameraButton"),
             colors = ButtonDefaults.buttonColors(containerColor = NomsyColors.Title)
         ) {
             Icon(
@@ -114,11 +118,12 @@ fun PictureCaptureForm() {
                 text = "Detected: $recognizedFood",
                 color = NomsyColors.Title,
                 modifier = Modifier.padding(8.dp)
+                    .testTag("DetectedFood")
             )
         }
 
         foodDetail?.let {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.testTag("FoodDetails")) {
                 Text("Food: ${it.food_name}", color = NomsyColors.Texts)
                 Text("Calories: ${it.calories} kcal", color = NomsyColors.Texts)
                 Text("Carbs: ${it.carbs} g", color = NomsyColors.Texts)

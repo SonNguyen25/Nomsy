@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.nomsy.ui.theme.NomsyColors
-
+import androidx.compose.ui.platform.testTag
 
 @Composable
 fun NutrientCircle(
@@ -40,7 +40,8 @@ fun NutrientCircle(
     Box(
         modifier = modifier
             .size(100.dp)
-            .padding(8.dp),
+            .padding(8.dp)
+            .testTag("NutrientCircle_$label"),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {

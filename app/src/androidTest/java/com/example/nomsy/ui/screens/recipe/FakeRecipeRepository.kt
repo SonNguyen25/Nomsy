@@ -2,7 +2,6 @@ package com.example.nomsy.ui.screens.recipe
 
 import com.example.nomsy.data.local.models.Recipe
 import com.example.nomsy.data.repository.IRecipeRepository
-import com.example.nomsy.data.repository.RecipeRepository
 
 class FakeRecipeRepository : IRecipeRepository {
 

@@ -5,16 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="profileContent_displaysUserInformation()">
+      <SelectionState runConfigName="RecipeCardTest (2)">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ProfileContentTest">
+      <SelectionState runConfigName="ManualInputFormTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testButtonStates()">
+      <SelectionState runConfigName="MealTypeSelectorTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testMultipleButtonSelect()">
+      <SelectionState runConfigName="nutrientCircle_displaysLabelAndPercentage()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="SearchFoodDropdownTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

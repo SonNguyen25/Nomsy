@@ -19,12 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.nomsy.data.local.models.Food
 import com.example.nomsy.ui.theme.NomsyColors
-import com.example.nomsy.viewModels.FoodViewModel
+import com.example.nomsy.viewModels.IFoodViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SearchFoodDropdown(
-    viewModel: FoodViewModel,
+    viewModel: IFoodViewModel,
     foodName: String,
     onSelectFood: (Food) -> Unit,
     onQueryChange: (String) -> Unit
@@ -66,7 +67,8 @@ fun SearchFoodDropdown(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(15.dp)),
+                .clip(RoundedCornerShape(15.dp))
+                .testTag("SearchTextField"),
             singleLine = true,
             shape = RoundedCornerShape(15.dp),
             textStyle = TextStyle(color = NomsyColors.Texts),
@@ -108,10 +110,12 @@ fun SearchFoodDropdown(
             modifier = Modifier
                 .width(300.dp)
                 .background(NomsyColors.Background)
+                .testTag("SearchDropdown")
         ) {
             searchResults.take(5).forEach { food ->
                 Box(
                     modifier = Modifier
+                        .testTag("SearchResult_${food.food_name}")
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                         .border(1.dp, NomsyColors.Title, RoundedCornerShape(8.dp))
                         .clickable {

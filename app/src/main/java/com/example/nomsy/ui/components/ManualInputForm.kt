@@ -14,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nomsy.data.local.models.Food
 import com.example.nomsy.ui.theme.NomsyColors
 import com.example.nomsy.viewModels.FoodViewModel
+import com.example.nomsy.viewModels.IFoodViewModel
 
 
 @Composable
@@ -34,7 +35,7 @@ fun ManualInputForm(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        val foodViewModel: FoodViewModel = viewModel()
+        val foodViewModel: IFoodViewModel = viewModel()
 
         LaunchedEffect(Unit) {
             if (foodViewModel.allFoods.isEmpty()) {
