@@ -183,9 +183,9 @@ class HomeScreenTest {
     }
 
     private lateinit var navController: TestNavHostController
-    private lateinit var authViewModel: SimpleAuthViewModel
-    private lateinit var homeViewModel: SimpleHomeViewModel
-    private lateinit var profileViewModel: SimpleProfileViewModel
+    private lateinit var authViewModel: IAuthViewModel
+    private lateinit var homeViewModel: IHomeViewModel
+    private lateinit var profileViewModel: IProfileViewModel
 
     @Before
     fun setUp() {
@@ -193,7 +193,7 @@ class HomeScreenTest {
             val context = ApplicationProvider.getApplicationContext<Context>()
             navController = TestNavHostController(context)
             navController.navigatorProvider.addNavigator(ComposeNavigator())
-            navController.graph = navController.createGraph(startDestination = "login") {
+            navController.graph = navController.createGraph(startDestination = "home") {
                 composable("login") { /* Test doesn't need content */ }
                 composable("register") { /* Test doesn't need content */ }
                 composable("home") { /* Test doesn't need content */ }
@@ -214,14 +214,6 @@ class HomeScreenTest {
         }
     }
 
-
-    @Test
-    fun displayHomeScreen() {
-        // Just display the home screen - no assertions
-
-        // render the HomeScreen :(
-    }
-
     /**
      *  start testing here
      * */
@@ -238,7 +230,6 @@ class HomeScreenTest {
 
     @Test
     fun changeDatePrev() {
-        // Check date selector is displayed
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("4/14/2025").assertIsDisplayed()
@@ -250,7 +241,6 @@ class HomeScreenTest {
 
     @Test
     fun changeDateNext() {
-        // Check date selector is displayed
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("4/14/2025").assertIsDisplayed()
@@ -324,6 +314,7 @@ class HomeScreenTest {
         composeTestRule.onNodeWithText("220 kcal").assertIsDisplayed()
     }
 
+    // add button
     @Test
     fun displayAddFoodButton() {
         // Check add food button is displayed
@@ -340,6 +331,15 @@ class HomeScreenTest {
         composeTestRule.onNodeWithText("Update Water Intake").assertIsDisplayed()
         composeTestRule.onNodeWithText("Cancel").assertIsDisplayed()
         composeTestRule.onNodeWithText("Update").assertIsDisplayed()
+    }
+
+    @Test
+    fun updateWaterIntakeDialogChange() {
+        composeTestRule.onNodeWithText("2.0 L").performClick()
+        composeTestRule.onNodeWithContentDescription("Decrease").performClick()
+        composeTestRule.onNodeWithText("1.9").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Update").performClick()
+        composeTestRule.onNodeWithText("1.9 L").assertIsDisplayed()
     }
 
 }

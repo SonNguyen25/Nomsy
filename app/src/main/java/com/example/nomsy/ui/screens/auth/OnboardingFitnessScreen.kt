@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,11 +26,14 @@ import androidx.navigation.NavController
 import com.example.nomsy.ui.components.FitnessGoalButton
 import com.example.nomsy.ui.components.OnboardingBaseScreen
 import com.example.nomsy.ui.theme.NomsyColors
-import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 import kotlin.random.Random
 
 @Composable
-fun OnboardingFitnessGoalScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun OnboardingFitnessGoalScreen(
+    navController: NavController,
+    authViewModel: IAuthViewModel = viewModel()
+) {
     var selectedGoal by remember { mutableStateOf("") }
     val context = LocalContext.current
 

@@ -28,10 +28,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.nomsy.ui.components.OnboardingBaseScreen
 import com.example.nomsy.ui.theme.NomsyColors
-import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 
 @Composable
-fun OnboardingWeightScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun OnboardingWeightScreen(
+    navController: NavController,
+    authViewModel: IAuthViewModel = viewModel()
+) {
     var weight by remember { mutableStateOf("") }
     val context = LocalContext.current
 
@@ -67,7 +70,9 @@ fun OnboardingWeightScreen(navController: NavController, authViewModel: AuthView
                         unfocusedBorderColor = NomsyColors.Subtitle,
                         backgroundColor = NomsyColors.PictureBackground
                     ),
-                    modifier = Modifier.weight(0.7f).testTag("weight_input")
+                    modifier = Modifier
+                        .weight(0.7f)
+                        .testTag("weight_input")
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -86,12 +91,20 @@ fun OnboardingWeightScreen(navController: NavController, authViewModel: AuthView
                 weight.isEmpty() -> {
                     Toast.makeText(context, "Please enter your weight", Toast.LENGTH_SHORT).show()
                 }
+
                 weight.toDoubleOrNull() == null -> {
-                    Toast.makeText(context, "Please enter a valid weight", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Please enter a valid weight", Toast.LENGTH_SHORT)
+                        .show()
                 }
+
                 weight.toDouble() < 30 || weight.toDouble() > 300 -> {
-                    Toast.makeText(context, "Please enter a realistic weight (30-300 kg)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please enter a realistic weight (30-300 kg)",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 else -> {
                     authViewModel.setUserWeight(weight.toInt())
                     navController.navigate("onboarding_fitness_goal")

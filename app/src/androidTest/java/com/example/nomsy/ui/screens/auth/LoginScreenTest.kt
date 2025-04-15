@@ -1,30 +1,36 @@
 package com.example.nomsy.ui.screens.auth
 
 import android.app.Application
-import androidx.compose.ui.test.*
+import android.content.Context
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.compose.composable
+import androidx.navigation.createGraph
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.nomsy.data.local.models.User
 import com.example.nomsy.utils.Result
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
-import android.content.Context
-import androidx.navigation.compose.ComposeNavigator
-import androidx.lifecycle.LiveData
-import androidx.navigation.compose.composable
-import androidx.navigation.createGraph
 import com.example.nomsy.viewModels.AuthViewModel
 import com.example.nomsy.viewModels.IAuthViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.mockito.ArgumentMatchers.any
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class LoginScreenTest {
@@ -104,7 +110,6 @@ class LoginScreenTest {
         }
 
 
-
     }
 
     @Test
@@ -136,7 +141,8 @@ class LoginScreenTest {
 
             LoginScreen(navController = navController, authViewModel = authViewModel)
         }
-        composeTestRule.onNode(hasSetTextAction() and hasText("Username")).performTextInput("testuser")
+        composeTestRule.onNode(hasSetTextAction() and hasText("Username"))
+            .performTextInput("testuser")
         composeTestRule.onNodeWithText("Sign In").performClick()
         assertEquals("login", navController.currentBackStackEntry?.destination?.route)
     }
@@ -173,7 +179,11 @@ class LoginScreenTest {
             LoginScreen(navController = navController, authViewModel = authViewModel)
         }
         composeTestRule.runOnUiThread {
-            (authViewModel.loginResult as? MutableLiveData<Result<User>?>)?.postValue(Result.Error(Exception("Invalid credentials")))
+            (authViewModel.loginResult as? MutableLiveData<Result<User>?>)?.postValue(
+                Result.Error(
+                    Exception("Invalid credentials")
+                )
+            )
         }
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Error: Invalid credentials").assertIsDisplayed()
@@ -199,8 +209,10 @@ class LoginScreenTest {
         composeTestRule.setContent {
             LoginScreen(navController = navController, authViewModel = testAuthViewModel)
         }
-        composeTestRule.onNode(hasSetTextAction() and hasText("Username")).performTextInput("testuser")
-        composeTestRule.onNode(hasSetTextAction() and hasText("Password")).performTextInput("password123")
+        composeTestRule.onNode(hasSetTextAction() and hasText("Username"))
+            .performTextInput("testuser")
+        composeTestRule.onNode(hasSetTextAction() and hasText("Password"))
+            .performTextInput("password123")
         composeTestRule.onNodeWithText("Sign In").performClick()
 
         val testUser = User(

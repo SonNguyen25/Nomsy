@@ -12,10 +12,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.nomsy.data.local.RecipeDatabase
 import com.example.nomsy.data.remote.network.RecipeRetrofitInstance
 import com.example.nomsy.data.repository.RecipeRepository
@@ -45,8 +45,8 @@ import com.example.nomsy.viewModels.RecipeViewModelFactory
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun NomsyAppNavHost() {
-    val navController = rememberNavController()
+fun NomsyAppNavHost(navController: NavHostController) {
+//    val navController = rememberNavController()
     val context = LocalContext.current
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(context.applicationContext as Application)

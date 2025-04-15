@@ -30,10 +30,13 @@ import androidx.navigation.NavController
 import com.example.nomsy.data.local.models.User
 import com.example.nomsy.ui.components.OnboardingBaseScreen
 import com.example.nomsy.ui.theme.NomsyColors
-import com.example.nomsy.viewModels.AuthViewModel
+import com.example.nomsy.viewModels.IAuthViewModel
 
 @Composable
-fun OnboardingNutritionScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun OnboardingNutritionScreen(
+    navController: NavController,
+    authViewModel: IAuthViewModel = viewModel()
+) {
     var calories by remember { mutableStateOf("") }
     var protein by remember { mutableStateOf("") }
     var carbs by remember { mutableStateOf("") }
@@ -215,7 +218,8 @@ fun OnboardingNutritionScreen(navController: NavController, authViewModel: AuthV
                         // Allow digits and a single decimal point
                         if (input.isEmpty() ||
                             (input.count { it == '.' } <= 1 &&
-                                    input.all { it.isDigit() || it == '.' })) {
+                                    input.all { it.isDigit() || it == '.' })
+                        ) {
                             water = input
                         }
                     },
@@ -249,7 +253,9 @@ fun OnboardingNutritionScreen(navController: NavController, authViewModel: AuthV
                                 "bulk" -> (bmr * 1.2).toInt()
                                 else -> bmr.toInt()
                             }
-                        } else -> {
+                        }
+
+                        else -> {
                             // Default values if data is missing
                             2000
                         }
@@ -257,9 +263,12 @@ fun OnboardingNutritionScreen(navController: NavController, authViewModel: AuthV
 
                     // Set calculated values
                     calories = basalMetabolicRate.toString()
-                    protein = (userWeight * 1.8).toInt().toString() // 1.8g protein per kg of body weight
-                    carbs = (basalMetabolicRate * 0.4 / 4).toInt().toString() // 40% of calories from carbs
-                    fat = (basalMetabolicRate * 0.3 / 9).toInt().toString() // 30% of calories from fat
+                    protein =
+                        (userWeight * 1.8).toInt().toString() // 1.8g protein per kg of body weight
+                    carbs = (basalMetabolicRate * 0.4 / 4).toInt()
+                        .toString() // 40% of calories from carbs
+                    fat = (basalMetabolicRate * 0.3 / 9).toInt()
+                        .toString() // 30% of calories from fat
                     // Calculate water intake: ~30-35ml per kg of body weight
                     // Convert ml to liters
                     val waterIntakeL = ((userWeight * 33) / 1000.0).toInt()
@@ -280,55 +289,85 @@ fun OnboardingNutritionScreen(navController: NavController, authViewModel: AuthV
                 calories.isEmpty() -> {
                     Toast.makeText(context, "Please enter calories", Toast.LENGTH_SHORT).show()
                 }
+
                 calories.toIntOrNull() == null -> {
-                    Toast.makeText(context, "Please enter a valid number for calories", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please enter a valid number for calories",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 protein.isEmpty() -> {
                     Toast.makeText(context, "Please enter protein", Toast.LENGTH_SHORT).show()
                 }
+
                 protein.toIntOrNull() == null -> {
-                    Toast.makeText(context, "Please enter a valid number for protein", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please enter a valid number for protein",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 carbs.isEmpty() -> {
                     Toast.makeText(context, "Please enter carbs", Toast.LENGTH_SHORT).show()
                 }
+
                 carbs.toIntOrNull() == null -> {
-                    Toast.makeText(context, "Please enter a valid number for carbs", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please enter a valid number for carbs",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 fat.isEmpty() -> {
                     Toast.makeText(context, "Please enter fat", Toast.LENGTH_SHORT).show()
                 }
+
                 fat.toIntOrNull() == null -> {
-                    Toast.makeText(context, "Please enter a valid number for fat", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please enter a valid number for fat",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 water.isEmpty() -> {
                     Toast.makeText(context, "Please enter water", Toast.LENGTH_SHORT).show()
                 }
+
                 water.toIntOrNull() == null -> {
-                    Toast.makeText(context, "Please enter a valid number for water", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Please enter a valid number for water",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
+
                 else -> {
                     // All inputs are non-empty and valid integers
                     val nutritionGoals = mapOf(
                         "calories" to calories.toInt(),
-                        "protein"  to protein.toInt(),
-                        "carbs"    to carbs.toInt(),
-                        "fat"      to fat.toInt(),
-                        "water"    to water.toInt()
+                        "protein" to protein.toInt(),
+                        "carbs" to carbs.toInt(),
+                        "fat" to fat.toInt(),
+                        "water" to water.toInt()
                     )
 
                     authViewModel.setUserNutritionGoals(nutritionGoals)
 
                     val user = User(
-                        id               = "",
-                        username         = authViewModel.getUsername(),
-                        password         = authViewModel.getPassword(),
-                        name             = authViewModel.getUserName(),
-                        age              = authViewModel.getUserAge(),
-                        height           = authViewModel.getUserHeight(),
-                        weight           = authViewModel.getUserWeight(),
-                        fitness_goal     = authViewModel.getUserFitnessGoal(),
-                        nutrition_goals  = nutritionGoals
+                        id = "",
+                        username = authViewModel.getUsername(),
+                        password = authViewModel.getPassword(),
+                        name = authViewModel.getUserName(),
+                        age = authViewModel.getUserAge(),
+                        height = authViewModel.getUserHeight(),
+                        weight = authViewModel.getUserWeight(),
+                        fitness_goal = authViewModel.getUserFitnessGoal(),
+                        nutrition_goals = nutritionGoals
                     )
 
                     authViewModel.register(user)
@@ -338,7 +377,7 @@ fun OnboardingNutritionScreen(navController: NavController, authViewModel: AuthV
                         }
                         launchSingleTop = true
 
-                }
+                    }
                 }
             }
         }

@@ -5,19 +5,16 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testUpdateProfileError()">
+      <SelectionState runConfigName="profileContent_displaysUserInformation()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testNutritionGoalsValidation()">
+      <SelectionState runConfigName="ProfileContentTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testEmptyFieldsHandling()">
+      <SelectionState runConfigName="testButtonStates()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="EditProfileScreenTest">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="testInitialState()">
+      <SelectionState runConfigName="testMultipleButtonSelect()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
