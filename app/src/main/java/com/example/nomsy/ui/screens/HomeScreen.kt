@@ -1,6 +1,5 @@
 package com.example.nomsy.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +43,6 @@ import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.IAuthViewModel
 import com.example.nomsy.viewModels.IHomeViewModel
 import com.example.nomsy.viewModels.IProfileViewModel
-import java.util.Locale
 
 @Composable
 fun HomeScreen(
@@ -208,7 +206,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-
 //            // Meal sections with fixed data for prototype
 //            val breakfastMeals = remember {
 //                listOf(
@@ -271,22 +268,37 @@ fun HomeScreen(
                         )
                     } else {
                         // Display each meal type section
-                        mealsByType.forEach { (mealType, meals) ->
-                            // Capitalize first letter for display
-                            val displayMealType = mealType.replaceFirstChar {
-                                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                            }
-
+                        mealsByType["breakfast"]?.let {
                             MealListSection(
-                                title = displayMealType,
-                                meals = meals,
+                                title = "Breakfast",
+                                meals = it,
                                 onDelete = { meal ->
-                                    Log.d("HomeScreen", "Delete requested for: ${meal.food_name}")
                                     viewModel.deleteMeal(formattedDate, meal.food_name)
                                 }
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        mealsByType["lunch"]?.let {
+                            MealListSection(
+                                title = "Lunch",
+                                meals = it,
+                                onDelete = { meal ->
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        mealsByType["dinner"]?.let {
+                            MealListSection(
+                                title = "Dinner",
+                                meals = it,
+                                onDelete = { meal ->
+                                    viewModel.deleteMeal(formattedDate, meal.food_name)
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+
                     }
                 }
 
