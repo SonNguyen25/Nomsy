@@ -320,7 +320,11 @@ fun HomeScreen(
 
     if (showAddFoodDialog) {
         addFoodCard(
-            onDismiss = { showAddFoodDialog = false }
+            date = "2025-04-12",
+            onDismiss = { showAddFoodDialog = false },
+            onMealAdded = {
+                viewModel.refreshData()
+            }
         )
     }
 }

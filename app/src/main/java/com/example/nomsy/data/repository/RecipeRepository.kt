@@ -11,7 +11,7 @@ import java.io.IOException
 class RecipeRepository(
     private val api: RecipeAPIService,
     private val dao: RecipeDAO
-) {
+) : IRecipeRepository {
     suspend fun searchRecipes(query: String): List<Recipe> = withContext(Dispatchers.IO) {
         return@withContext try {
             val result = api.searchMeals(query).meals?.map { it.toRecipe() }.orEmpty()

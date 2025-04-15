@@ -68,6 +68,14 @@ class HomeViewModel(application: Application) :
         updateWaterFromNutrition("2025-04-${selectedDate.value}")
     }
 
+    private fun loadData() {
+        //our api takes YYYY-MM-DD format
+        loadDataForDate("2025-04-${selectedDate.value}")
+    }
+
+    fun refreshData() {
+        loadDataForDate("2025-04-${selectedDate.value}")
+    }
 
     // Load all data for the current date
     private fun loadDataForDate(date: String) {
@@ -174,4 +182,6 @@ class HomeViewModel(application: Application) :
             loadDataForDate(date)
         }
     }
+
+
 }
