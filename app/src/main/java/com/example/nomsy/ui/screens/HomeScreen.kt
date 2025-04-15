@@ -43,7 +43,6 @@ import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.IAuthViewModel
 import com.example.nomsy.viewModels.IHomeViewModel
 import com.example.nomsy.viewModels.IProfileViewModel
-import java.util.Locale
 
 @Composable
 fun HomeScreen(
@@ -207,7 +206,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-
 //            // Meal sections with fixed data for prototype
 //            val breakfastMeals = remember {
 //                listOf(
@@ -300,7 +298,7 @@ fun HomeScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        
+
                     }
                 }
 
