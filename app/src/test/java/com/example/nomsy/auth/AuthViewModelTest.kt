@@ -2,6 +2,7 @@ package com.example.nomsy.viewModels
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.core.app.ApplicationProvider
 import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.data.remote.GetProfileResponse
 import com.example.nomsy.data.remote.LoginResponse
@@ -15,6 +16,7 @@ import com.example.nomsy.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -28,19 +30,18 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import org.robolectric.RobolectricTestRunner
 import retrofit2.Response
 import java.lang.reflect.Field
 
-@RunWith(JUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 @ExperimentalCoroutinesApi
 class AuthViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     private lateinit var fakeAuthApiService: FakeAuthApiService
     private lateinit var fakeUserDatabase: FakeUserDatabase
@@ -65,8 +66,11 @@ class AuthViewModelTest {
         fakeAuthApiService = FakeAuthApiService()
         fakeUserDatabase = FakeUserDatabase.getInstance()
 
-        authViewModel = AuthViewModel(Application())
+        // <-- use a real Application from Robolectric
+        val app = ApplicationProvider.getApplicationContext<Application>()
+        authViewModel = AuthViewModel(app)
 
+        // swap in our fake repo
         val field: Field = AuthViewModel::class.java.getDeclaredField("repository")
         field.isAccessible = true
         val testRepository: IUserRepository =
@@ -190,8 +194,8 @@ class AuthViewModelTest {
         fakeAuthApiService.loginResponse = Response.success(loginResponse)
         authViewModel.login("testuser", "password123")
         testDispatcher.scheduler.advanceUntilIdle()
+        authViewModel.loginResult.getOrAwaitValue()
         assertTrue(authViewModel.isLoggedIn.value)
-        assertNotNull(authViewModel.loginResult.value)
         assertEquals("testuser", authViewModel.getCurrentUsername())
 
         authViewModel.logout()

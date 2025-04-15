@@ -84,7 +84,7 @@ dependencies {
     implementation(libs.image.labeling.default.common)
     implementation(libs.androidx.espresso.core)
 //    testImplementation(libs.androidx.ui.test.android)
-    implementation(libs.androidx.espresso.intents)
+//    implementation(libs.androidx.espresso.intents)
     debugImplementation("androidx.fragment:fragment-testing:1.8.5")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     androidTestImplementation("androidx.navigation:navigation-testing:2.8.5")
