@@ -2,7 +2,9 @@ package com.example.nomsy.ui.screens.home
 
 
 import android.content.Context
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -230,13 +232,14 @@ class HomeScreenTest {
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("4/14/2025").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Previous day").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Next day").assertIsDisplayed()
     }
 
     @Test
     fun displayCalorieTotal() {
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Calories").assertIsDisplayed()
         composeTestRule.onNodeWithText("1500 kcal").assertIsDisplayed()
         composeTestRule.onNodeWithText("out of 2000").assertIsDisplayed()
     }
@@ -245,6 +248,7 @@ class HomeScreenTest {
     fun displayNutritionLabels() {
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Calories").assertIsDisplayed()
         composeTestRule.onNodeWithText("Protein").assertIsDisplayed()
         composeTestRule.onNodeWithText("Carbs").assertIsDisplayed()
         composeTestRule.onNodeWithText("Fat").assertIsDisplayed()
@@ -255,7 +259,8 @@ class HomeScreenTest {
         composeTestRule.mainClock.advanceTimeByFrame()
         composeTestRule.waitForIdle()
         // Check nutrition circles are displayed
-        composeTestRule.onNodeWithText("50g").assertIsDisplayed()
+        composeTestRule.onAllNodes(hasText("50g", substring = true), useUnmergedTree = true)
+            .assertCountEquals(2)
         composeTestRule.onNodeWithText("20g").assertIsDisplayed()
     }
 
@@ -265,8 +270,8 @@ class HomeScreenTest {
         composeTestRule.waitForIdle()
         // Check water intake is displayed
         composeTestRule.onNodeWithText("Water Intake").assertIsDisplayed()
-        composeTestRule.onNodeWithText("2.0").assertIsDisplayed()
-        composeTestRule.onNodeWithText("3.0 L").assertIsDisplayed()
+        composeTestRule.onNodeWithText("2.0 L").assertIsDisplayed()
+        composeTestRule.onNodeWithText("2.0 / 3.0 L").assertIsDisplayed()
     }
 
     @Test
