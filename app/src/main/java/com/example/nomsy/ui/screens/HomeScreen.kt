@@ -28,6 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.nomsy.data.local.entities.DailySummaryEntity
@@ -87,12 +89,14 @@ fun HomeScreen(
             androidx.compose.material.Text(
                 text = "Error loading profile",
                 color = MaterialTheme.colors.error,
+                modifier = Modifier.semantics { contentDescription = "Error loading profile" }
             )
         }
 
         Result.Loading -> {
             androidx.compose.material.CircularProgressIndicator(
-                color = NomsyColors.Title
+                color = NomsyColors.Title,
+                modifier = Modifier.semantics { contentDescription = "Loading profile" }
             )
         }
 
@@ -193,7 +197,7 @@ fun HomeScreen(
                         color = NomsyColors.Title,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-
+                            .semantics { contentDescription = "Loading nutrition data" }
                     )
                 }
 
@@ -201,8 +205,10 @@ fun HomeScreen(
                     androidx.compose.material.Text(
                         text = "Error loading profile",
                         color = MaterialTheme.colors.error,
-
-                        )
+                        modifier = Modifier.semantics {
+                            contentDescription = "Error loading nutrition data"
+                        }
+                    )
                 }
             }
 
@@ -251,13 +257,15 @@ fun HomeScreen(
                         color = NomsyColors.Title,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
+                            .semantics { contentDescription = "Loading meal data" }
                     )
                 }
 
                 is Result.Error -> {
                     Text(
                         text = "error has occurred",
-                        color = NomsyColors.Subtitle
+                        color = NomsyColors.Subtitle,
+                        modifier = Modifier.semantics { contentDescription = "Meal data error" }
                     )
                 }
 
@@ -266,7 +274,8 @@ fun HomeScreen(
                     if (mealsByType.isEmpty()) {
                         Text(
                             text = "No meals logged for this date",
-                            color = NomsyColors.Subtitle
+                            color = NomsyColors.Subtitle,
+                            modifier = Modifier.semantics { contentDescription = "No meals" }
                         )
                     } else {
                         // Display each meal type section
