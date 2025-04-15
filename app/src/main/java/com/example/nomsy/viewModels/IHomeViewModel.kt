@@ -12,12 +12,8 @@ interface IHomeViewModel {
     val mealsByType: LiveData<Result<Map<String, List<MealItem>>>>
     val waterIntake: StateFlow<Double>
     val selectedDate: StateFlow<Int>
-
     fun incrementDate()
-
     fun decrementDate()
-
     fun updateWaterIntake(date: String, newWaterIntake: Double)
-
     fun deleteMeal(date: String, foodName: String)
 }
