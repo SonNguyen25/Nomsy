@@ -8,9 +8,18 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.example.nomsy.data.local.UserDatabase
 import com.example.nomsy.data.local.dao.UserDao
 import com.example.nomsy.data.local.entities.User
+import com.example.nomsy.data.remote.AuthApiService
+import com.example.nomsy.data.remote.GetProfileResponse
+import com.example.nomsy.data.remote.LoginRequest
+import com.example.nomsy.data.remote.LoginResponse
+import com.example.nomsy.data.remote.RegisterRequest
+import com.example.nomsy.data.remote.RegisterResponse
+import com.example.nomsy.data.remote.UpdateProfileRequest
 import com.example.nomsy.utils.Result
-import com.example.nomsy.data.remote.*
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
@@ -45,6 +54,34 @@ fun <T> LiveData<T>.getOrAwaitValue(
     return data as T
 }
 
+/**
+ * Helper method to collect the latest value from a StateFlow for testing
+ */
+suspend fun <T> StateFlow<T>.getValueOrAwait(
+    timeout: Long = 2000
+): T {
+    // If there's already a value available, return it immediately
+    val currentValue = this.value
+
+    return withTimeout(timeout) {
+        var latestValue = currentValue
+        val channel = kotlinx.coroutines.channels.Channel<T>()
+
+        val job = launch {
+            this@getValueOrAwait.collect {
+                latestValue = it
+                channel.trySend(it)
+            }
+        }
+
+        // Wait for first emission or return current value if no updates
+        val result = channel.receiveCatching().getOrNull() ?: latestValue
+        job.cancel()
+
+        result
+    }
+}
+
 class TimeoutException(message: String) : Exception(message)
 
 class FakeAuthApiService : AuthApiService {
@@ -53,7 +90,10 @@ class FakeAuthApiService : AuthApiService {
 
     override suspend fun login(loginRequest: LoginRequest): Response<LoginResponse> {
         if (shouldThrowLoginException) throw Exception("Login exception")
-        return loginResponse ?: Response.error(500, "No login response set".toResponseBody("application/json".toMediaTypeOrNull()))
+        return loginResponse ?: Response.error(
+            500,
+            "No login response set".toResponseBody("application/json".toMediaTypeOrNull())
+        )
     }
 
     var registerResponse: Response<RegisterResponse>? = null
@@ -61,7 +101,10 @@ class FakeAuthApiService : AuthApiService {
 
     override suspend fun register(registerRequest: RegisterRequest): Response<RegisterResponse> {
         if (shouldThrowRegisterException) throw Exception("Register exception")
-        return registerResponse ?: Response.error(500, "No register response set".toResponseBody("application/json".toMediaTypeOrNull()))
+        return registerResponse ?: Response.error(
+            500,
+            "No register response set".toResponseBody("application/json".toMediaTypeOrNull())
+        )
     }
 
     var getProfileResponse: Response<GetProfileResponse>? = null
@@ -69,7 +112,10 @@ class FakeAuthApiService : AuthApiService {
 
     override suspend fun getProfile(userId: String): Response<GetProfileResponse> {
         if (shouldThrowGetProfileException) throw Exception("Get profile exception")
-        return getProfileResponse ?: Response.error(500, "No getProfile response set".toResponseBody("application/json".toMediaTypeOrNull()))
+        return getProfileResponse ?: Response.error(
+            500,
+            "No getProfile response set".toResponseBody("application/json".toMediaTypeOrNull())
+        )
     }
 
     var getUserByUsernameResponse: Response<GetProfileResponse>? = null
@@ -77,7 +123,10 @@ class FakeAuthApiService : AuthApiService {
 
     override suspend fun getUserByUsername(username: String): Response<GetProfileResponse> {
         if (shouldThrowGetUserByUsernameException) throw Exception("GetUserByUsername exception")
-        return getUserByUsernameResponse ?: Response.error(500, "No getUserByUsername response set".toResponseBody("application/json".toMediaTypeOrNull()))
+        return getUserByUsernameResponse ?: Response.error(
+            500,
+            "No getUserByUsername response set".toResponseBody("application/json".toMediaTypeOrNull())
+        )
     }
 
     var updateProfileResponse: Response<GetProfileResponse>? = null
@@ -88,7 +137,10 @@ class FakeAuthApiService : AuthApiService {
         request: UpdateProfileRequest
     ): Response<GetProfileResponse> {
         if (shouldThrowUpdateProfileException) throw Exception("UpdateProfile exception")
-        return updateProfileResponse ?: Response.error(500, "No updateProfile response set".toResponseBody("application/json".toMediaTypeOrNull()))
+        return updateProfileResponse ?: Response.error(
+            500,
+            "No updateProfile response set".toResponseBody("application/json".toMediaTypeOrNull())
+        )
     }
 
     fun reset() {
@@ -144,9 +196,11 @@ class FakeUserDatabase private constructor() : UserDatabase() {
     }
 
     companion object {
-        @Volatile private var instance: FakeUserDatabase? = null
+        @Volatile
+        private var instance: FakeUserDatabase? = null
         fun getInstance(): FakeUserDatabase =
             instance ?: synchronized(this) { instance ?: FakeUserDatabase().also { instance = it } }
+
         fun getDatabase(context: android.content.Context): UserDatabase = getInstance()
     }
 }
