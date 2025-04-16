@@ -1,4 +1,4 @@
-package com.example.nomsy.viewModels
+package com.example.nomsy.profile
 
 import android.app.Application
 import android.os.Looper
@@ -13,9 +13,9 @@ import com.example.nomsy.testutil.FakeAuthApiService
 import com.example.nomsy.testutil.FakeUserDatabase
 import com.example.nomsy.testutil.getOrAwaitValue
 import com.example.nomsy.utils.Result
+import com.example.nomsy.viewModels.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
