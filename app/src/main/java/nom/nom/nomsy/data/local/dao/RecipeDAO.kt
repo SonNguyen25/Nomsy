@@ -1,0 +1,16 @@
+package nom.nom.nomsy.data.local.dao
+
+import androidx.room.*
+import nom.nom.nomsy.data.local.entities.Recipe
+
+@Dao
+interface RecipeDAO {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRecipes(recipes: List<Recipe>)
+
+    @Query("SELECT * FROM recipe")
+    suspend fun getAllRecipes(): List<Recipe>
+
+    @Query("SELECT * FROM recipe WHERE idMeal = :id LIMIT 1")
+    suspend fun getRecipeById(id: String): Recipe?
+}

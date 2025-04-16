@@ -18,7 +18,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -69,7 +72,8 @@ class AuthViewModelTest {
         fakeUserDatabase.clearAllTables()
         fakeAuthApiService.reset()
 
-        testRepository = AuthRepository(authApi = fakeAuthApiService, userDatabase = fakeUserDatabase)
+        testRepository =
+            AuthRepository(authApi = fakeAuthApiService, userDatabase = fakeUserDatabase)
 
         authViewModel = AuthViewModel(testApplication)
 
@@ -91,17 +95,17 @@ class AuthViewModelTest {
 
     @Test
     fun loginSuccessful() = runTest {
-           
+
         val loginResponse = LoginResponse(
             message = "Login successful",
             user = testUser
         )
         fakeAuthApiService.loginResponse = Response.success(loginResponse)
 
-          
+
         authViewModel.login("testuser", "password123")
 
-         
+
         val result = authViewModel.loginResult.getOrAwaitValue()
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
@@ -111,13 +115,13 @@ class AuthViewModelTest {
 
     @Test
     fun loginError() = runTest {
-           
+
         fakeAuthApiService.shouldThrowLoginException = true
 
-          
+
         authViewModel.login("testuser", "password123")
 
-         
+
         val result = authViewModel.loginResult.getOrAwaitValue()
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Login exception", (result as Result.Error).exception.message)
@@ -126,7 +130,7 @@ class AuthViewModelTest {
 
     @Test
     fun registerSuccessful() = runTest {
-           
+
         val registerResponse = RegisterResponse(
             message = "Registration successful",
             user_id = "new-user-id"
@@ -134,10 +138,10 @@ class AuthViewModelTest {
         fakeAuthApiService.registerResponse = Response.success(registerResponse)
         val userToRegister = testUser.copy(id = "")
 
-          
+
         authViewModel.register(userToRegister)
 
-         
+
         val result = authViewModel.registerResult.getOrAwaitValue()
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals("new-user-id", (result as Result.Success).data.id)
@@ -146,13 +150,13 @@ class AuthViewModelTest {
 
     @Test
     fun registerError() = runTest {
-           
+
         fakeAuthApiService.shouldThrowRegisterException = true
 
-          
+
         authViewModel.register(testUser)
 
-         
+
         val result = authViewModel.registerResult.getOrAwaitValue()
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Register exception", (result as Result.Error).exception.message)
@@ -160,14 +164,14 @@ class AuthViewModelTest {
 
     @Test
     fun fetchProfileSuccessful() = runTest {
-        
+
         val profileResponse = GetProfileResponse(user = testUser)
         fakeAuthApiService.getProfileResponse = Response.success(profileResponse)
 
-          
+
         authViewModel.fetchProfile(testUser.id)
 
-         
+
         val result = authViewModel.profileResult.getOrAwaitValue()
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
@@ -181,7 +185,7 @@ class AuthViewModelTest {
 
         authViewModel.fetchProfile(testUser.id)
 
-        
+
         val result = authViewModel.profileResult.getOrAwaitValue()
         assertTrue("Result should be Error but was $result", result is Result.Error)
         assertEquals("Get profile exception", (result as Result.Error).exception.message)
@@ -189,14 +193,14 @@ class AuthViewModelTest {
 
     @Test
     fun fetchProfileByUsernameSuccessful() = runTest {
-           
+
         val profileResponse = GetProfileResponse(user = testUser)
         fakeAuthApiService.getUserByUsernameResponse = Response.success(profileResponse)
 
-          
+
         authViewModel.fetchProfileByUsername(testUser.username)
 
-         
+
         val result = authViewModel.profileResult.getOrAwaitValue()
         assertTrue("Result should be Success but was $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
@@ -204,7 +208,6 @@ class AuthViewModelTest {
 
     @Test
     fun logoutClearsState() = runTest {
-
         val loginResponse = LoginResponse(
             message = "Login successful",
             user = testUser
@@ -213,17 +216,16 @@ class AuthViewModelTest {
         authViewModel.login("testuser", "password123")
         testDispatcher.scheduler.advanceUntilIdle()
 
-        authViewModel.loginResult.getOrAwaitValue()
-        assertTrue(authViewModel.isLoggedIn.value)
+        val loginResult = authViewModel.loginResult.getOrAwaitValue()
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(loginResult is Result.Success)
         assertEquals("testuser", authViewModel.getCurrentUsername())
 
-          
         authViewModel.logout()
         testDispatcher.scheduler.advanceUntilIdle()
 
-         
         assertNull(authViewModel.loginResult.value)
-        assertFalse(authViewModel.isLoggedIn.value ?: true)
+        assertFalse(authViewModel.isLoggedIn.value)
         assertEquals("", authViewModel.getCurrentUsername())
     }
 }

@@ -1,0 +1,33 @@
+package nom.nom.nomsy.viewModels
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import nom.nom.nomsy.data.local.entities.Recipe
+import nom.nom.nomsy.data.repository.IRecipeRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+
+class RecipeViewModel(private val repository: IRecipeRepository) : ViewModel(), IRecipeViewModel {
+
+    private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
+    override val recipes: StateFlow<List<Recipe>> = _recipes
+    private val _recipesByCategory = MutableStateFlow<Map<String, List<Recipe>>>(emptyMap())
+    override val recipesByCategory: StateFlow<Map<String, List<Recipe>>> = _recipesByCategory
+
+    override fun search(query: String) {
+        viewModelScope.launch {
+            val result = repository.searchRecipes(query)
+            _recipes.value = result
+            _recipesByCategory.value = result.groupBy { it.strCategory ?: "Uncategorized" }
+        }
+    }
+
+    override fun loadAllRecipes() {
+        viewModelScope.launch {
+            val allRecipes = repository.getAllRecipes()
+            _recipes.value = allRecipes
+            _recipesByCategory.value = allRecipes.groupBy { it.strCategory ?: "Uncategorized" }
+        }
+    }
+}
