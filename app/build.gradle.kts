@@ -8,11 +8,22 @@ plugins {
 }
 
 android {
-    namespace = "com.example.nomsy"
+    namespace = "nom.nom.nomsy"
     compileSdk = 35
 
+    signingConfigs {
+        create("release") {
+            // Configure your signing information for release build
+            storeFile =
+                file("\"C:\\Users\\aweso\\Desktop\\coding\\mobile_app_dev\\mobile dev calorie tracker\\keyNomsy.jks")
+            storePassword = "123456"
+            keyAlias = "key0"
+            keyPassword = "123456"
+        }
+    }
+
     defaultConfig {
-        applicationId = "com.example.nomsy"
+        applicationId = "nom.nom.nomsy"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -22,6 +33,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        signingConfig = signingConfigs.getByName("release")
     }
 
     buildTypes {
