@@ -40,7 +40,6 @@ class FoodViewModelTest {
 
         fakeApi = FakeMealTrackerApiService()
 
-        // Inject the fakeApi into the MealTrackerRetrofitClient singleton via reflection
         val clientClass = MealTrackerRetrofitClient::class.java
         val delegateField: Field = clientClass.getDeclaredField("mealTrackerApi\$delegate")
             .apply { isAccessible = true }
