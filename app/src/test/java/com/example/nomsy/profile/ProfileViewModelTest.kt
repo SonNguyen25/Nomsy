@@ -1,9 +1,6 @@
-package com.example.nomsy.profile
+package com.example.nomsy.viewModels
 
-import android.app.Application
-import android.os.Looper
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.core.app.ApplicationProvider
 import com.example.nomsy.data.local.entities.User
 import com.example.nomsy.data.remote.GetProfileResponse
 import com.example.nomsy.data.remote.UpdateProfileRequest
@@ -13,7 +10,6 @@ import com.example.nomsy.testutil.FakeAuthApiService
 import com.example.nomsy.testutil.FakeUserDatabase
 import com.example.nomsy.testutil.getOrAwaitValue
 import com.example.nomsy.utils.Result
-import com.example.nomsy.viewModels.ProfileViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -26,12 +22,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.Shadows.shadowOf
+import org.junit.runners.JUnit4
 import retrofit2.Response
 import java.lang.reflect.Field
 
-@RunWith(RobolectricTestRunner::class)
+@RunWith(JUnit4::class)
 @ExperimentalCoroutinesApi
 class ProfileViewModelTest {
 
@@ -43,6 +38,8 @@ class ProfileViewModelTest {
     private lateinit var fakeAuthApiService: FakeAuthApiService
     private lateinit var fakeUserDatabase: FakeUserDatabase
     private lateinit var profileViewModel: ProfileViewModel
+
+    private val testApplication = TestApplication()
 
     private val testUser = User(
         id = "test-user-id",
@@ -60,17 +57,24 @@ class ProfileViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
-        val appContext = ApplicationProvider.getApplicationContext<Application>()
         fakeAuthApiService = FakeAuthApiService()
         fakeUserDatabase = FakeUserDatabase.getInstance()
 
-        profileViewModel = ProfileViewModel(appContext)
+        val testRepository = AuthRepository(
+            userDatabase = fakeUserDatabase,
+            authApi = fakeAuthApiService
+        )
 
-        // inject our fake repo
+        val testApp = object : TestApplication() {
+            override fun getApplicationContext(): android.content.Context {
+                return this
+            }
+        }
+
+        profileViewModel = ProfileViewModel(testApp)
+
         val repoField: Field = ProfileViewModel::class.java.getDeclaredField("repo")
         repoField.isAccessible = true
-        val testRepository: IUserRepository =
-            AuthRepository(userDatabase = fakeUserDatabase, authApi = fakeAuthApiService)
         repoField.set(profileViewModel, testRepository)
 
         fakeUserDatabase.clearAllTables()
@@ -84,15 +88,11 @@ class ProfileViewModelTest {
 
     @Test
     fun fetchByUsernameSuccessful() = runTest {
-        // arrange
         fakeAuthApiService.getUserByUsernameResponse = Response.success(GetProfileResponse(user = testUser))
 
-        // act
         profileViewModel.fetchByUsername(testUser.username)
         testDispatcher.scheduler.advanceUntilIdle()
-        shadowOf(Looper.getMainLooper()).idle()   // <— ensure LiveData posts
 
-        // assert
         val result = profileViewModel.profile.getOrAwaitValue()
         assertTrue("Expected Result.Success but got $result", result is Result.Success)
         assertEquals(testUser, (result as Result.Success).data)
@@ -100,15 +100,11 @@ class ProfileViewModelTest {
 
     @Test
     fun fetchByUsernameError() = runTest {
-        // arrange: make the API throw
         fakeAuthApiService.shouldThrowGetUserByUsernameException = true
 
-        // act
         profileViewModel.fetchByUsername(testUser.username)
         testDispatcher.scheduler.advanceUntilIdle()
-        shadowOf(Looper.getMainLooper()).idle()
 
-        // assert
         val result = profileViewModel.profile.getOrAwaitValue()
         assertTrue("Expected Result.Error but got $result", result is Result.Error)
         assertEquals("GetUserByUsername exception", (result as Result.Error).exception.message)
@@ -116,23 +112,18 @@ class ProfileViewModelTest {
 
     @Test
     fun updateProfileSuccessful() = runTest {
-        // arrange
         val updated = testUser.copy(name = "Updated", weight = 75)
         fakeAuthApiService.updateProfileResponse = Response.success(GetProfileResponse(user = updated))
         val req = UpdateProfileRequest(name = "Updated", weight = 75)
 
-        // act
         profileViewModel.updateProfile(testUser.username, req)
         testDispatcher.scheduler.advanceUntilIdle()
-        shadowOf(Looper.getMainLooper()).idle()
 
-        // assert updateResult
         val upd = profileViewModel.updateResult.getOrAwaitValue()
         assertTrue(upd is Result.Success)
         assertEquals("Updated", (upd as Result.Success).data.name)
         assertEquals(75, upd.data.weight)
 
-        // assert profile was also updated
         val prof = profileViewModel.profile.getOrAwaitValue()
         assertTrue(prof is Result.Success)
         assertEquals(updated, (prof as Result.Success).data)
@@ -140,16 +131,12 @@ class ProfileViewModelTest {
 
     @Test
     fun updateProfileError() = runTest {
-        // arrange
         fakeAuthApiService.shouldThrowUpdateProfileException = true
         val req = UpdateProfileRequest(name = "Bad")
 
-        // act
         profileViewModel.updateProfile(testUser.username, req)
         testDispatcher.scheduler.advanceUntilIdle()
-        shadowOf(Looper.getMainLooper()).idle()
 
-        // assert
         val upd = profileViewModel.updateResult.getOrAwaitValue()
         assertTrue("Expected Result.Error but got $upd", upd is Result.Error)
         assertEquals("UpdateProfile exception", (upd as Result.Error).exception.message)
@@ -157,16 +144,18 @@ class ProfileViewModelTest {
 
     @Test
     fun clearUpdateStateClearsUpdateResult() = runTest {
-        // pre‑populate
         profileViewModel.updateResult.postValue(Result.Success(testUser))
         assertNotNull("updateResult should be set", profileViewModel.updateResult.value)
 
-        // act
         profileViewModel.clearUpdateState()
         testDispatcher.scheduler.advanceUntilIdle()
-        shadowOf(Looper.getMainLooper()).idle()
 
-        // assert
         assertNull("updateResult should be null after clearing", profileViewModel.updateResult.value)
+    }
+
+    open class TestApplication : android.app.Application() {
+        override fun getApplicationContext(): android.content.Context {
+            return this
+        }
     }
 }

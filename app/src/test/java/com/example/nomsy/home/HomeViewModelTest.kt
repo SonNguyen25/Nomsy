@@ -10,11 +10,9 @@ import com.example.nomsy.data.remote.AdjustWaterRequest
 import com.example.nomsy.data.remote.DailySummaryResponse
 import com.example.nomsy.data.remote.DeleteMealResponse
 import com.example.nomsy.data.remote.FoodResponse
-import com.example.nomsy.data.remote.MealItem
 import com.example.nomsy.data.remote.MealTrackerApiService
 import com.example.nomsy.data.remote.NutritionTotals
 import com.example.nomsy.data.remote.WaterResponse
-import com.example.nomsy.data.repository.IMealTrackerRepository
 import com.example.nomsy.data.repository.MealTrackerRepository
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.HomeViewModel
@@ -38,14 +36,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.robolectric.RobolectricTestRunner
 import retrofit2.Response
+import android.app.Application
+import android.content.Context
 import java.lang.reflect.Field
-import org.robolectric.RuntimeEnvironment
-import java.io.IOException
 
-
-@RunWith(RobolectricTestRunner::class)
+@RunWith(JUnit4::class)
 @ExperimentalCoroutinesApi
 class HomeViewModelTest {
 
@@ -57,7 +53,7 @@ class HomeViewModelTest {
     private lateinit var fakeApi: FakeMealTrackerApiService
     private lateinit var fakeDao: FakeMealTrackerDao
     private lateinit var homeViewModel: HomeViewModel
-
+    private lateinit var testApplication: TestApplication
 
     private val testDate = "2025-04-14"
     private val testFormattedDate = "2025-04-14"
@@ -66,23 +62,21 @@ class HomeViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
-         fakeApi = FakeMealTrackerApiService()
-         fakeDao = FakeMealTrackerDao()
+        fakeApi = FakeMealTrackerApiService()
+        fakeDao = FakeMealTrackerDao()
 
         val fakeRepo = MealTrackerRepository(
             mealApiService = fakeApi,
-            mealDao        = fakeDao
+            mealDao = fakeDao
         )
 
-
-        val application = RuntimeEnvironment.getApplication()
-        homeViewModel = HomeViewModel(application)
+        testApplication = TestApplication()
+        homeViewModel = HomeViewModel(testApplication)
 
         val repoField = HomeViewModel::class.java
             .getDeclaredField("mealRepository")
             .apply { isAccessible = true }
         repoField.set(homeViewModel, fakeRepo)
-
     }
 
     @After
@@ -107,7 +101,6 @@ class HomeViewModelTest {
 
         advanceUntilIdle()
 
-        // After a successful API call, repository inserts into DAO, so DAO.getDailySummaryByDate will emit the entity
         val nutritionResult = homeViewModel.nutritionTotals.value
         assertNotNull("nutrition result should not be null", nutritionResult)
         assertTrue("nutrition should be Success", nutritionResult is Result.Success)
@@ -115,7 +108,6 @@ class HomeViewModelTest {
         assertEquals(1500, summaryEntity.totalCalories)
         assertEquals(2.0, summaryEntity.waterLiters, 0.0)
 
-        // Water intake StateFlow should also have been updated
         assertEquals(2.0, homeViewModel.waterIntake.value, 0.0)
     }
 
@@ -140,7 +132,6 @@ class HomeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(13, homeViewModel.selectedDate.value)
-
     }
 
     @Test
@@ -159,7 +150,6 @@ class HomeViewModelTest {
         }
         assertEquals(11, homeViewModel.selectedDate.value)
 
-        // one more does nothing
         homeViewModel.decrementDate()
         advanceUntilIdle()
         assertEquals(11, homeViewModel.selectedDate.value)
@@ -212,19 +202,25 @@ class HomeViewModelTest {
         assertNotNull(loaded)
         assertEquals(5, loaded!!.totalCalories)
     }
+
+    class TestApplication : Application() {
+        override fun getApplicationContext(): Context = this
+    }
 }
 
 class FakeMealTrackerApiService : MealTrackerApiService {
-    private val dailyMap  = mutableMapOf<String, Response<DailySummaryResponse>>()
+    private val dailyMap = mutableMapOf<String, Response<DailySummaryResponse>>()
     private val deleteMap = mutableMapOf<Pair<String,String>, Response<DeleteMealResponse>>()
     private var waterResp = WaterResponse("", 0.0)
 
     fun setDailySummaryResponse(date: String, resp: Response<DailySummaryResponse>) {
         dailyMap[date] = resp
     }
+
     fun setDeleteMealResponse(date: String, food: String, resp: Response<DeleteMealResponse>) {
         deleteMap[Pair(date,food)] = resp
     }
+
     fun setAdjustWaterResponse(resp: WaterResponse) {
         waterResp = resp
     }
@@ -245,9 +241,7 @@ class FakeMealTrackerApiService : MealTrackerApiService {
         Response.success(FoodResponse(emptyList()))
 }
 
-
-
-class FakeMealTrackerDao : com.example.nomsy.data.local.dao.MealTrackerDao {
+class FakeMealTrackerDao : MealTrackerDao {
     private val summaryMap = mutableMapOf<String, DailySummaryEntity?>()
     var lastUpdateDate: String? = null
     var lastUpdateAmount: Double = 0.0
@@ -258,6 +252,7 @@ class FakeMealTrackerDao : com.example.nomsy.data.local.dao.MealTrackerDao {
     override suspend fun insertDailySummary(summary: DailySummaryEntity) {
         summaryMap[summary.date] = summary
     }
+
     override fun getDailySummaryByDate(date: String) =
         flowOf(summaryMap[date])
 
@@ -265,20 +260,25 @@ class FakeMealTrackerDao : com.example.nomsy.data.local.dao.MealTrackerDao {
         lastUpdateDate = date
         lastUpdateAmount = waterLiters
     }
+
     override suspend fun deleteMealByDateAndName(date: String, food_name: String): Int {
         deleteByDateAndNameCalled = true
         return 1
     }
 
+    override suspend fun insertMeal(meal: MealEntity): Long = 1L
 
-    override suspend fun insertMeal(meal: com.example.nomsy.data.local.entities.MealEntity): Long = 1L
-    override suspend fun insertMeals(meals: List<com.example.nomsy.data.local.entities.MealEntity>) {}
-    override fun getMealsByDate(date: String) = flowOf(emptyList<com.example.nomsy.data.local.entities.MealEntity>())
+    override suspend fun insertMeals(meals: List<MealEntity>) {}
+
+    override fun getMealsByDate(date: String) = flowOf(emptyList<MealEntity>())
+
     override fun getMealsByDateAndType(date: String, mealType: String) =
-        flowOf(emptyList<com.example.nomsy.data.local.entities.MealEntity>())
+        flowOf(emptyList<MealEntity>())
+
     override suspend fun deleteMealsByDate(date: String) {}
+
     override suspend fun updateDailySummaryWithMeals(
         summary: DailySummaryEntity,
-        meals: List<com.example.nomsy.data.local.entities.MealEntity>
+        meals: List<MealEntity>
     ) {}
 }
