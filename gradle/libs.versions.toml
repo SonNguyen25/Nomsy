@@ -22,6 +22,10 @@ roomRuntimeAndroid = "2.7.0"
 runtimeLivedata = "1.7.8"
 visionCommon = "17.3.0"
 imageLabelingDefaultCommon = "17.0.0"
+espressoIntents = "3.6.1"
+uiTestAndroid = "1.7.6"
+uiTestJunit4Android = "1.7.8"
+navigationTesting = "2.8.5"
 
 [libraries]
 accompanist-glide = { module = "com.google.accompanist:accompanist-glide", version.ref = "accompanistGlide" }
@@ -50,6 +54,10 @@ androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 vision-common = { group = "com.google.mlkit", name = "vision-common", version.ref = "visionCommon" }
 image-labeling-default-common = { group = "com.google.mlkit", name = "image-labeling-default-common", version.ref = "imageLabelingDefaultCommon" }
+androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
+androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "uiTestAndroid" }
+androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

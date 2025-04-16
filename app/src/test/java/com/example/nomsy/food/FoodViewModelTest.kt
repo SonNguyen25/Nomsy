@@ -1,13 +1,14 @@
 package com.example.nomsy.food
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.core.app.ApplicationProvider
 import com.example.nomsy.data.local.entities.Food
 import com.example.nomsy.data.remote.*
 import com.example.nomsy.data.remote.MealTrackerRetrofitClient
 import com.example.nomsy.testutil.getOrAwaitValue
 import com.example.nomsy.utils.Result
 import com.example.nomsy.viewModels.FoodViewModel
+import junit.framework.TestCase.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,35 +17,30 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.After
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.robolectric.RuntimeEnvironment
-import org.robolectric.RobolectricTestRunner
 import retrofit2.Response
 import java.lang.reflect.Field
 
 @ExperimentalCoroutinesApi
-@RunWith(RobolectricTestRunner::class)
+@RunWith(JUnit4::class)
 class FoodViewModelTest {
+
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private val mainDispatcher = UnconfinedTestDispatcher()
-
+    private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var fakeApi: FakeMealTrackerApiService
-    private lateinit var vm: FoodViewModel
+    private lateinit var viewModel: FoodViewModel
 
     @Before
     fun setup() {
-        Dispatchers.setMain(mainDispatcher)
+        Dispatchers.setMain(testDispatcher)
 
         fakeApi = FakeMealTrackerApiService()
 
+        // Inject the fakeApi into the MealTrackerRetrofitClient singleton via reflection
         val clientClass = MealTrackerRetrofitClient::class.java
         val delegateField: Field = clientClass.getDeclaredField("mealTrackerApi\$delegate")
             .apply { isAccessible = true }
@@ -53,8 +49,8 @@ class FoodViewModelTest {
             .apply { isAccessible = true }
         valueField.set(lazyImpl, fakeApi)
 
-        val app = ApplicationProvider.getApplicationContext<android.app.Application>()
-        vm = FoodViewModel(app)
+        val app = Application()
+        viewModel = FoodViewModel(app)
     }
 
     @After
@@ -64,21 +60,13 @@ class FoodViewModelTest {
 
     @Test
     fun searchFoodsFromApiFiltersByQuery() = runTest {
-
-        val apple = Food(
-            "1", "2025-05-14", 50.toString(), "Apple", 0, 0, 0,
-            fat = 10
-        )
-        val banana = Food(
-            "2", "2025-05-14", 100.toString(), "Banana", 1, 0, 0,
-            fat = 2
-        )
+        val apple = Food("1", "2025-05-14", "50", "Apple", 0, 0, 0, fat = 10)
+        val banana = Food("2", "2025-05-14", "100", "Banana", 1, 0, 0, fat = 2)
         fakeApi.getAllFoodsResponse = Response.success(FoodResponse(listOf(apple, banana)))
 
+        viewModel.searchFoodsFromApi("app")
 
-        vm.searchFoodsFromApi("app")
-
-        assertEquals(listOf(apple), vm.searchResults)
+        assertEquals(listOf(apple), viewModel.searchResults)
     }
 
     @Test
@@ -87,10 +75,10 @@ class FoodViewModelTest {
         val f2 = Food("2", "2025-05-14", "lunch", "Broccoli", 4, 1, 0, 0)
         fakeApi.getAllFoodsResponse = Response.success(FoodResponse(listOf(f1, f2)))
 
-        vm.fetchAllFoods()
+        viewModel.fetchAllFoods()
 
-        assertEquals(listOf(f1, f2), vm.allFoods)
-        assertEquals(listOf(f1, f2), vm.searchResults)
+        assertEquals(listOf(f1, f2), viewModel.allFoods)
+        assertEquals(listOf(f1, f2), viewModel.searchResults)
     }
 
     @Test
@@ -100,9 +88,9 @@ class FoodViewModelTest {
             DailySummaryResponse("2025-04-15", totals, emptyMap())
         )
 
-        vm.fetchDailySummary("2025-04-15")
+        viewModel.fetchDailySummary("2025-04-15")
 
-        val result = vm.dailySummary.getOrAwaitValue()
+        val result = viewModel.dailySummary.getOrAwaitValue()
         assertEquals(totals, result)
     }
 
@@ -112,8 +100,8 @@ class FoodViewModelTest {
         val resp = AddMealResponse("OK", "id-123")
         fakeApi.addMealResponse = Response.success(resp)
 
-        vm.submitMeal(req)
-        val result = vm.mealResult!!.getOrAwaitValue()
+        viewModel.submitMeal(req)
+        val result = viewModel.mealResult!!.getOrAwaitValue()
 
         assertTrue(result is Result.Success)
         assertEquals(resp, (result as Result.Success).data)
@@ -128,64 +116,22 @@ class FoodViewModelTest {
             msg.toResponseBody("application/json".toMediaTypeOrNull())
         )
 
-        vm.submitMeal(req)
-        val result = vm.mealResult!!.getOrAwaitValue()
+        viewModel.submitMeal(req)
+        val result = viewModel.mealResult!!.getOrAwaitValue()
 
         assertTrue(result is Result.Error)
         val errorResult = result as Result.Error
-
         assertTrue(errorResult.exception.message!!.contains("Failed to add meal"))
         assertTrue(errorResult.exception.message!!.contains(msg))
-
     }
 
     @Test
     fun clearMealResultResetsLiveData() = runTest {
-
         fakeApi.addMealResponse = Response.success(AddMealResponse("OK", "x"))
-        vm.submitMeal(AddMealRequest("d","t","f",1,1,1,1))
-        vm.mealResult!!.getOrAwaitValue()  // consume
+        viewModel.submitMeal(AddMealRequest("d", "t", "f", 1, 1, 1, 1))
+        viewModel.mealResult!!.getOrAwaitValue()
 
-
-        vm.clearMealResult()
-        assertNull(vm.mealResult!!.value)
+        viewModel.clearMealResult()
+        assertNull(viewModel.mealResult!!.value)
     }
 }
-
-
-//
-//class FakeMealTrackerApiService : MealTrackerApiService {
-//    var getAllFoodsResponse: Response<FoodResponse>? = null
-//    var dailySummaryResponse: Response<DailySummaryResponse>? = null
-//    var addMealResponse: Response<AddMealResponse>? = null
-//    var deleteMealResponse: Response<DeleteMealResponse>? = null
-//    var adjustWaterResponse: WaterResponse? = null
-//
-//    override suspend fun getAllFoods(): Response<FoodResponse> =
-//        getAllFoodsResponse
-//            ?: Response.success(FoodResponse(emptyList()))
-//
-//    override suspend fun getDailySummary(date: String): Response<DailySummaryResponse> =
-//        dailySummaryResponse
-//            ?: Response.success(
-//                DailySummaryResponse(
-//                    date, NutritionTotals(0,0,0,0,0.0), emptyMap()
-//                )
-//            )
-//
-//    override suspend fun addMeal(mealRequest: AddMealRequest): Response<AddMealResponse> {
-//        return addMealResponse
-//            ?: Response.error(
-//                500,
-//                "No addMealResponse".toResponseBody("application/json".toMediaTypeOrNull())
-//            )
-//    }
-//
-//    override suspend fun deleteMeal(date: String, foodName: String): Response<DeleteMealResponse> =
-//        deleteMealResponse
-//            ?: Response.success(DeleteMealResponse("ok", true))
-//
-//    override suspend fun adjustWater(data: AdjustWaterRequest): WaterResponse =
-//        adjustWaterResponse
-//            ?: WaterResponse(data.date, data.delta)
-//}
